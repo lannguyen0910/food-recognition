@@ -1,0 +1,50 @@
+
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <link rel='stylesheet' href='../static/style.css'>
+    <script src='../static/client.js' defer></script>
+  </head>
+
+  <body>
+    <div>
+      <div class='center'>
+        <div class='title'>Food detection</div>
+        <p>
+          A food classifier with YOLOv5. 
+          <p>Model based on food dataset contains some classes.</p>
+          Statistical Machine Learning project in university
+        </p>
+        <div class='content'>
+          <form action = "/analyze" method = "POST" enctype="multipart/form-data">
+          <div class='no-display'>
+            <input id='file-input'
+                  class='no-display'
+                  type='file'
+                  name='file'
+                  accept='image/*'
+                  onchange='showPicked(this)'>
+          </div>
+          <button class='choose-file-button' type='button' onclick='showPicker()'>Select Image</button>
+
+          <div class='upload-label'>
+            <label id='upload-label'>No file chosen</label>
+          </div>
+
+          <div>
+            <img id='image-picked' class='no-display' alt='Chosen Image' height='300'>
+          </div>
+          <div class='analyze'>
+            <button id='analyze-button' class='analyze-button' type='submit' onclick='analyze()'>Detect</button>
+            <!-- <input name='analyze-button' type='submit' onclick='analyze()'>Detect</button> -->
+            <!-- <form action = "/analyze" method = "POST" 
+                                    enctype = "multipart/form-data">
+                <input type="submit" name='analyze-button' type='button' value="Detect" />
+            </form> -->
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

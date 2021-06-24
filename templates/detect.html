@@ -1,0 +1,57 @@
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <link rel='stylesheet' href='../static/style.css'>
+    <script src='../static/client.js' defer></script>
+  </head>
+
+  <body>
+    <div>
+      <div class='center'>
+        <div class='title'>Food detection</div>
+        <p>
+          A food classifier with YOLOv5. 
+          <p>Model based on food dataset contains some classes.</p>
+          Statistical Machine Learning project in university
+        </p>
+        <div class='content'>
+          <form action = "/analyze" method = "POST" enctype="multipart/form-data">
+          <div class='no-display'>
+            <input id='file-input'
+                  class='no-display'
+                  type='file'
+                  name='file'
+                  accept='image/*'
+                  onchange='showPicked(this)'>
+          </div>
+          <button class='choose-file-button' type='button' onclick='showPicker()'>Select Image</button>
+
+          <div class='upload-label'>
+            <label id='upload-label'>{{fname}}</label>
+          </div>
+
+          <div>
+            <img id='image-picked' src="/assets/uploads/{{ fname }}" alt='Chosen Image' height='300'>
+          </div>
+          <div class='analyze'>
+            <button id='analyze-button' class='analyze-button' type='submit'>Detected</button>
+          </div>
+          </form>
+          {% block content %}
+    
+            <div>
+                <a href="/assets/uploads/{{ fname }}" target="_new"><img src="/assets/uploads/{{ fname }}" class="upload-image-thumb" alt='Detect Image' height="300"></a>
+            <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
+            </div>
+            <div class='result-label'> 
+                <h2 id='label'>Class: {{fname}}</h2>
+                <h3 id='calories'>Calories: {{fname}}</h3>
+            </div>
+
+            {% endblock %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

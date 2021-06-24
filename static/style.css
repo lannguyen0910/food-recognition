@@ -1,0 +1,77 @@
+  body {
+      background-color: #fff;
+  }
+
+  .no-display {
+      display: none;
+  }
+
+  .center {
+      margin: auto;
+      padding: 10px 10px;
+      text-align: center;
+      font-size: 14px;
+  }
+
+  .title {
+      font-size: 30px;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      color: #262626;
+  }
+
+  .content {
+      margin-top: 30px;
+  }
+
+  .analyze {
+      margin-top: 5em;
+  }
+
+  .upload-label {
+      padding: 10px;
+      font-size: 12px;
+  }
+
+  #label {
+      margin-top: 0.5em;
+      padding: 10px;
+      font-size: 18px;
+      font-weight: bold;
+  }
+
+  #calories {
+      margin-top: 0.5em;
+      padding: 10px;
+      font-size: 15px;
+      font-weight: italic;
+  }
+
+  button.choose-file-button {
+      width: 200px;
+      height: 40px;
+      border-radius: 2px;
+      background-color: #ffffff;
+      border: solid 1px #7052CB;
+      font-size: 13px;
+      color: #7052CB;
+  }
+
+  button.analyze-button {
+      width: 200px;
+      height: 40px;
+      border: solid 1px #7052CB;
+      border-radius: 2px;
+      background-color: #7052CB;
+      font-size: 13px;
+      color: #ffffff;
+  }
+
+  button:focus {
+      outline: 0;
+  }
+
+  button:hover {
+      opacity: 0.8;
+      transition: all 500ms ease;
+  }
