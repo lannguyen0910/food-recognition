@@ -8,7 +8,7 @@ import os
 import imageio
 from pathlib import Path
 from werkzeug.utils import secure_filename
-
+from .modules import get_prediction
 
 app = Flask(__name__, template_folder='templates', static_folder='assets')
 UPLOAD_FOLDER = './assets/uploads'
@@ -35,8 +35,12 @@ def analyze():
     print('Filename: ', filename)
     # save file to /static/uploads
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    output_path=os.path.join(app.config['DETECTION_FOLDER'], filename)
     print('File path: ', filepath)
     f.save(filepath)
+
+    filename2, result_dict = get_prediction(filepath, output_path)
+
     # img_data = await request.form()
     # print('Img data: ', img_data)
     # img_bytes = await (img_data['file'].read())
@@ -45,7 +49,7 @@ def analyze():
     # prediction = learn.predict(img)[0]
     # return JSONResponse({'result': str(prediction)})
     # html_file = path / 'template' / 'index.html'
-    return render_template("detect.html", fname=filename)
+    return render_template("detect.html", fname=filename, fname2=filename2)
 
 
 if __name__ == '__main__':
