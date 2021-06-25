@@ -1,3 +1,4 @@
+from genericpath import exists
 from PIL import Image
 from flask import Flask, request, Response, jsonify, send_from_directory, abort, render_template
 from io import BytesIO
@@ -8,7 +9,9 @@ import os
 import imageio
 from pathlib import Path
 from werkzeug.utils import secure_filename
-from .modules import get_prediction
+from modules import get_prediction
+
+HOST="192.168.100.4"
 
 app = Flask(__name__, template_folder='templates', static_folder='assets')
 UPLOAD_FOLDER = './assets/uploads'
@@ -39,7 +42,7 @@ def analyze():
     print('File path: ', filepath)
     f.save(filepath)
 
-    filename2, result_dict = get_prediction(filepath, output_path)
+    filename2, result_dict = get_prediction(filepath, filename, model_name="yolov5m")
 
     # img_data = await request.form()
     # print('Img data: ', img_data)
@@ -53,4 +56,8 @@ def analyze():
 
 
 if __name__ == '__main__':
-    app.run(port=4000, debug=True)
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    if not os.path.exists(DETECTION_FOLDER):
+        os.makedirs(DETECTION_FOLDER, exist_ok=True)
+    app.run(host=HOST, port=4000, debug=True)
