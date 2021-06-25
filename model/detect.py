@@ -142,11 +142,7 @@ def detect(args, config):
     print(devices_info)
 
 
-    result_dict = {
-        'bbox':[],
-        'label':[],
-        'score':[]
-    }
+    result_dict = {}
 
     empty_imgs = 0
     with tqdm(total=len(testloader)) as pbar:
@@ -181,9 +177,11 @@ def detect(args, config):
                     scores = outputs['scores']
                     
                     for (box,label,score) in zip(boxes, labels, scores):
-                        result_dict['bbox'].append(boxes)
-                        result_dict['label'].append(labels)
-                        result_dict['score'].append(scores)
+                        result_dict.append({
+                            'bbox': box,
+                            'label': label,
+                            'score': score
+                        })
 
                     if len(boxes) == 0:
                         empty_imgs += 1

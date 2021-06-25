@@ -52,7 +52,7 @@ def analyze():
     # prediction = learn.predict(img)[0]
     # return JSONResponse({'result': str(prediction)})
     # html_file = path / 'template' / 'index.html'
-    return render_template("detect.html", fname=filename, fname2=filename2)
+    return render_template("detect.html", fname=filename, fname2=filename2, result_dict=result_dict)
 
 
 if __name__ == '__main__':

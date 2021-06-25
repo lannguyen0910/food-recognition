@@ -45,9 +45,9 @@
             </div>
             {{result_dict}}
             <tr>
-              {%for label, score in zip(result_dict.label, result.score %}
+              {%for item in result_dict %}
               <div class='result-label'> 
-                <h2 id='label'>Class: {{label}} || Confidence: {{score}} </h2>
+                <h2 id='label'>Class: {{item.label}} || Confidence: {{item.score}} </h2>
                 <!-- <h3 id='calories'></h3> -->
               </div>
               {% endfor %}
