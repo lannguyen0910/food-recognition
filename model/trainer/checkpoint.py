@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import os
 from datetime import datetime
-from configs import config_from_dict
+from model.configs import config_from_dict
 
 class Checkpoint():
     """

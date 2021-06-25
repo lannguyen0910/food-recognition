@@ -30,7 +30,7 @@ class Config():
     
 
 def config_from_dict(_dict, ignore_keys=[]):
-    config = Config('./configs/configs.yaml')
+    config = Config('./model/configs/configs.yaml')
     for k,v in _dict.items():
         if k not in ignore_keys:
             config.__setattr__(k,v)

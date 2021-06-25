@@ -180,9 +180,10 @@ def detect(args, config):
                     labels = outputs['classes']  
                     scores = outputs['scores']
                     
-                    result_dict['bbox'] += boxes
-                    result_dict['label'] += labels
-                    result_dict['score'] += scores
+                    for (box,label,score) in zip(boxes, labels, scores):
+                        result_dict['bbox'].append(boxes)
+                        result_dict['label'].append(labels)
+                        result_dict['score'].append(scores)
 
                     if len(boxes) == 0:
                         empty_imgs += 1

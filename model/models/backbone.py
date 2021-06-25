@@ -18,7 +18,6 @@ def get_model(args, config, num_classes):
     
     net = None
 
-    config.model_name.startswith('yolo'):
     version_name = config.model_name.split('v')[1]
     net = YoloBackbone(
         version_name=version_name,
@@ -63,13 +62,13 @@ class YoloBackbone(BaseBackbone):
             version_mode = version_name.split('-')[1]
             self.name = f'yolov4-{version_mode}'
             self.model = Yolov4(
-                cfg=f'./models/yolo/configs/yolov4-{version_mode}.yaml', ch=3, nc=num_classes
+                cfg=f'./model/models/yolo/configs/yolov4-{version_mode}.yaml', ch=3, nc=num_classes
             )
         elif version =='5':
             version_mode = version_name[-1]
             self.name = f'yolov5{version_mode}'
             self.model = Yolov5(
-                cfg=f'./models/yolo/configs/yolov5{version_mode}.yaml', ch=3, nc=num_classes
+                cfg=f'./model/models/yolo/configs/yolov5{version_mode}.yaml', ch=3, nc=num_classes
             )
         
 
