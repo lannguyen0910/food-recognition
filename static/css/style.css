@@ -51,10 +51,10 @@
       width: 200px;
       height: 40px;
       border-radius: 2px;
-      background-color: #ffffff;
+      background-color: #7052CB;
+      color: #fff;
       border: solid 1px #7052CB;
       font-size: 13px;
-      color: #7052CB;
   }
 
   button.analyze-button {
