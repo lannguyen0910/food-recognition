@@ -2,7 +2,6 @@ import os
 from model import detect, get_config, Config, download_weights
 
 CACHE_DIR = '.cache'
-WEIGHT = "./yolov5m_best.pth"
 
 class Arguments:
     def __init__(self, model_name='yolov5m') -> None:

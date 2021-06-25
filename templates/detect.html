@@ -43,10 +43,17 @@
                 <a href="/assets/detections/{{ fname2 }}" target="_new"><img src="/assets/detections/{{ fname2 }}" class="upload-image-thumb" alt='Detect Image' height="300"></a>
             <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
             </div>
-            <div class='result-label'> 
-                <h2 id='label'>Class: {{fname}}</h2>
-                <h3 id='calories'>Calories: {{fname}}</h3>
-            </div>
+            {{result_dict}}
+            <tr>
+              {%for label, score in zip(result_dict.label, result.score %}
+              <div class='result-label'> 
+                <h2 id='label'>Class: {{label}} || Confidence: {{score}} </h2>
+                <!-- <h3 id='calories'></h3> -->
+              </div>
+              {% endfor %}
+            </tr>
+
+            
 
             {% endblock %}
         </div>
