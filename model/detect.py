@@ -142,7 +142,7 @@ def detect(args, config):
     print(devices_info)
 
 
-    result_dict = {}
+    result_dict = []
 
     empty_imgs = 0
     with tqdm(total=len(testloader)) as pbar:
