@@ -7,6 +7,7 @@
     <link rel='stylesheet' href='../static/css/bootstrap.min.css'>
     <link rel="stylesheet" href="../static/css/w3.css">
     <link rel="stylesheet" href="../static/css/bulma.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
   </head>
 
@@ -22,27 +23,87 @@
     <div class='center' style="position:relative;">
       <div class='content'>
         <form action = "/analyze" method = "POST" enctype="multipart/form-data">
-        <div class='no-display'>
-          <input id='file-input'
-                class='no-display'
-                type='file'
-                name='file'
-                accept='.png, .jpg, .jpeg, .gif'
-                onchange='showPicked(this)'>
-        </div>
-        <button class='btn btn-primary' type='button' onclick='showPicker()'>Select Image</button>
-        <button id="webcam-btn" type="button" class="btn btn-info">Use Webcam</button>
+          <div class="row">
+            <div class="col-md-3">
+              <div id="canvas-tools" class="panel panel-default">
+                <div class="panel-body">
+                  <div id="iou-threshold">
+                    <b>IOU Threshold:</b>
+                    <span>50</span>%
+                  </div>
+                  <input id="threshold-range" type="range" min="0" max="100" value="50" class="slider">
+                </div>
+              </div>
+            </div>
 
-        <div class='upload-label'>
-          <label id='upload-label'></label>
-        </div>
+            <div class="col-md-3">
+              <div id="canvas-tools" class="panel panel-default">
+                <div class="panel-body">
+                  <div id="confidence">
+                    <b>Confidence:</b>
+                    <span>50</span>%
+                  </div>
+                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="model-types">Choose a model</label>
+                <br/>
+                <select class="form-control-sm" id="model-types">
+                  <option>YOLOv3</option>
+                  <option>YOLOv4</option>
+                  <option>YOLOv5</option>
+                </select>
+              </div>
+            </div>
 
-        <div>
-          <img id='image-picked' class='no-display' alt='Chosen Image' height='300'>
-        </div>
-        <div class='analyze'>
-          <button id='analyze-button' class='analyze-button' type='submit' onclick='analyze()'>Detect</button>
-        </div>
+            <div class="col-md-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="tta">
+                <label class="form-check-label" for="tta">Testing time augmentation</label>
+              </div>
+              
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="ensemble" value="option2">
+                <label class="form-check-label" for="ensemble">Ensemble models</label>
+              </div>
+            </div>
+
+          </div>
+
+
+          <div class='no-display'>
+            <input id='file-input'
+                  class='no-display'
+                  type='file'
+                  name='file'
+                  accept='.png, .jpg, .jpeg, .gif'
+                  onchange='showPicked(this)'>
+          </div>
+          <button class='btn btn-primary' type='button' onclick='showPicker()'>Select Image</button>
+          <button class="btn btn-info" id="webcam-btn" type="button" >Use Webcam</button>
+
+          <div class='upload-label'>
+            <label id='upload-label'></label>
+          </div>
+
+          
+          <div class="row">
+
+            <div class="col-md-12">
+              <img id='image-display' class='no-display' alt='Chosen Image' height='300'>
+              <!-- <div id="image-display"></div> -->
+              <div id="webcam-video"></div>
+
+            </div>
+
+          </div>
+
+          <div class='analyze'>
+            <button id='analyze-button' class='analyze-button' type='submit' onclick='analyze()'>Detect</button>
+          </div>
         </form>
       </div>
     </div>
@@ -58,6 +119,7 @@
 
     <script src='../static/js/client.js' defer></script>
     <script src='../static/js/jquery-3.5.1.min.js' defer></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script src="../static/js/all.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </body>
 </html>
