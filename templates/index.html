@@ -22,7 +22,7 @@
 
     <div class='center' style="position:relative;">
       <div class='content'>
-        <form action = "/analyze" method = "POST" enctype="multipart/form-data">
+        <form id="file-upload" action = "/analyze" method = "POST" enctype="multipart/form-data">
           <div class="row">
             <div class="col-md-3">
               <div id="canvas-tools" class="panel panel-default">
@@ -83,7 +83,7 @@
                   onchange='showPicked(this)'>
           </div>
           <button class='btn btn-primary' type='button' onclick='showPicker()'>Select Image</button>
-          <button class="btn btn-info" id="webcam-btn" type="button" >Use Webcam</button>
+          <button class="btn btn-info" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
 
           <div class='upload-label'>
             <label id='upload-label'></label>
@@ -93,8 +93,8 @@
           <div class="row">
 
             <div class="col-md-12">
-              <img id='image-display' class='no-display' alt='Chosen Image' height='300'>
-              <!-- <div id="image-display"></div> -->
+              <!-- <img id='image-display' class='no-display' alt='Chosen Image' height='300'> -->
+              <div id="image-display"></div>
               <div id="webcam-video"></div>
 
             </div>

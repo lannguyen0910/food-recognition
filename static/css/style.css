@@ -5,6 +5,11 @@ body {
     background-color: #fff;
 }
 
+video {
+    height: 100%;
+    width: 100%;
+}
+
 .no-display {
     display: none;
 }
