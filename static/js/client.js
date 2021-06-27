@@ -29,7 +29,9 @@ var messageArea = null,
   btnNewPhoto = null,
   btnDownload = null,
   videoCamera = null,
-  canvasPhoto = null;
+  canvasPhoto = null,
+  uploadPhoto = null;
+
 
 function runWebcam() {
   clear();
@@ -39,11 +41,12 @@ function runWebcam() {
   var video_canvas_html = '<video id="video1" playsinline autoplay></video>' + '<br/>' + '<canvas id="image-canvas"></canvas>';
   $('#webcam-video').html(video_canvas_html);
 
-
   btnNewPhoto = document.querySelector("#capture-img");
   btnDownload = document.querySelector("#download-img");
   videoCamera = document.querySelector("video");
   canvasPhoto = document.querySelector("canvas");
+  uploadPhoto = document.querySelector("#file-input");
+  
 
   if (window.location.protocol != 'https:' && window.location.protocol != "file:") {
     window.location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
@@ -79,13 +82,19 @@ function runWebcam() {
         videoCamera.src = window.URL.createObjectURL(stream);
       }
 
-      $('#analyze-button').prop('disabled', true); //disable image upload
+      $('#analyze-button').prop('disabled', true); //disable detection
+      $('#file-input').prop('disabled', true); //disable image upload
 
       messageArea.style.display = "none";
       wrapperArea.style.display = "block";
+      
       btnNewPhoto.removeAttribute("disabled");
+      uploadPhoto.setAttribute("disabled","disabled");
+
+
       btnNewPhoto.onclick = takeAPhoto;
       btnDownload.onclick = downloadPhoto;
+      
 
       videoCamera.onloadedmetadata = function () {
         videoCamera.setAttribute("width", this.videoWidth);
@@ -93,6 +102,7 @@ function runWebcam() {
         canvasPhoto.setAttribute("width", this.videoWidth);
         canvasPhoto.setAttribute("height", this.videoHeight);
         videoCamera.play();
+        
       };
     })
     .catch(function (err) {
@@ -116,32 +126,3 @@ function downloadPhoto() {
 
   }, "image/jpeg", 1);
 };
-
-// function snapImageOnWebcam() {
-//   $('#image-display').html('<canvas id="image-canvas"></canvas>');
-//   var canvas = document.querySelector('#image-canvas');
-//   console.log(video)
-//   canvas.width = video.videoWidth;
-//   canvas.height = video.videoHeight;
-//   console.log(canvas.width)
-//   console.log(canvas.height)
-
-
-//   canvas.getContext('2d').drawImage(video, 0, 0);
-
-
-//   var img = document.createElement('img');
-//   img.id = 'user-image';
-//   img.src = canvas.toDataURL();
-//   $('#image-display').prepend(img);
-
-//   window.stream.getVideoTracks()[0].stop();
-//   $('#webcam-video').empty();
-
-//   // Reset button
-//   $('#webcam-btn').removeClass('shutter-btn btn-danger').addClass('btn-info')
-//     .text('New Picture?').off('click', snapImageOnWebcam).click(runWebcam);
-
-//   // Re-enable image upload
-//   $('#analyze-button').prop('disabled', false);
-// }
