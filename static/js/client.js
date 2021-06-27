@@ -127,3 +127,15 @@ function downloadPhoto() {
 
   }, "image/jpeg", 1);
 };
+
+window.onload = function(){
+  $('#threshold-range').on('input', function() {
+    $('#threshold-text span').html(this.value);
+    threshold = $('#threshold-range').val() / 100;
+  });
+
+  $('#confidence-range').on('input', function() {
+    $('#confidence-text span').html(this.value);
+    threshold = $('#confidence-range').val() / 100;
+  });
+}

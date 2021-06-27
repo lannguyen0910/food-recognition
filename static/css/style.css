@@ -89,3 +89,8 @@ button:hover {
 button:disabled {
     background: inherit;
 }
+
+#threshold-range,
+#confidence-range {
+    margin: 10px 0;
+}
