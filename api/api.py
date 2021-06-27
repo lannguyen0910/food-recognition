@@ -21,7 +21,7 @@ def make_request(api_name, params, headers):
     result_dict = get_response(api_name,response)
     return result_dict
 
-def update_db(food_list, api_name="edanam"):
+def update_db(food_list, api_name="edamam"):
     query_str = API[api_name]['query_str']
     headers = {"Accept": "application/json",}
     db = []

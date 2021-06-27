@@ -1,7 +1,7 @@
-API_NAMES = ["edanam", "usda"]
+API_NAMES = ["edamam", "usda"]
 
 API ={
-    "edanam": {
+    "edamam": {
         "homepage": "https://developer.edamam.com/",
         "url": "https://api.edamam.com/api/food-database/v2/parser?",
         "auth":{
@@ -24,7 +24,7 @@ API ={
 }
 
 
-def get_response_from_edanam(response):
+def get_response_from_edamam(response):
     response_dict = response.json()
     result = response_dict['parsed'][0]
     food_info = result['food']
@@ -53,7 +53,7 @@ def get_response_from_edanam(response):
 def get_response(api_name, response):
     assert api_name in API_NAMES, "API not supported"
     try:
-        if api_name == 'edanam':
-            return get_response_from_edanam(response)
+        if api_name == 'edamam':
+            return get_response_from_edamam(response)
     except:
         return None
