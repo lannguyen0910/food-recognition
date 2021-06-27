@@ -15,8 +15,8 @@ from modules import get_prediction
 from flask_ngrok import run_with_ngrok
 
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
-parser.add_argument('--type', '-t', type=str, default='local', help="Run on local or ngrok")
-parser.add_argument('--host', '-h', type=str, default='192.168.100.4', help="Local IP")
+parser.add_argument('--type', type=str, default='local', help="Run on local or ngrok")
+parser.add_argument('--host',  type=str, default='192.168.100.4', help="Local IP")
 
 
 
@@ -49,7 +49,7 @@ def analyze():
     print('File path: ', filepath)
     f.save(filepath)
 
-    filename2, result_dict = get_prediction(filepath, filename, model_name="yolov5m")
+    filename2, result_dict = get_prediction(filepath, output_path, model_name="yolov5m")
 
     # img_data = await request.form()
     # print('Img data: ', img_data)
