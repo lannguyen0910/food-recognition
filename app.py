@@ -69,6 +69,10 @@ if __name__ == '__main__':
         os.makedirs(DETECTION_FOLDER, exist_ok=True)
 
     args = parser.parse_args()
+
+    response = requests.get("https://api.nal.usda.gov/fdc/v1/foods/search?query=apple&pageSize=2&api_key=UTGKCT7Z084bVzDu9qCIEzFYrsYB6DhuwhiWv9y3")
+    print(response)
+
     if args.type == 'ngrok':
         run_with_ngrok(app)
     else:
