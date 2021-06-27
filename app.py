@@ -51,14 +51,6 @@ def analyze():
 
     filename2, result_dict = get_prediction(filepath, output_path, model_name="yolov5m")
 
-    # img_data = await request.form()
-    # print('Img data: ', img_data)
-    # img_bytes = await (img_data['file'].read())
-    # filename = img_data['file'].filename
-    # img = Image.open(BytesIO(img_bytes))
-    # prediction = learn.predict(img)[0]
-    # return JSONResponse({'result': str(prediction)})
-    # html_file = path / 'template' / 'index.html'
     return render_template("detect.html", fname=filename, fname2=filename2, result_dict=result_dict)
 
 
