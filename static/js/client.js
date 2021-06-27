@@ -1,4 +1,3 @@
-
 var el = x => document.getElementById(x);
 
 function showPicker() {
@@ -17,9 +16,8 @@ function showPicked(input) {
   el("upload-label").innerHTML = input.files[0].name;
   var reader = new FileReader();
   reader.onload = function(e) {
-      var file_url = e.target.result
-      var img_html = '<img id="user-image" src="' + file_url + '" style="display: block;margin-left: auto;margin-right: auto;width: 50%;"/>';
-      $('#image-display').html(img_html); // replaces previous img and canvas
+      el("image-display").src = e.target.result;
+      el("image-display").className = "";
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -85,7 +83,8 @@ function runWebcam() {
       $('#analyze-button').prop('disabled', true); //disable detection
       $('#file-input').prop('disabled', true); //disable image upload
 
-      messageArea.style.display = "none";
+      
+      messageArea.style.display = 'block';
       wrapperArea.style.display = "block";
       
       btnNewPhoto.removeAttribute("disabled");
@@ -102,7 +101,7 @@ function runWebcam() {
         canvasPhoto.setAttribute("width", this.videoWidth);
         canvasPhoto.setAttribute("height", this.videoHeight);
         videoCamera.play();
-        
+
       };
     })
     .catch(function (err) {
@@ -112,6 +111,8 @@ function runWebcam() {
 
 function takeAPhoto() {
   canvasPhoto.getContext("2d").drawImage(videoCamera, 0, 0, videoCamera.width, videoCamera.height);
+  var timestamp = new Date().getTime().toString();
+  messageArea.innerHTML = timestamp +'.png';
   btnDownload.removeAttribute("disabled");
   $('#analyze-button').prop('disabled', false); //disable image upload
 
