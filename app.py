@@ -7,11 +7,18 @@ import asyncio
 import sys
 import os
 import imageio
+import argparse
+import requests
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction
+from flask_ngrok import run_with_ngrok
 
-HOST="192.168.100.4"
+parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
+parser.add_argument('--type', '-t', type=str, default='local', help="Run on local or ngrok")
+parser.add_argument('--host', '-h', type=str, default='192.168.100.4', help="Local IP")
+
+
 
 app = Flask(__name__, template_folder='templates', static_folder='assets')
 UPLOAD_FOLDER = './assets/uploads'
@@ -60,4 +67,9 @@ if __name__ == '__main__':
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     if not os.path.exists(DETECTION_FOLDER):
         os.makedirs(DETECTION_FOLDER, exist_ok=True)
-    app.run(host=HOST, port=4000, debug=True)
+
+    args = parser.parse_args()
+    if args.type == 'ngrok':
+        run_with_ngrok(app)
+    else:
+        app.run(host=args.host, port=4000, debug=True)
