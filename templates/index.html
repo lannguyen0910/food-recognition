@@ -83,7 +83,11 @@
                   onchange='showPicked(this)'>
           </div>
           <button class='btn btn-primary' type='button' onclick='showPicker()'>Select Image</button>
-          <button class="btn btn-info" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
+          <button class="btn btn-secondary" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
+          <div id="wrapper">
+            <button class="btn btn-danger" type="button" id="capture-img" disabled="disabled">Capture</button>
+            <button class="btn btn-success" type="button" id="download-img" disabled="disabled">Download</button>
+          </div>
 
           <div class='upload-label'>
             <label id='upload-label'></label>
@@ -94,8 +98,12 @@
 
             <div class="col-md-12">
               <!-- <img id='image-display' class='no-display' alt='Chosen Image' height='300'> -->
-              <div id="image-display"></div>
-              <div id="webcam-video"></div>
+              <div id="image-display">
+
+              </div>
+              <div id="webcam-video">
+
+              </div>
 
             </div>
 
