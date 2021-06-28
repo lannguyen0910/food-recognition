@@ -73,7 +73,7 @@ class YoloBackbone(BaseBackbone):
         
 
         if load_weights:
-            tmp_path = os.path.join(CACHE_DIR, f'yolo{version_name}.pth')
+            tmp_path = os.path.join(CACHE_DIR, f'yolov{version_name}.pth')
             download_pretrained_weights(f'yolov{version_name}', tmp_path)
             ckpt = torch.load(tmp_path, map_location='cpu')  # load checkpoint
             try:
