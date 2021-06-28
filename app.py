@@ -72,7 +72,9 @@ def analyze():
 @app.after_request
 def add_header(response):
     if 'Cache-Control' not in response.headers:
-        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Cache-Control'] = 'public, no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
     return response
 
 if __name__ == '__main__':
