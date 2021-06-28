@@ -28,28 +28,30 @@ def allowed_file_video(filename):
         filename.rsplit('.', 1)[1].lower() in VIDEO_ALLOWED_EXTENSIONS
 
 
-def cleaning_dir(path):
+def make_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
-    if not os.listdir(path):
-        print('Folder Empty')
-    else:
-        filelist = [f for f in os.listdir(path)]
-        for f in filelist:
-            os.remove(os.path.join(path, f))
+
+
+def download_yt(url):
+    youtube = pytube.YouTube(url)
+    video = youtube.streams.first()
+    path = video.download(app.config['VIDEO_FOLDER'])
+
+    return path
 
 
 def download(url):
     ext = tldextract.extract(url)
     if ext.domain == 'youtube':
         try:
-            cleaning_dir(app.config['VIDEO_FOLDER'])
+            make_dir(app.config['VIDEO_FOLDER'])
         except:
             pass
         print('Youtube')
         path = download_yt(url)
     else:
-        cleaning_dir(app.config['UPLOAD_FOLDER'])
+        make_dir(app.config['UPLOAD_FOLDER'])
         filename = url.split('/')[-1]
         path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2)',
@@ -65,22 +67,14 @@ def download(url):
     return path
 
 
-def download_yt(url):
-    youtube = pytube.YouTube(url)
-    video = youtube.streams.first()
-    path = video.download(app.config['VIDEO_FOLDER'])
-
-    return path
-
-
 def save_upload(file):
     filename = secure_filename(file.filename)
     if allowed_file_image(filename):
-        cleaning_dir(app.config['UPLOAD_FOLDER'])
+        make_dir(app.config['UPLOAD_FOLDER'])
         path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     elif allowed_file_video(filename):
         try:
-            cleaning_dir(app.config['VIDEO_FOLDER'])
+            make_dir(app.config['VIDEO_FOLDER'])
         except:
             pass
         path = os.path.join(app.config['VIDEO_FOLDER'], filename)
