@@ -2757,7 +2757,6 @@ pre code {
     .col-lg-3,
     .col-lg-4,
     .col-lg-5,
-    .col-lg-6,
     .col-lg-7,
     .col-lg-8,
     .col-lg-9,
@@ -2793,6 +2792,7 @@ pre code {
 
     .col-lg-6 {
         width: 50%;
+        margin: auto;
     }
 
     .col-lg-5 {

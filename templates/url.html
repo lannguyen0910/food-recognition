@@ -24,7 +24,7 @@
 
     <div class='center' style="position:relative;">
       <div class='content'>
-        <form id="file-upload" action = "/analyze" method = "POST" enctype="multipart/form-data">
+        <form id="file-upload" action = "/analyze_v2" method = "POST" enctype="multipart/form-data">
           <div class="row">
             <div class="col-md-3">
               <div id="canvas-tools" class="panel panel-default">
@@ -75,41 +75,24 @@
 
           </div>
 
-
-          <div class='no-display'>
-            <input id='file-input'
-                  class='no-display'
-                  type='file'
-                  name='file'
-                  onchange='showPicked(this)'>
-          </div>
-
-          <button class='btn btn-primary' type='button' onclick='showPicker()'>Upload File</button>
-          <button class="btn btn-secondary" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
-
-
-          <div id="wrapper">
-            <button class="btn btn-danger" type="button" id="capture-img" disabled="disabled">Capture</button>
-            <button class="btn btn-success" type="button" id="download-img" disabled="disabled">Download</button>
-          </div>
-
-
-          <div class='upload-label'>
-            <label id='upload-label'></label>
-          </div>
-
           <div class="row">
-            <div class="col-md-12">
-              <div id='image-display'></div>
-
-              <div id="webcam-video"></div>
+            <div class="col-lg-6">
+              <div class="panel panel-default margin">
+                <div class="panel-body">
+                  <div class="header-setting">
+                      <b style="font-size:medium;">Detect Image and Video</b>
+                  </div>
+                  <p style="margin-top: 5px; margin-bottom: 0px;">Select From URL</p>
+                  <div>
+                      <input type=url class="form-control" id="url" name="url_link" onchange="trackURL(this.value)" placeholder="http://">
+                  </div>
+                  <button type="submit" id="url-button" name="url-button" class="btn btn-outline-success"
+                      style="margin-top: 10px;border: 1px gray solid" disabled="disabled">Detect by URL</button>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class='analyze'>
-            <button id='analyze-button' class='btn btn-outline-success' type='submit' disabled="disabled" onclick='analyze()'>Detect</button>
-          </div>
-
+          
         </form>
       </div>
     </div>

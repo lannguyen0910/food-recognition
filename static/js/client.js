@@ -25,6 +25,7 @@ function stopWebcam(){
   btnNewPhoto.setAttribute("disabled","disabled");
 }
 
+// Upload file 
 function showPicked(input) {
   clear();
   if(window.stream){
@@ -57,6 +58,8 @@ function showPicked(input) {
   reader.readAsDataURL(input.files[0]);
 }
 
+
+// Webcam
 var messageArea = null,
   wrapperArea = null,
   btnNewPhoto = null,
@@ -172,6 +175,30 @@ function downloadPhoto() {
 
   }, "image/jpeg", 1);
 };
+
+// URL handle
+var detectURLBtn = document.querySelector("#url-button");
+
+function isValidHttpUrl(string) {
+  let url;
+  
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;  
+  }
+
+  return (url.protocol === "http:" || url.protocol === "https:") && string.match(/\.(jpeg|jpg|gif|png)$/) != null;
+}
+
+function trackURL(url){
+  if (isValidHttpUrl(url)){
+    detectURLBtn.removeAttribute("disabled");
+  }
+  else{
+    detectURLBtn.setAttribute("disabled","disabled");
+  }
+}
 
 window.onload = function(){
 
