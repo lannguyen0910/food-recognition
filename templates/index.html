@@ -8,7 +8,7 @@
     <link rel='stylesheet' href='../static/css/bootstrap.css'>
     <link rel="stylesheet" href="../static/css/w3.css">
     <link rel="stylesheet" href="../static/css/bulma.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
   </head>
 
@@ -32,7 +32,7 @@
                     <b>IOU Threshold:</b>
                     <span>50</span>%
                   </div>
-                  <input id="threshold-range" type="range" min="0" max="100" value="50" class="slider">
+                  <input id="threshold-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
                 </div>
               </div>
             </div>
@@ -44,7 +44,7 @@
                     <b>Confidence:</b>
                     <span>50</span>%
                   </div>
-                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider">
+                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
                 </div>
               </div>
             </div>
@@ -62,12 +62,12 @@
 
             <div class="col-md-3">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="tta">
+                <input class="form-check-input" type="checkbox" id="tta" name="tta">
                 <label class="form-check-label" for="tta">Testing time augmentation</label>
               </div>
               
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="ensemble" value="option2">
+                <input class="form-check-input" type="checkbox" id="ensemble" name="ensemble">
                 <label class="form-check-label" for="ensemble">Ensemble models</label>
               </div>
             </div>

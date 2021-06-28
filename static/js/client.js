@@ -8,14 +8,24 @@ function clear() {
   $('#image-display').empty(); // removes previous img
   $('#upload-label').empty(); //removes previous img name
   $('#result-content').empty();   //remove result content (image + labels ...)
-
   // let canvas = document.querySelector("canvas");
   // const context = canvas.getContext('2d');
   // context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function stopWebcam(){
+  window.stream.getTracks().forEach(function(track) {
+    track.stop();
+  });
+  $('#webcam-video').empty();
+
+  btnDownload.setAttribute("disabled","disabled");
+  btnNewPhoto.setAttribute("disabled","disabled");
+}
+
 function showPicked(input) {
   clear();
+  stopWebcam();
   el("upload-label").innerHTML = input.files[0].name;
   var extension = input.files[0].name.split(".")[1].toLowerCase();
   var reader = new FileReader();
@@ -55,7 +65,7 @@ function runWebcam() {
   messageArea = document.querySelector("#upload-label");
   wrapperArea = document.querySelector("#wrapper");
 
-  var video_canvas_html = '<video id="video1" playsinline autoplay></video>' + '<br/>' + '<canvas id="image-canvas"></canvas>';
+  var video_canvas_html = '<video id="video1" playsinline autoplay></video>' + '<br/>' + '<canvas id="image-canvas" name="image-canvas"></canvas>';
   $('#webcam-video').html(video_canvas_html);
 
   btnNewPhoto = document.querySelector("#capture-img");
@@ -95,19 +105,18 @@ function runWebcam() {
     .then(function (stream) {
       if ("srcObject" in videoCamera) {
         videoCamera.srcObject = stream;
+        window.stream = stream;
       } else {
         videoCamera.src = window.URL.createObjectURL(stream);
       }
 
       $('#analyze-button').prop('disabled', true); //disable detection
-      $('#file-input').prop('disabled', true); //disable image upload
-
       
       messageArea.style.display = 'block';
       wrapperArea.style.display = "block";
       
       btnNewPhoto.removeAttribute("disabled");
-      uploadPhoto.setAttribute("disabled","disabled");
+      btnDownload.setAttribute("disabled","disabled");
 
 
       btnNewPhoto.onclick = takeAPhoto;
@@ -130,6 +139,17 @@ function runWebcam() {
 
 function takeAPhoto() {
   canvasPhoto.getContext("2d").drawImage(videoCamera, 0, 0, videoCamera.width, videoCamera.height);
+
+  var img = document.createElement('img');
+  img.id = 'user-image';
+  img.src = canvasPhoto.toDataURL();
+  $('#image-display').prepend(img);
+
+  window.stream.getTracks().forEach(function(track) {
+    track.stop();
+  });
+  $('#webcam-video').empty();
+
   var timestamp = new Date().getTime().toString();
   messageArea.innerHTML = timestamp +'.png';
   btnDownload.removeAttribute("disabled");

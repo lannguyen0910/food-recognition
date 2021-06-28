@@ -79,6 +79,7 @@ button:hover {
 
 button:disabled {
     background: inherit;
+    display: none;
 }
 
 #threshold-range,
