@@ -1,4 +1,6 @@
 var el = x => document.getElementById(x);
+var detectBtn = document.querySelector("#analyze-button");
+
 
 function showPicker() {
   $("#file-input").click();
@@ -25,7 +27,9 @@ function stopWebcam(){
 
 function showPicked(input) {
   clear();
-  stopWebcam();
+  if(window.stream){
+    stopWebcam();
+  }
   el("upload-label").innerHTML = input.files[0].name;
   var extension = input.files[0].name.split(".")[1].toLowerCase();
   var reader = new FileReader();
@@ -47,7 +51,9 @@ function showPicked(input) {
     }
 
     $('#webcam-video').prop('disabled', true); //disable image upload
+    
   };
+  detectBtn.removeAttribute("disabled");
   reader.readAsDataURL(input.files[0]);
 }
 
@@ -65,7 +71,7 @@ function runWebcam() {
   messageArea = document.querySelector("#upload-label");
   wrapperArea = document.querySelector("#wrapper");
 
-  var video_canvas_html = '<video id="video1" playsinline autoplay></video>' + '<br/>' + '<canvas id="image-canvas" name="image-canvas"></canvas>';
+  var video_canvas_html = '<video id="video1" playsinline autoplay></video>' + '<br/>' + '<canvas id="image-canvas"></canvas>';
   $('#webcam-video').html(video_canvas_html);
 
   btnNewPhoto = document.querySelector("#capture-img");
@@ -110,7 +116,7 @@ function runWebcam() {
         videoCamera.src = window.URL.createObjectURL(stream);
       }
 
-      $('#analyze-button').prop('disabled', true); //disable detection
+      detectBtn.setAttribute('disabled', 'disabled'); //disable detection
       
       messageArea.style.display = 'block';
       wrapperArea.style.display = "block";
@@ -153,7 +159,7 @@ function takeAPhoto() {
   var timestamp = new Date().getTime().toString();
   messageArea.innerHTML = timestamp +'.png';
   btnDownload.removeAttribute("disabled");
-  $('#analyze-button').prop('disabled', false); //disable image upload
+  detectBtn.removeAttribute("disabled"); //enable detect
 
 };
 
@@ -168,6 +174,7 @@ function downloadPhoto() {
 };
 
 window.onload = function(){
+
   $('#threshold-range').on('input', function() {
     $('#threshold-text span').html(this.value);
     threshold = $('#threshold-range').val() / 100;
