@@ -1,9 +1,9 @@
-from model.utils.postprocess import box_fusion
 import cv2
 import numpy as np
 import os
 import pandas as pd
-from model import detect, get_config, Config, download_weights, draw_boxes_v2, get_class_names, postprocessing
+from model import detect, get_config, Config, download_weights, draw_boxes_v2, get_class_names, postprocessing, box_fusion
+from api import get_info_from_db
 
 CACHE_DIR = '.cache'
 
@@ -29,6 +29,7 @@ class Arguments:
             self.weight=tmp_path
             
 weight_urls = {
+    'yolov5s': "1-3TXxsF_CYjPzQqEVudNUtMA5nexc8TG",
     'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI"
 }
 
@@ -143,7 +144,14 @@ def ensemble_models(input_path, image_size):
         'boxes': final_boxes,
         'labels': final_classes,
         'scores': final_scores
-    }
+    }, class_names
+
+def append_food_info(food_dict, class_names):
+    food_labels = food_dict['labels']
+    food_names = [class_names[i] for i in food_labels]
+    food_info = get_info_from_db(food_names)
+    food_dict.update(food_info)
+    return food_dict
 
 def get_prediction(
     input_path, 
@@ -176,10 +184,12 @@ def get_prediction(
         result_dict = detect(args, config)
       
     else:
-        result_dict = ensemble_models(input_path)
+        result_dict, class_names = ensemble_models(input_path)
 
     cache_prediction(result_dict)
     ori_img = cv2.imread(input_path)
+
+    result_dict = append_food_info(result_dict, class_names)
     draw_image(output_path, ori_img, result_dict, class_names)
 
     return output_path, result_dict
