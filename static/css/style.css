@@ -67,15 +67,6 @@ button.choose-file-button {
     font-size: 13px;
 }
 
-button.analyze-button {
-    width: 200px;
-    height: 40px;
-    border: solid 1px #7052CB;
-    border-radius: 2px;
-    background-color: #7052CB;
-    font-size: 13px;
-    color: #ffffff;
-}
 
 button:focus {
     outline: 0;
@@ -93,4 +84,69 @@ button:disabled {
 #threshold-range,
 #confidence-range {
     margin: 10px 0;
+}
+
+/* added */
+
+.pannel-bottom {
+    margin-bottom: 10px !important;
+}
+
+#upload-div {
+    border: 3px dashed #cccccc;
+    height: 35px;
+    position: relative;
+    text-align: center;
+}
+
+.upload-div.clickable {
+    cursor: pointer;
+}
+
+.logo-card {
+    width: 20px;
+    display: block;
+    margin: auto;
+    margin-top: 5px;
+}
+
+.header-setting {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.result-card {
+    min-height: 275px;
+    position: relative;
+    text-align: center;
+}
+
+.result-panel {
+    margin-bottom: 5px !important;
+}
+
+.placeholder-img {
+    width: 200px;
+    display: block;
+    margin: auto;
+    margin-top: 80px;
+}
+
+.vid-result {
+    height: 350;
+    display: block;
+    margin: auto;
+}
+
+.img-result {
+    height: 250px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.alert-margin {
+    margin-bottom: 10px;
+    margin-top: 5px;
 }

@@ -5,6 +5,7 @@
 
     <link rel='stylesheet' href='../static/css/style.css'>
     <link rel='stylesheet' href='../static/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='../static/css/bootstrap.css'>
     <link rel="stylesheet" href="../static/css/w3.css">
     <link rel="stylesheet" href="../static/css/bulma.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -12,13 +13,13 @@
   </head>
 
   <body>
-
     <div class="w3-top" style="position:relative;">
-      <div class="w3-bar w3-white w3-wide w3-padding w3-card" style="font-size:15px;font-family:Verdana, sans-serif;margin:0">
+      <div class="w3-bar w3-black w3-wide w3-padding w3-card" style="font-size:15px;font-family:Verdana, sans-serif;margin:0">
         <a href="./index.html" class="w3-bar-item w3-button" style="font-size:18px;text-decoration:none;font-family:Verdana, sans-serif;"><b>Food</b> Detector</a>  
         <a href="./about.html" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">About</a>       
       </div>
     </div>
+
 
     <div class='center' style="position:relative;">
       <div class='content'>
@@ -79,32 +80,33 @@
                   class='no-display'
                   type='file'
                   name='file'
-                  accept='.png, .jpg, .jpeg, .gif'
                   onchange='showPicked(this)'>
           </div>
 
-          <button class='btn btn-primary' type='button' onclick='showPicker()'>Select Image</button>
+          <button class='btn btn-primary' type='button' onclick='showPicker()'>Upload File</button>
           <button class="btn btn-secondary" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
+
 
           <div id="wrapper">
             <button class="btn btn-danger" type="button" id="capture-img" disabled="disabled">Capture</button>
             <button class="btn btn-success" type="button" id="download-img" disabled="disabled">Download</button>
           </div>
 
+
           <div class='upload-label'>
             <label id='upload-label'></label>
           </div>
- 
+
           <div class="row">
             <div class="col-md-12">
-              <img id='image-display' class='no-display' alt='Chosen Image' height='480' width='640'>
+              <div id='image-display'></div>
 
               <div id="webcam-video"></div>
             </div>
           </div>
 
           <div class='analyze'>
-            <button id='analyze-button' class='analyze-button' type='submit' onclick='analyze()'>Detect</button>
+            <button id='analyze-button' class='btn btn-outline-success' type='submit' onclick='analyze()'>Detect</button>
           </div>
 
         </form>
@@ -112,7 +114,7 @@
     </div>
 
 
-    <footer style="position: absolute;right: 0;left: 0;padding: 1rem;text-align: center; box-sizing: border-box;z-index:150;" class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge">
+    <footer style="position: absolute;right: 0;left: 0;padding: 1rem;text-align: center; box-sizing: border-box;z-index:150;" class="w3-container w3-padding-64 w3-center w3-light-gray w3-xlarge">
       
       <a href="https://github.com/yolo-statistical-ml/" target="_blank"><i class="fab fa-github w3-hover-opacity"></i></a>
       <p class="w3-medium" style="font-weight: bold;">Created by <a href="https://github.com/kaylode/"
