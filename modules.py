@@ -1,3 +1,4 @@
+import hashlib
 import cv2
 import numpy as np
 import os
@@ -47,9 +48,12 @@ def draw_image(out_path, ori_img, result_dict, class_names):
         class_names)
 
 
-def cache_prediction(result_dict, cache_name):
+def save_cache(result_dict, cache_name):
     df = pd.DataFrame(result_dict)
     df.to_csv(f'./{CACHE_DIR}/{cache_name}.csv', index=False)
+
+def check_cache(cache_name):
+    return os.path.isfile(f'./{CACHE_DIR}/{cache_name}.csv')
 
 def load_cache(image_name):
     df = pd.read_csv(f'./{CACHE_DIR}/{image_name}.csv')
@@ -66,7 +70,7 @@ def load_cache(image_name):
 
     return result_dict
 
-def postprocess(args, result_dict, img_w, img_h):
+def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
     outputs = {
         'bboxes': result_dict['boxes'],
         'scores': result_dict['scores'],
@@ -76,8 +80,8 @@ def postprocess(args, result_dict, img_w, img_h):
     outputs = postprocessing(
         outputs, 
         current_img_size=[img_w, img_h],
-        min_iou=args.min_iou,
-        min_conf=args.min_conf,
+        min_iou=min_iou,
+        min_conf=min_conf,
         output_format='xywh',
         mode='nms')
 
@@ -157,7 +161,9 @@ def get_prediction(
     input_path, 
     output_path,
     model_name,
-    ensemble=False):
+    ensemble=False,
+    min_iou=0.5,
+    min_conf=0.1):
 
     ignore_keys = [
             'min_iou_val',
@@ -169,27 +175,41 @@ def get_prediction(
             'tta_iou_threshold',
         ]
     
-    if not ensemble:
-        args = Arguments(model_name=model_name)
-        class_names, num_classes = get_class_names(args.weight)
+    # get hashed key from image path
+    hashed_key = os.path.basename(input_path)
 
-        config = get_config(args.weight, ignore_keys)
-        if config is None:  
-            print("Config not found. Load configs from configs/configs.yaml")
-            config = Config(os.path.join('model/configs','configs.yaml'))
-        else:
-            print("Load configs from weight")   
-
-        args.input_path = input_path
-        result_dict = detect(args, config)
-      
+    # check whether cache exists
+    if check_cache(hashed_key):
+        result_dict = load_cache(hashed_key)
     else:
-        result_dict, class_names = ensemble_models(input_path)
+        if not ensemble:
+            args = Arguments(model_name=model_name)
+            class_names, num_classes = get_class_names(args.weight)
 
-    cache_prediction(result_dict)
+            config = get_config(args.weight, ignore_keys)
+            if config is None:  
+                print("Config not found. Load configs from configs/configs.yaml")
+                config = Config(os.path.join('model/configs','configs.yaml'))
+            else:
+                print("Load configs from weight")   
+
+            args.input_path = input_path
+            result_dict = detect(args, config)
+        
+        else:
+            result_dict, class_names = ensemble_models(input_path) 
+        save_cache(result_dict)
+
     ori_img = cv2.imread(input_path)
+    img_h, img_w, _ = ori_img.shape
 
+    # post process
+    postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+
+    # add food infomation
     result_dict = append_food_info(result_dict, class_names)
+
+    # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
 
     return output_path, result_dict

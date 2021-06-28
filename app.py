@@ -12,6 +12,7 @@ import requests
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction
+import hashlib
 from flask_ngrok import run_with_ngrok
 
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
@@ -39,17 +40,23 @@ def homepage():
 @app.route('/analyze', methods=['POST'])
 def analyze():
     f = request.files['file']
-    print('F: ', f)
-    # create a secure filename
-    filename = secure_filename(f.filename)
-    print('Filename: ', filename)
+
+    # Get cache name by hashing image
+    filename = hashlib.md5(f.read()).hexdigest() + '.jpg'
+    
     # save file to /static/uploads
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    output_path=os.path.join(app.config['DETECTION_FOLDER'], filename)
-    print('File path: ', filepath)
     f.save(filepath)
 
-    filename2, result_dict = get_prediction(filepath, output_path, model_name="yolov5m")
+    # predict image
+    output_path=os.path.join(app.config['DETECTION_FOLDER'], filename)
+    filename2, result_dict = get_prediction(
+        filepath, 
+        output_path, 
+        model_name="yolov5m",
+        ensemble=False,
+        min_conf=0.1,
+        min_iou=0.65)
 
     return render_template("detect.html", fname=filename, fname2=filename2, result_dict=result_dict)
 
