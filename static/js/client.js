@@ -10,9 +10,6 @@ function clear() {
   $('#image-display').empty(); // removes previous img
   $('#upload-label').empty(); //removes previous img name
   $('#result-content').empty();   //remove result content (image + labels ...)
-  // let canvas = document.querySelector("canvas");
-  // const context = canvas.getContext('2d');
-  // context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function stopWebcam(){
@@ -27,15 +24,18 @@ function stopWebcam(){
 
 // Upload file 
 function showPicked(input) {
-  clear();
   if(window.stream){
     stopWebcam();
   }
-  el("upload-label").innerHTML = input.files[0].name;
+
   var extension = input.files[0].name.split(".")[1].toLowerCase();
   var reader = new FileReader();
+
   reader.onload = function(e) {
+    clear();
+    el("upload-label").innerHTML = input.files[0].name;
     var file_url = e.target.result
+
     if (extension === "mp4"){
       var video_html = '<video autoplay id="user-video" controls> <source id="user-source"></source></video>'
       $('#image-display').html(video_html); // replaces previous video
@@ -52,8 +52,9 @@ function showPicked(input) {
     }
 
     $('#webcam-video').prop('disabled', true); //disable image upload
-    
+  
   };
+
   detectBtn.removeAttribute("disabled");
   reader.readAsDataURL(input.files[0]);
 }
@@ -95,7 +96,6 @@ function runWebcam() {
 
   if (navigator.mediaDevices.getUserMedia === undefined) {
     navigator.mediaDevices.getUserMedia = function (constraints) {
-
       var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
       if (!getUserMedia) {
@@ -123,6 +123,7 @@ function runWebcam() {
       
       messageArea.style.display = 'block';
       wrapperArea.style.display = "block";
+      canvasPhoto.style.display = "none";
       
       btnNewPhoto.removeAttribute("disabled");
       btnDownload.setAttribute("disabled","disabled");
@@ -203,7 +204,7 @@ function imageExists(image_url){ //https://stackoverflow.com/questions/18837735/
     return http.status != 404;
 }
 
-// youtube url
+// youtube video url
 function YouTubeGetID(url){ //https://gist.github.com/takien/4077195
   var ID = '';
   url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
