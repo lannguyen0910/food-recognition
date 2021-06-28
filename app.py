@@ -13,6 +13,8 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction
 from flask_ngrok import run_with_ngrok
+from flask_cors import CORS
+
 
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
 parser.add_argument('--type', '-t', type=str, default='local', help="Run on local or ngrok")
@@ -21,6 +23,8 @@ parser.add_argument('--host', '-h', type=str, default='192.168.100.4', help="Loc
 
 
 app = Flask(__name__, template_folder='templates', static_folder='assets')
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 UPLOAD_FOLDER = './assets/uploads'
 DETECTION_FOLDER = './assets/detections'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
