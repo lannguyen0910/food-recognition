@@ -93,5 +93,6 @@ if __name__ == '__main__':
 
     if args.ngrok:
         run_with_ngrok(app)
+        app.run()
     else:
         app.run(host=args.host, port=4000, debug=True)
