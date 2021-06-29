@@ -21,7 +21,8 @@ from flask_cors import CORS
 
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
 parser.add_argument('--ngrok', action='store_true',default=False, help="Run on local or ngrok")
-parser.add_argument('--host',  type=str, default='192.168.100.4', help="Local IP")
+parser.add_argument('--host',  type=str, default='192.168.100.4:4000', help="Local IP")
+parser.add_argument('--debug', action='store_true',default=False, help="Run app in debug mode")
 
 
 
@@ -95,4 +96,10 @@ if __name__ == '__main__':
         run_with_ngrok(app)
         app.run()
     else:
-        app.run(host=args.host, port=4000, debug=True)
+        hostname = str.split(args.host,':')
+        if len(hostname) == 1:
+            port = 4000
+        else:
+            port = hostname[1]
+        host = hostname[0]
+        app.run(host=host, port=port, debug=args.debug)
