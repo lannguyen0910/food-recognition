@@ -1,28 +1,27 @@
-from genericpath import exists
-from PIL import Image
-from flask import Flask, request, Response, jsonify, send_from_directory, abort, render_template
-from io import BytesIO
 import aiohttp
 import asyncio
 import sys
 import os
-import imageio
 import argparse
 import requests
 import cv2
 import numpy as np
+import tldextract
+import pytube
+import hashlib
+import tldextract
+import pytube
+
+from genericpath import exists
+from PIL import Image
+from flask import Flask, request, render_template, redirect, url_for
+from io import BytesIO
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction
-import hashlib
 from flask_ngrok import run_with_ngrok
 from flask_cors import CORS
-from flask import render_template, redirect, url_for, flash, request, Response
-import os
 from werkzeug.utils import secure_filename
-import requests
-import tldextract
-import pytube
 
 
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
@@ -124,13 +123,16 @@ path = Path(__file__).parent
 def homepage():
     return render_template("index.html")
 
+
 @app.route('/about')
 def about_page():
     return redirect(url_for('about'))
 
+
 @app.route('/url')
 def detect_by_url_page():
     return redirect(url_for('url'))
+
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
