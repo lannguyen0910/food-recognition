@@ -3,11 +3,11 @@
   <head>
     <meta charset='utf-8'>
 
-    <link rel='stylesheet' href='../static/css/style.css'>
-    <link rel='stylesheet' href='../static/css/bootstrap.min.css'>
-    <link rel='stylesheet' href='../static/css/bootstrap.css'>
-    <link rel="stylesheet" href="../static/css/w3.css">
-    <link rel="stylesheet" href="../static/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/w3.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma.min.css') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
   </head>
@@ -15,9 +15,9 @@
   <body>
     <div class="w3-top" style="position:relative;">
       <div class="w3-bar w3-black w3-wide w3-padding w3-card" style="font-size:15px;font-family:Verdana, sans-serif;margin:0">
-        <a href="./index.html" class="w3-bar-item w3-button" style="font-size:18px;text-decoration:none;font-family:Verdana, sans-serif;"><b>Food</b> Detector</a>  
-        <a href="./about.html" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">About</a>  
-        <a href="./url.html" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">Detect by url</a>       
+        <a href="/" class="w3-bar-item w3-button" style="font-size:18px;text-decoration:none;font-family:Verdana, sans-serif;"><b>Food</b> Detector</a>  
+        <a href="/about" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">About</a>       
+        <a href="/url" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">Detect by url</a>       
       </div>
     </div>
 
@@ -45,7 +45,7 @@
                     <b>Confidence:</b>
                     <span>50</span>%
                   </div>
-                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
+                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider" name="confidence-range">
                 </div>
               </div>
             </div>
@@ -53,7 +53,7 @@
               <div class="form-group">
                 <label for="model-types">Choose a model</label>
                 <br/>
-                <select class="form-control-sm" id="model-types">
+                <select name="model-types" class="form-control-sm" id="model-types">
                   <option>YOLOv3</option>
                   <option>YOLOv4</option>
                   <option>YOLOv5</option>
@@ -107,9 +107,9 @@
 
     </footer>
 
-    <script src='../static/js/client.js' defer></script>
-    <script src='../static/js/jquery-3.5.1.min.js' defer></script>
-    <script src="../static/js/all.js" defer></script>
+    <script src="{{ url_for('static', filename='js/client.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/all.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </body>
 </html>

@@ -124,6 +124,13 @@ path = Path(__file__).parent
 def homepage():
     return render_template("index.html")
 
+@app.route('/about')
+def about_page():
+    return redirect(url_for('about'))
+
+@app.route('/url')
+def detect_by_url_page():
+    return redirect(url_for('url'))
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
