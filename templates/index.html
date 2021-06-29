@@ -8,6 +8,7 @@
     <link rel='stylesheet' href='../static/css/bootstrap.css'>
     <link rel="stylesheet" href="../static/css/w3.css">
     <link rel="stylesheet" href="../static/css/bulma.min.css">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
   </head>
@@ -45,7 +46,7 @@
                     <b>Confidence:</b>
                     <span>50</span>%
                   </div>
-                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
+                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider" name="confidence-range">
                 </div>
               </div>
             </div>
@@ -53,7 +54,7 @@
               <div class="form-group">
                 <label for="model-types">Choose a model</label>
                 <br/>
-                <select class="form-control-sm" id="model-types">
+                <select name="model-types" class="form-control-sm" id="model-types">
                   <option>YOLOv3</option>
                   <option>YOLOv4</option>
                   <option>YOLOv5</option>
@@ -107,7 +108,7 @@
           </div>
 
           <div class='analyze'>
-            <button id='analyze-button' class='btn btn-outline-success' type='submit' disabled="disabled" onclick='analyze()'>Detect</button>
+            <button id='analyze-button' class='btn btn-outline-success' type='submit' disabled="disabled">Detect</button>
           </div>
 
         </form>

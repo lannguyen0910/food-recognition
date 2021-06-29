@@ -96,7 +96,9 @@
           
           <div class="row">
             <div class="col-md-12">
-              <img id='image-display' src="/assets/uploads/{{ fname }}" alt='Chosen Image' height='480' width='640'>
+              <div id='image-display'>
+                <img id="user-image" src="/assets/uploads/{{ fname }}" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px">
+              </div>
 
               <div id="webcam-video"></div>
             </div>
@@ -110,7 +112,7 @@
           {% block content %}
           <div id='result-content'>
               <div>
-                  <a href="/assets/detections/{{ fname2 }}" target="_new"><img src="/assets/detections/{{ fname2 }}" class="upload-image-thumb" alt='Detect Image' height="300"></a>
+                  <a href="/assets/detections/{{ fname2 }}" target="_new"><img src="/assets/detections/{{ fname2 }}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
               <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
               </div>
               {{result_dict}}
