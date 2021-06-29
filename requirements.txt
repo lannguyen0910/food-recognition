@@ -12,3 +12,4 @@ aiohttp
 tldextract
 pytube
 flask-cors
+flask_ngrok

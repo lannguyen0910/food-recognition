@@ -130,11 +130,6 @@ def detect(args, config):
     if args.weight is not None:                
         load_checkpoint(model, args.weight)
 
-    if os.path.isdir(args.input_path):
-        if not os.path.exists(args.output_path):
-            os.makedirs(args.output_path)
-
-
     ## Print info
     print(config)
     print(testset)
@@ -142,7 +137,11 @@ def detect(args, config):
     print(devices_info)
 
 
-    result_dict = []
+    result_dict = {
+        'boxes': [],
+        'labels': [],
+        'scores': []
+    }
 
     empty_imgs = 0
     with tqdm(total=len(testloader)) as pbar:
@@ -154,8 +153,6 @@ def detect(args, config):
                     preds = model.inference_step(batch)
 
                 for idx, outputs in enumerate(preds):
-                    img_name = batch['img_names'][idx]
-                    ori_img = batch['ori_imgs'][idx]
                     img_w = batch['image_ws'][idx]
                     img_h = batch['image_hs'][idx]
                     img_ori_ws = batch['image_ori_ws'][idx]
@@ -177,22 +174,13 @@ def detect(args, config):
                     scores = outputs['scores']
                     
                     for (box,label,score) in zip(boxes, labels, scores):
-                        result_dict.append({
-                            'bbox': box,
-                            'label': label,
-                            'score': score
-                        })
+                        result_dict['boxes'].append(box)
+                        result_dict['labels'].append(label)
+                        result_dict['scores'].append(score)
 
                     if len(boxes) == 0:
                         empty_imgs += 1
                         boxes = None
-
-                    if boxes is not None:
-                        if os.path.isdir(args.input_path):
-                            out_path = os.path.join(args.output_path, img_name)
-                        else:
-                            out_path = args.output_path
-                        draw_boxes_v2(out_path, ori_img , boxes, labels, scores, class_names)
 
                 pbar.update(1)
                 pbar.set_description(f'Empty images: {empty_imgs}')

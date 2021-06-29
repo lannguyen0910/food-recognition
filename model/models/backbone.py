@@ -54,7 +54,7 @@ class YoloBackbone(BaseBackbone):
         self.max_pre_nms = max_pre_nms
 
         if max_post_nms is None:
-            max_post_nms = 300
+            max_post_nms = 1000
         self.max_post_nms = max_post_nms
 
         version = version_name[0]
@@ -73,7 +73,7 @@ class YoloBackbone(BaseBackbone):
         
 
         if load_weights:
-            tmp_path = os.path.join(CACHE_DIR, f'yolo{version_name}.pth')
+            tmp_path = os.path.join(CACHE_DIR, f'yolov{version_name}.pth')
             download_pretrained_weights(f'yolov{version_name}', tmp_path)
             ckpt = torch.load(tmp_path, map_location='cpu')  # load checkpoint
             try:
