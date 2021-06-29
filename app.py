@@ -20,7 +20,7 @@ from flask_cors import CORS
 
 
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
-parser.add_argument('--type', type=str, default='local', help="Run on local or ngrok")
+parser.add_argument('--ngrok', action='store_true',default=False, help="Run on local or ngrok")
 parser.add_argument('--host',  type=str, default='192.168.100.4', help="Local IP")
 
 
@@ -70,7 +70,7 @@ def analyze():
         output_path, 
         model_name="yolov5m",
         ensemble=False,
-        min_conf=0.5,
+        min_conf=0.25,
         min_iou=0.65)
 
     return render_template("detect.html", fname=filename, fname2=filename, result_dict=result_dict)
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.type == 'ngrok':
+    if args.ngrok:
         run_with_ngrok(app)
     else:
         app.run(host=args.host, port=4000, debug=True)
