@@ -7,7 +7,8 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/w3.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma.min.css') }}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
   </head>
 
@@ -112,20 +113,24 @@
 
           </form>
           {% block content %}
-          <div id='result-content'>
-              <div>
-                  <a href="{{url_for('static', filename='assets/detections/' + fname2)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname2)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
-              <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
+          <div class="panel panel-default result-panel">
+            <div class="panel-body result-card">
+              <div id='result-content'>
+                  <div>
+                      <a href="{{url_for('static', filename='assets/detections/' + fname2)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname2)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                  <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
+                  </div>
+                  {{result_dict}}
+                  <tr>
+                    {%for item in result_dict %}
+                    <div class='result-label'> 
+                      <h2 id='label'>Class: {{item.labels}} || Confidence: {{item.scores}} </h2>
+                      <!-- <h3 id='calories'></h3> -->
+                    </div>
+                    {% endfor %}
+                  </tr>
               </div>
-              {{result_dict}}
-              <tr>
-                {%for item in result_dict %}
-                <div class='result-label'> 
-                  <h2 id='label'>Class: {{item.label}} || Confidence: {{item.score}} </h2>
-                  <!-- <h3 id='calories'></h3> -->
-                </div>
-                {% endfor %}
-              </tr>
+            </div>
           </div>
           {% endblock %}
         </div>
