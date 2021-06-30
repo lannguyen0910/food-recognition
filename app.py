@@ -126,12 +126,12 @@ def homepage():
 
 @app.route('/about')
 def about_page():
-    return redirect(url_for('about'))
+    return render_template("about.html")
 
 
 @app.route('/url')
 def detect_by_url_page():
-    return redirect(url_for('url'))
+    return render_template("url.html")
 
 
 @app.route('/analyze', methods=['POST'])
