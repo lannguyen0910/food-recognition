@@ -186,6 +186,7 @@ def append_food_info(food_dict, class_names):
     food_names = [class_names[int(i)] for i in food_labels]
     food_info = get_info_from_db(food_names)
     food_dict.update(food_info)
+    food_dict['names'] = food_names
     return food_dict
 
 def convert_dict_to_list(result_dict):
