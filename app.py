@@ -143,12 +143,6 @@ def analyze():
     tta = request.form.get('tta')
     ensemble = request.form.get('ensemble')
 
-    print('iou: ', iou)
-    print('confidence: ', confidence)
-    print('model_types: ', model_types)
-    print('tta: ', tta)
-    print('ensemble: ', ensemble)
-
     ori_file_name = secure_filename(f.filename)
     _, ext = os.path.splitext(ori_file_name)
 
@@ -164,13 +158,20 @@ def analyze():
 
     # predict image
     output_path = os.path.join(app.config['DETECTION_FOLDER'], filename)
+
+    ensemble = True if ensemble=='on' else False
+    tta = True if tta=='on' else False
+    model_types = str.lower(model_types)
+    min_conf = float(confidence)/100
+    min_iou = float(iou)/100
+
     filename2, result_dict = get_prediction(
         filepath,
         output_path,
-        model_name="yolov5m",
-        ensemble=False,
-        min_conf=0.25,
-        min_iou=0.65)
+        model_name=model_types,
+        ensemble=ensemble,
+        min_conf=min_conf,
+        min_iou=min_iou)
 
     return render_template("detect.html", fname=filename, fname2=filename, result_dict=result_dict)
 

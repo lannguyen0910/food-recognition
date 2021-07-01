@@ -31,7 +31,9 @@ class Arguments:
             
 weight_urls = {
     'yolov5s': "1-3TXxsF_CYjPzQqEVudNUtMA5nexc8TG",
-    'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI"
+    'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI",
+    "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
+    "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP"
 }
 
 def download_pretrained_weights(name, cached=None):
@@ -41,8 +43,7 @@ def download_pretrained_weights(name, cached=None):
 def draw_image(out_path, ori_img, result_dict, class_names):
     if os.path.isfile(out_path):
         os.remove(out_path)
-        print("yes")
-        
+
     draw_boxes_v2(
         out_path, 
         ori_img , 
@@ -187,6 +188,16 @@ def append_food_info(food_dict, class_names):
     food_dict.update(food_info)
     return food_dict
 
+def convert_dict_to_list(result_dict):
+    result_list = []
+    num_items = len(result_dict['labels'])
+    for i in range(num_items):
+        item_dict = {}
+        for key in result_dict.keys():
+            item_dict[key] = result_dict[key][i]
+        result_list.append(item_dict)
+    return result_list
+
 def get_prediction(
     input_path, 
     output_path,
@@ -248,5 +259,6 @@ def get_prediction(
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
 
-    return output_path, result_dict
+    result_list = convert_dict_to_list(result_dict)
+    return output_path, result_list
 
