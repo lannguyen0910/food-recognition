@@ -32,9 +32,9 @@
                 <div class="panel-body">
                   <div id="threshold-text">
                     <b>IOU Threshold:</b>
-                    <span>50</span>%
+                    <span>65</span>%
                   </div>
-                  <input id="threshold-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
+                  <input id="threshold-range" type="range" min="0" max="100" value="65" class="slider" name="threshold-range">
                 </div>
               </div>
             </div>
@@ -44,9 +44,9 @@
                 <div class="panel-body">
                   <div id="confidence-text">
                     <b>Confidence:</b>
-                    <span>50</span>%
+                    <span>25</span>%
                   </div>
-                  <input id="confidence-range" type="range" min="0" max="100" value="50" class="slider" name="confidence-range">
+                  <input id="confidence-range" type="range" min="0" max="100" value="25" class="slider" name="confidence-range">
                 </div>
               </div>
             </div>
@@ -55,9 +55,10 @@
                 <label for="model-types">Choose a model</label>
                 <br/>
                 <select name="model-types" class="form-control-sm" id="model-types">
-                  <option>YOLOv3</option>
-                  <option>YOLOv4</option>
-                  <option>YOLOv5</option>
+                  <option>YOLOv5s</option>
+                  <option>YOLOv5m</option>
+                  <option>YOLOv5l</option>
+                  <option>YOLOv5x</option>
                 </select>
               </div>
             </div>
@@ -120,11 +121,11 @@
                       <a href="{{url_for('static', filename='assets/detections/' + fname2)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname2)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
                   <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
                   </div>
-                  {{result_dict}}
+                  <!-- {{result_dict}} -->
                   <tr>
                     {%for item in result_dict %}
                     <div class='result-label'> 
-                      <h2 id='label'>Class: {{item.labels}} || Confidence: {{item.scores}} </h2>
+                      <h2 id='label'>{{item.labels}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
                       <!-- <h3 id='calories'></h3> -->
                     </div>
                     {% endfor %}
