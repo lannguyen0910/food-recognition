@@ -188,6 +188,7 @@ weight_url = {
     "yolov5m": "1-9ra0DEo5AjXmopm2cAkI_eqlD1DVwrF" ,
     "yolov5l": "1-Bsl9DayZtKx-POlhZM2dN7PBo1dmbHJ",
     "yolov5x": "1-HTVvUR88cXixngUbtScCSK42hlcNm1g",
+    "se_resnet": "1SjWV-tZ980n7t0K68Lfpu5j9sw5-E2Gs"
 }
 
 def download_pretrained_weights(name, cached=None):

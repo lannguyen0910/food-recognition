@@ -1,7 +1,10 @@
+import os
 import torch
 from torchvision import transforms as transforms
 from .main_model import MODEL
+from modules import download_pretrained_weights
 
+CACHE_DIR = '.cache'
 
 def get_classification_predict(image_list):
     normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406],
@@ -21,10 +24,15 @@ def get_classification_predict(image_list):
         multi_scale = True, 
         learn_region=True)
 
-    # model = torch.nn.DataParallel(model)
-    # vgg16 = model
-    # vgg16.load_state_dict(torch.load('./model/ISIAfood500.pth'))
-    # vgg16.cuda()
+    model = torch.nn.DataParallel(model)
+
+    tmp_path = os.path.join(CACHE_DIR, 'se_resnet.pth')
+    download_pretrained_weights(
+        'se_resnet', 
+        cached=tmp_path)
+
+    model.load_state_dict(torch.load(tmp_path))
+    model.cuda()
     model.eval()
 
     batch = [test_transforms(i) for i in image_list]
