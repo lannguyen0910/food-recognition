@@ -1,9 +1,13 @@
-import hashlib
 import cv2
+from PIL import Image
 import numpy as np
 import os
 import pandas as pd
-from model import detect, get_config, Config, download_weights, draw_boxes_v2, get_class_names, postprocessing, box_fusion
+from model import (
+    detect, get_config, Config, 
+    download_weights, draw_boxes_v2, 
+    get_class_names, postprocessing, 
+    box_fusion, get_classification_predict)
 from api import get_info_from_db
 
 CACHE_DIR = '.cache'
@@ -199,13 +203,42 @@ def convert_dict_to_list(result_dict):
         result_list.append(item_dict)
     return result_list
 
+
+def crop_box(image, box):
+    #xyxy box, cv2 image h,w,c
+    return image[box[1]:box[3], box[0]:box[2], :]
+
+    
+
+def label_enhancement(image, cache_name, result_dict):
+    boxes = np.array(result_dict['boxes'])
+    labels = np.array(result_dict['labels'])
+    boxes[:,2] += boxes[:,0]  #xyxy
+    boxes[:,3] += boxes[:,1]  #xyxy
+    
+    cropped_folder = os.path.join(CACHE_DIR, cache_name)
+    os.makedirs(cropped_folder, exist_ok=True)
+    # Label starts at 1
+    img_list = []
+    for box_id, (box, label) in enumerate(zip(boxes, labels)):
+        if label == 0: # other food
+            cropped = crop_box(image, box) # rgb
+            cropped_path = os.path.join(cropped_folder, str(box_id)+'.jpg')
+            cv2.imwrite(cropped_path, cropped)
+            img = Image.fromarray(cropped)
+            img_list.append(img)
+
+    result = get_classification_predict(img_list)
+    print(result)
+
 def get_prediction(
     input_path, 
     output_path,
     model_name,
     ensemble=False,
     min_iou=0.5,
-    min_conf=0.1):
+    min_conf=0.1,
+    enhance_labels=False):
 
     ignore_keys = [
             'min_iou_val',
@@ -253,6 +286,10 @@ def get_prediction(
 
     # post process
     result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+
+    # enhance by using a classifier
+    if enhance_labels:
+        result_dict = label_enhancement(ori_img, hashed_key, result_dict)
 
     # add food infomation
     result_dict = append_food_info(result_dict, class_names)
