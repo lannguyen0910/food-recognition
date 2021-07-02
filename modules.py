@@ -50,13 +50,22 @@ def draw_image(out_path, ori_img, result_dict, class_names):
     if os.path.isfile(out_path):
         os.remove(out_path)
 
-    draw_boxes_v2(
-        out_path, 
-        ori_img , 
-        result_dict["boxes"], 
-        result_dict["labels"], 
-        result_dict["scores"], 
-        class_names)
+    if "names" in result_dict.keys():
+        draw_boxes_v2(
+            out_path, 
+            ori_img , 
+            result_dict["boxes"], 
+            result_dict["labels"], 
+            result_dict["scores"],
+            label_names = result_dict["names"])
+    else:
+        draw_boxes_v2(
+            out_path, 
+            ori_img , 
+            result_dict["boxes"], 
+            result_dict["labels"], 
+            result_dict["scores"],
+            obj_list = class_names)
 
 
 def save_cache(result_dict, cache_name):
@@ -206,9 +215,23 @@ def convert_dict_to_list(result_dict):
     return result_list
 
 
-def crop_box(image, box):
+def crop_box(image, box, expand=10):
+
+    h,w,c = image.shape
+    # expand box a little
+    new_box = box.copy()
+    # new_box[0] -= expand
+    # new_box[1] -= expand
+    # new_box[2] += expand
+    # new_box[3] += expand
+
+    # new_box[0] = max(0, new_box[0])
+    # new_box[1] = max(0, new_box[1])
+    # new_box[2] = min(h, new_box[2])
+    # new_box[3] = min(w, new_box[3])
+
     #xyxy box, cv2 image h,w,c
-    return image[int(box[1]):int(box[3]), int(box[0]):int(box[2]), :]
+    return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
 
     
 
@@ -222,10 +245,13 @@ def label_enhancement(image, cache_name, result_dict):
     os.makedirs(cropped_folder, exist_ok=True)
     # Label starts at 1
     img_list = []
+    new_id_list = []
+ 
     for box_id, (box, label) in enumerate(zip(boxes, labels)):
-        if label == 0: # other food
+        if label == 21: # other food 31
             cropped = crop_box(image, box) # rgb
             img_list.append(cropped.copy())
+            new_id_list.append(box_id)
 
     tmp_path = os.path.join(CACHE_DIR, 'effnetb4.pth')
     if not os.path.isfile(tmp_path):
@@ -233,8 +259,12 @@ def label_enhancement(image, cache_name, result_dict):
             'effnetb4', 
             cached=tmp_path)
 
-    result = classify(tmp_path, img_list)
-    print(result)
+    new_names, new_probs = classify(tmp_path, img_list)
+
+    for idx, id in enumerate(new_id_list):
+        result_dict['names'][id] = new_names[idx]
+    
+    return result_dict
 
 def get_prediction(
     input_path, 
@@ -292,12 +322,12 @@ def get_prediction(
     # post process
     result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
 
+    # add food infomation
+    result_dict = append_food_info(result_dict, class_names)
+
     # enhance by using a classifier
     if enhance_labels:
         result_dict = label_enhancement(ori_img, hashed_key, result_dict)
-
-    # add food infomation
-    result_dict = append_food_info(result_dict, class_names)
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)

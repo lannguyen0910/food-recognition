@@ -26,8 +26,6 @@ class ClassificationTestset():
             ToTensorV2(p=1.0)
         ])
 
-        self.load_images()
-
     def __getitem__(self, idx):
         img = self.img_list[idx]
         img = img.astype(np.float32)
