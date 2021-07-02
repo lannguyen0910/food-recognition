@@ -49,7 +49,7 @@ def standard_to_bgr(list_color_name):
 
 color_list = standard_to_bgr(STANDARD_COLORS)
 
-def draw_boxes_v2(img_name, img, boxes, labels, scores, obj_list=None, figsize=(15,15)):
+def draw_boxes_v2(img_name, img, boxes, label_ids, scores, label_names=None, obj_list=None, figsize=(15,15)):
     """
     Visualize an image with its bouding boxes
     """
@@ -61,17 +61,28 @@ def draw_boxes_v2(img_name, img, boxes, labels, scores, obj_list=None, figsize=(
     ax.imshow(img)
 
     # Create a Rectangle patch
-    for box, label, score in zip(boxes, labels, scores):
-        label = int(label)
-        color = STANDARD_COLORS[label]
+    for i in range(len(boxes)):
+        box = boxes[i]
+        label_id = label_ids[i]
+        if label_names is not None:
+            label_name = label_names[i]
+        score = scores[i]
+        
+        label_id = int(label_id)
+        color = STANDARD_COLORS[label_id]
+
         x,y,w,h = box
-        rect = patches.Rectangle((x,y),w,h,linewidth=1.5,edgecolor = color,facecolor='none')
+        rect = patches.Rectangle((x,y),w,h,linewidth=2,edgecolor = color,facecolor='none')
         score = np.round(score, 3)
         if obj_list is not None:
-            text = '{}: {}'.format(obj_list[label], str(score))
+            text = '{}: {}'.format(obj_list[label_id], str(score))
         else:
-            text = '{}: {}'.format(label, str(score))
-        plt.text(x, y-3,text, color = color, fontsize=15)
+            if label_names is not None:
+                text = '{}: {}'.format(label_name, str(score))
+            else:
+                text = '{}: {}'.format(label_id, str(score))
+
+        plt.text(x, y-3,text, color = color, fontsize=15, weight='bold')
         # Add the patch to the Axes
         ax.add_patch(rect)
     plt.axis('off')
