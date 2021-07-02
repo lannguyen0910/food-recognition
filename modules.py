@@ -7,7 +7,7 @@ from model import (
     detect, get_config, Config, 
     download_weights, draw_boxes_v2, 
     get_class_names, postprocessing, 
-    box_fusion, get_classification_predict)
+    box_fusion, classify)
 from api import get_info_from_db
 
 CACHE_DIR = '.cache'
@@ -38,7 +38,8 @@ weight_urls = {
     'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI",
     "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
     "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP",
-    "se_resnet": "1mB1QlCrylJVsFT9YV9TyV7IVbS9ECuuI"
+    "effnetb4": "1-4AZSXhKAViZdM5PkhoeOZITVFM0WKIm",
+    "yolov5m_extra": "1-HBTIM8pqXbppBiOHBVC9unWkUPjiZ_U"
 }
 
 def download_pretrained_weights(name, cached=None):
@@ -207,7 +208,7 @@ def convert_dict_to_list(result_dict):
 
 def crop_box(image, box):
     #xyxy box, cv2 image h,w,c
-    return image[box[1]:box[3], box[0]:box[2], :]
+    return image[int(box[1]):int(box[3]), int(box[0]):int(box[2]), :]
 
     
 
@@ -224,18 +225,15 @@ def label_enhancement(image, cache_name, result_dict):
     for box_id, (box, label) in enumerate(zip(boxes, labels)):
         if label == 0: # other food
             cropped = crop_box(image, box) # rgb
-            cropped_path = os.path.join(cropped_folder, str(box_id)+'.jpg')
-            cv2.imwrite(cropped_path, cropped)
-            img = Image.fromarray(cropped)
-            img_list.append(img)
+            img_list.append(cropped.copy())
 
-    tmp_path = os.path.join(CACHE_DIR, 'se_resnet.pth')
+    tmp_path = os.path.join(CACHE_DIR, 'effnetb4.pth')
     if not os.path.isfile(tmp_path):
         download_pretrained_weights(
-            'se_resnet', 
+            'effnetb4', 
             cached=tmp_path)
 
-    result = get_classification_predict(img_list, tmp_path)
+    result = classify(tmp_path, img_list)
     print(result)
 
 def get_prediction(
