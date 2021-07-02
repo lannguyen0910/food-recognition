@@ -288,6 +288,12 @@ def get_prediction(
     # get hashed key from image path
     hashed_key = os.path.basename(input_path)[:-4]
 
+    # additional tags
+    model_tag = model_name[-1]
+    ensemble_tag = 'ens' if ensemble else ''
+
+    hashed_key += f"_{model_tag}_{ensemble_tag}"
+
     # check whether cache exists
     if check_cache(hashed_key):
         print(f"Load cache from {hashed_key}")
