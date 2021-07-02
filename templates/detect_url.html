@@ -98,23 +98,30 @@
           <div class="panel panel-default result-panel">
             <div class="panel-body result-card">
               <div id='result-content'>
-                  <div>
-                      <a href="{{url_for('static', filename='assets/detections/' + fname2)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname2)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
-                  <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
-                  </div>
-                  <!-- {{result_dict}} -->
-                  <tr>
-                    {%for item in result_dict %}
-                    <div class='result-label'> 
-                      {% if item.calories %}
-                        <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
-                      {% else %}
-                        <h2 id='label'>{{item.names}} || No information </h2>
-                      {% endif %}
-                        <!-- <h3 id='calories'></h3> -->
-                    </div>
-                    {% endfor %}
-                  </tr>
+                <div style="text-align: center;">
+                    <b>{{out_name}}</b>
+                </div>
+
+                <div>
+                    {% if filetype == 'image' %}
+                    <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                    {% else %}
+                    <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
+                    {% endif %}
+                </div>
+                <!-- {{result_dict}} -->
+                <tr>
+                {%for item in result_dict %}
+                <div class='result-label'> 
+                    {% if item.calories %}
+                    <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
+                    {% else %}
+                    <h2 id='label'>{{item.names}} || No information </h2>
+                    {% endif %}
+                    <!-- <h3 id='calories'></h3> -->
+                </div>
+                {% endfor %}
+                </tr>
               </div>
             </div>
           </div>

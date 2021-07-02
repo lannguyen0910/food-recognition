@@ -97,7 +97,7 @@ def download(url):
         with open(path, "wb") as file:
             file.write(r.content)
 
-    return path
+    return filename, path
 
 
 def save_upload(file):
@@ -114,6 +114,17 @@ def save_upload(file):
     file.save(path)
 
     return path
+
+
+def file_type(path):
+    filename = path.split('/')[-1]
+    if allowed_file_image(filename):
+        filetype = 'image'
+    elif allowed_file_video(filename):
+        filetype = 'video'
+    else:
+        filetype = 'invalid'
+    return filetype
 
 
 path = Path(__file__).parent
@@ -138,10 +149,41 @@ def detect_by_url_page():
 def analyze():
     if 'url-button' in request.form:
         url = request.form['url_link']
-        path = download(url)
-        print('Path', path)
+        filename, filepath = download(url)
+        print('Filename', filename)
+        print('Upload filepath', filepath)
+        filetype = file_type(filepath)
 
-        return render_template('detect_url.html')
+        if filetype == 'image':
+            out_name = "Image Result"
+            output_path = os.path.join(
+                app.config['DETECTION_FOLDER'], filename)
+
+            iou = request.form.get('threshold-range')
+            confidence = request.form.get('confidence-range')
+            model_types = request.form.get('model-types')
+            tta = request.form.get('tta')
+            ensemble = request.form.get('ensemble')
+
+            ensemble = True if ensemble == 'on' else False
+            tta = True if tta == 'on' else False
+            model_types = str.lower(model_types)
+            min_conf = float(confidence)/100
+            min_iou = float(iou)/100
+
+            filename2, result_dict = get_prediction(
+                filepath,
+                output_path,
+                model_name=model_types,
+                ensemble=ensemble,
+                min_conf=min_conf,
+                min_iou=min_iou)
+
+        if filetype == 'video':
+            out_name = "Video Result"
+            print("Video detection here")
+
+        return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype)
 
     if 'upload-button' in request.form:
         f = request.files['file']
@@ -167,8 +209,8 @@ def analyze():
         tta = request.form.get('tta')
         ensemble = request.form.get('ensemble')
 
-        ensemble = True if ensemble=='on' else False
-        tta = True if tta=='on' else False
+        ensemble = True if ensemble == 'on' else False
+        tta = True if tta == 'on' else False
         model_types = str.lower(model_types)
         min_conf = float(confidence)/100
         min_iou = float(iou)/100
