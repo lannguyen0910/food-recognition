@@ -72,7 +72,7 @@ var messageArea = null,
 
 
 function runWebcam() {
-  clear();
+  
   messageArea = document.querySelector("#upload-label");
   wrapperArea = document.querySelector("#wrapper");
 
@@ -119,7 +119,7 @@ function runWebcam() {
       } else {
         videoCamera.src = window.URL.createObjectURL(stream);
       }
-
+      clear();
       detectBtn.setAttribute('disabled', 'disabled'); //disable detection
       
       messageArea.style.display = 'block';
@@ -161,10 +161,10 @@ function takeAPhoto() {
   });
   $('#webcam-video').empty();
 
-  var timestamp = new Date().getTime().toString();
-  messageArea.innerHTML = timestamp +'.png';
+  // var timestamp = new Date().getTime().toString();
+  // messageArea.innerHTML = timestamp +'.png';
   btnDownload.removeAttribute("disabled");
-  detectBtn.removeAttribute("disabled"); //enable detect
+  // detectBtn.removeAttribute("disabled"); //enable detect
 
 };
 
@@ -197,12 +197,27 @@ function isValidHttpUrl(string) {
 }
 
 function imageExists(image_url){ //https://stackoverflow.com/questions/18837735/check-if-image-exists-on-server-using-javascript
-    var http = new XMLHttpRequest();
+    // var http = new XMLHttpRequest();
 
-    http.open('HEAD', image_url, false);
-    http.send();
+    // http.open('GET', image_url, false);
+    // http.setRequestHeader("Access-Control-Allow-Origin", "*");
+    // http.setRequestHeader('Access-Control-Allow-Credentials', 'true');
+    // http.send();
 
-    return http.status != 404;
+    // return http.status != 404;
+    $.ajax({
+      method: 'HEAD',
+      url: image_url,
+      dataType: 'jsonp', //change the datatype to 'jsonp' works in most cases
+      success: (res) => {
+        console.log(res);
+        return true;
+      },
+      error: (e) =>{
+        console.log(e);
+        return false;
+      }
+    })
 }
 
 // youtube video url
@@ -242,7 +257,7 @@ function checkThumbnail(width) {
 }
 
 function trackURL(url){
-  if (isValidHttpUrl(url) && (imageExists(url) || validVideoId(YouTubeGetID(url)))){
+  if (isValidHttpUrl(url)){
     detectURLBtn.removeAttribute("disabled");
   }
   else{

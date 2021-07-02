@@ -100,11 +100,15 @@
           
           <div class="row">
             <div class="col-md-12">
-              <div id='image-display'>
-                <img id="user-image" src="{{url_for('static', filename='assets/uploads/' + fname)}}" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px">
-              </div>
+              <div class="panel panel-default result-panel">
+                <div class="panel-body result-card">
+                  <div id='image-display'>
+                    <img id="user-image" src="{{url_for('static', filename='assets/uploads/' + fname)}}" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px">
+                  </div>
 
-              <div id="webcam-video"></div>
+                  <div id="webcam-video"></div>
+                </div>
+              </div>
             </div>
           </div>
 
