@@ -162,11 +162,11 @@ def analyze():
             iou = request.form.get('threshold-range')
             confidence = request.form.get('confidence-range')
             model_types = request.form.get('model-types')
-            tta = request.form.get('tta')
+            enhanced = request.form.get('enhanced')
             ensemble = request.form.get('ensemble')
 
             ensemble = True if ensemble == 'on' else False
-            tta = True if tta == 'on' else False
+            enhanced = True if enhanced == 'on' else False
             model_types = str.lower(model_types)
             min_conf = float(confidence)/100
             min_iou = float(iou)/100
@@ -177,7 +177,8 @@ def analyze():
                 model_name=model_types,
                 ensemble=ensemble,
                 min_conf=min_conf,
-                min_iou=min_iou)
+                min_iou=min_iou,
+                enhance_labels=enhanced)
 
         if filetype == 'video':
             out_name = "Video Result"
