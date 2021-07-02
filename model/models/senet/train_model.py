@@ -325,7 +325,7 @@ def adjust_learning_rate(optimizer, epoch):
     param_groups[4]['lr']=lr*0.01
 
     for param_group in param_groups:
-        print param_group
+        print(param_group)
         # param_group['lr'] = lr
 
 

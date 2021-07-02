@@ -5,7 +5,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 import torchvision
-from .senet import senet154, se_resnext101_32x4d
+from .senet import senet154, se_resnext101_32x4d, se_resnet50, se_resnet101, se_resnet152, se_resnext50_32x4d
 
 
 class ConvBlock(nn.Module):
@@ -214,7 +214,7 @@ class MODEL(nn.Module):
         self.num_classes = num_classes
 
         # construct SEnet154 
-        senet154_ = se_resnext101_32x4d(num_classes=1000, pretrained=None)
+        senet154_ = senet154(num_classes=1000, pretrained=None)
         if self.senet154_weight is not None:
             senet154_.load_state_dict(torch.load(self.senet154_weight))
 

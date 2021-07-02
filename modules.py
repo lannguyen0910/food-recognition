@@ -37,7 +37,8 @@ weight_urls = {
     'yolov5s': "1-3TXxsF_CYjPzQqEVudNUtMA5nexc8TG",
     'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI",
     "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
-    "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP"
+    "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP",
+    "se_resnet": "1mB1QlCrylJVsFT9YV9TyV7IVbS9ECuuI"
 }
 
 def download_pretrained_weights(name, cached=None):
@@ -228,7 +229,13 @@ def label_enhancement(image, cache_name, result_dict):
             img = Image.fromarray(cropped)
             img_list.append(img)
 
-    result = get_classification_predict(img_list)
+    tmp_path = os.path.join(CACHE_DIR, 'se_resnet.pth')
+    if not os.path.isfile(tmp_path):
+        download_pretrained_weights(
+            'se_resnet', 
+            cached=tmp_path)
+
+    result = get_classification_predict(img_list, tmp_path)
     print(result)
 
 def get_prediction(
