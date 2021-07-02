@@ -34,7 +34,7 @@ parser.add_argument('--debug', action='store_true',
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
@@ -136,44 +136,52 @@ def detect_by_url_page():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    f = request.files['file']
-    iou = request.form.get('threshold-range')
-    confidence = request.form.get('confidence-range')
-    model_types = request.form.get('model-types')
-    tta = request.form.get('tta')
-    ensemble = request.form.get('ensemble')
+    if 'url-button' in request.form:
+        url = request.form['url_link']
+        path = download(url)
+        print('Path', path)
 
-    ori_file_name = secure_filename(f.filename)
-    _, ext = os.path.splitext(ori_file_name)
+        return render_template('detect_url.html')
 
-    # Get cache name by hashing image
-    data = f.read()
-    filename = hashlib.md5(data).hexdigest() + f'{ext}'
+    if 'upload-button' in request.form:
+        f = request.files['file']
+        ori_file_name = secure_filename(f.filename)
+        _, ext = os.path.splitext(ori_file_name)
 
-    # save file to /static/uploads
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    np_img = np.fromstring(data, np.uint8)
-    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-    cv2.imwrite(filepath, img)
+        # Get cache name by hashing image
+        data = f.read()
+        filename = hashlib.md5(data).hexdigest() + f'{ext}'
 
-    # predict image
-    output_path = os.path.join(app.config['DETECTION_FOLDER'], filename)
+        # save file to /static/uploads
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        np_img = np.fromstring(data, np.uint8)
+        img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+        cv2.imwrite(filepath, img)
 
-    ensemble = True if ensemble=='on' else False
-    tta = True if tta=='on' else False
-    model_types = str.lower(model_types)
-    min_conf = float(confidence)/100
-    min_iou = float(iou)/100
+        # predict image
+        output_path = os.path.join(app.config['DETECTION_FOLDER'], filename)
 
-    filename2, result_dict = get_prediction(
-        filepath,
-        output_path,
-        model_name=model_types,
-        ensemble=ensemble,
-        min_conf=min_conf,
-        min_iou=min_iou)
+        iou = request.form.get('threshold-range')
+        confidence = request.form.get('confidence-range')
+        model_types = request.form.get('model-types')
+        tta = request.form.get('tta')
+        ensemble = request.form.get('ensemble')
 
-    return render_template("detect.html", fname=filename, fname2=filename, result_dict=result_dict)
+        ensemble = True if ensemble=='on' else False
+        tta = True if tta=='on' else False
+        model_types = str.lower(model_types)
+        min_conf = float(confidence)/100
+        min_iou = float(iou)/100
+
+        filename2, result_dict = get_prediction(
+            filepath,
+            output_path,
+            model_name=model_types,
+            ensemble=ensemble,
+            min_conf=min_conf,
+            min_iou=min_iou)
+
+        return render_template("detect.html", fname=filename, fname2=filename, result_dict=result_dict)
 
 
 @app.after_request
