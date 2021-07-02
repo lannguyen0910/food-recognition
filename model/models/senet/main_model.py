@@ -5,7 +5,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 import torchvision
-from senet import senet154
+from .senet import senet154, se_resnext101_32x4d
 
 
 class ConvBlock(nn.Module):
@@ -204,7 +204,7 @@ class MODEL(nn.Module):
     '''
     the mian model of cvper2020
     '''
-    def __init__(self, num_classes, senet154_weight, nchannels=[256,512,1024,2048], multi_scale = False ,learn_region=True, use_gpu=True):
+    def __init__(self, num_classes, senet154_weight=None, nchannels=[256,512,1024,2048], multi_scale = False ,learn_region=True, use_gpu=True):
         super(MODEL,self).__init__()
         self.learn_region=learn_region
         self.use_gpu = use_gpu
@@ -214,8 +214,9 @@ class MODEL(nn.Module):
         self.num_classes = num_classes
 
         # construct SEnet154 
-        senet154_ = senet154(num_classes=1000, pretrained=None)
-        senet154_.load_state_dict(torch.load(self.senet154_weight))
+        senet154_ = se_resnext101_32x4d(num_classes=1000, pretrained=None)
+        if self.senet154_weight is not None:
+            senet154_.load_state_dict(torch.load(self.senet154_weight))
 
 
         self.extract_feature = senet154_.layer0

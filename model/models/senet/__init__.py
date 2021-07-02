@@ -20,12 +20,12 @@ def get_classification_predict(image_list):
     model_name = 'se_resnext101_32x4d'
     model = MODEL(
         num_classes= 500 , 
-        senet154_weight = '', 
+        senet154_weight = None, 
         multi_scale = True, 
         learn_region=True)
 
     model = torch.nn.DataParallel(model)
-
+  
     tmp_path = os.path.join(CACHE_DIR, 'se_resnet.pth')
     download_pretrained_weights(
         'se_resnet', 

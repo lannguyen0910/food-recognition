@@ -16,8 +16,7 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import torch
 import time
-import pretrainedmodels
-from main_model import MODEL
+from .main_model import MODEL
 
 os.environ.setdefault('CUDA_VISIBLE_DEVICES', '0,1')
 
