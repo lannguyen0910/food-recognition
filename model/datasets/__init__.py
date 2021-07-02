@@ -4,8 +4,8 @@ import fiftyone.zoo as foz
 
 food_list = [
     "Apple", "Orange", "Pizza", "Hamburger", "French fries", 
-    "Sandwich", "Baked goods", "Cheese", "Burrito", "Banana",
-    "Cake", "Pancake", "Coffee", "Tea", "Milk", "Salab",
+    "Sandwich", "Cheese", "Burrito", "Banana",
+   "Pancake", "Coffee", "Tea", "Milk", "Salab",
     "Cucumber", "Tomato", "Egg"]
 
 dataset = foz.load_zoo_dataset(
