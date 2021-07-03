@@ -70,15 +70,16 @@ def draw_image(out_path, ori_img, result_dict, class_names):
 
 def save_cache(result_dict, cache_name):
     boxes = np.array(result_dict['boxes'])
-   
+    
     cache_dict = {
         'x': boxes[:, 0],
         'y': boxes[:, 1],
         'w': boxes[:, 2],
         'h': boxes[:, 3],
-        'labels': result_dict['labels'],
-        'scores': result_dict['scores'],
     }
+
+    for key in result_dict.keys():
+        cache_dict[key] = result_dict[key]
     df = pd.DataFrame(cache_dict)
 
     df.to_csv(f'./{CACHE_DIR}/{cache_name}.csv', index=False)
@@ -217,12 +218,16 @@ def ensemble_models(input_path, image_size):
         'scores': final_scores
     }, class_names
 
-def append_food_info(food_dict, class_names):
+def append_food_name(food_dict, class_names):
     food_labels = food_dict['labels']
     food_names = [class_names[int(i)] for i in food_labels]
+    food_dict['names'] = food_names
+    return food_dict
+
+def append_food_info(food_dict):
+    food_names = food_dict['names']
     food_info = get_info_from_db(food_names)
     food_dict.update(food_info)
-    food_dict['names'] = food_names
     return food_dict
 
 def convert_dict_to_list(result_dict):
@@ -307,16 +312,20 @@ def get_prediction(
         ]
     
     # get hashed key from image path
-    hashed_key = os.path.basename(input_path)[:-4]
+    ori_hashed_key = os.path.basename(input_path)[:-4]
 
     # additional tags
     model_tag = model_name[-1]
     ensemble_tag = 'ens' if ensemble else ''
 
     if ensemble:
-        hashed_key += f"_{ensemble_tag}"
+        hashed_key = ori_hashed_key + f"_{ensemble_tag}"
     else:
-        hashed_key += f"_{model_tag}"
+        hashed_key = ori_hashed_key + f"_{model_tag}"
+
+    ori_img = cv2.imread(input_path)
+    ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+    img_h, img_w, _ = ori_img.shape
 
     # check whether cache exists
     if check_cache(hashed_key):
@@ -339,27 +348,27 @@ def get_prediction(
             result_dict = detect(args, config)
         
         else:
-            img = cv2.imread(input_path)
-            h,w,_ = img.shape
-            result_dict, class_names = ensemble_models(input_path, [w,h]) 
+            result_dict, class_names = ensemble_models(input_path, [img_w,img_h]) 
         save_cache(result_dict, hashed_key)
         print(f"Save cache to {hashed_key}")
         
     class_names.insert(0, "Background")
 
-    ori_img = cv2.imread(input_path)
-    ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
-    img_h, img_w, _ = ori_img.shape
+    
 
     # post process
     result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
 
-    # add food infomation
-    result_dict = append_food_info(result_dict, class_names)
+    # add food name
+    result_dict = append_food_name(result_dict, class_names)
 
     # enhance by using a classifier
     if enhance_labels:
         result_dict = label_enhancement(ori_img, hashed_key, result_dict)
+
+    # add food infomation and save to file
+    result_dict = append_food_info(result_dict)
+    save_cache(result_dict, ori_hashed_key+'_info')
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
