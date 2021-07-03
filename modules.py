@@ -8,7 +8,7 @@ from model import (
     detect, get_config, Config, 
     download_weights, draw_boxes_v2, 
     get_class_names, postprocessing, 
-    box_fusion, classify)
+    box_fusion, classify, change_box_order)
 from api import get_info_from_db
 
 CACHE_DIR = '.cache'
@@ -180,7 +180,6 @@ def ensemble_models(input_path, image_size):
     result_dict3 = detect(args3, config3)
     result_dict4 = detect(args4, config4)
 
-
     merged_boxes = [
         np.array(result_dict1['boxes']), 
         np.array(result_dict2['boxes']), 
@@ -217,13 +216,15 @@ def ensemble_models(input_path, image_size):
     final_scores = final_scores[indexes]
     final_classes = final_classes[indexes]
 
+    final_boxes = change_box_order(final_boxes, order='xyxy2xywh')
+
     result_dict = {
         'boxes': [],
         'labels': [],
         'scores': []
     }
 
-    for (box, score, label) in zip(final_boxes, final_classes, final_scores):
+    for (box, score, label) in zip(final_boxes, final_scores, final_classes):
         result_dict['boxes'].append(box)
         result_dict['labels'].append(label)
         result_dict['scores'].append(score)
@@ -269,8 +270,6 @@ def crop_box(image, box, expand=10):
 
     #xyxy box, cv2 image h,w,c
     return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
-
-    
 
 def label_enhancement(image, result_dict):
     boxes = np.array(result_dict['boxes'])
@@ -362,8 +361,6 @@ def get_prediction(
         print(f"Save cache to {hashed_key}")
         
     class_names.insert(0, "Background")
-
-    
 
     # post process
     result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
