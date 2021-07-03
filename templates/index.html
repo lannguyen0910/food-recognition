@@ -24,104 +24,108 @@
 
 
     <div class='center' style="position:relative;">
-      <div class='content'>
-        <form id="file-upload" action = "{{ url_for('analyze') }}" method = "POST" enctype="multipart/form-data">
-          <div class="row">
-            <div class="col-md-3">
-              <div id="canvas-tools" class="panel panel-default">
-                <div class="panel-body">
-                  <div id="threshold-text">
-                    <b>IOU Threshold:</b>
-                    <span>65</span>%
+      <div class="panel panel-default result-panel">
+        <div class="panel-body result-card">
+          <div class='content'>
+            <form id="file-upload" action = "{{ url_for('analyze') }}" method = "POST" enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-md-3">
+                  <div id="canvas-tools" class="panel panel-default">
+                    <div class="panel-body">
+                      <div id="threshold-text">
+                        <b>IOU Threshold:</b>
+                        <span>65</span>%
+                      </div>
+                      <input id="threshold-range" type="range" min="0" max="100" value="65" class="slider" name="threshold-range">
+                    </div>
                   </div>
-                  <input id="threshold-range" type="range" min="0" max="100" value="65" class="slider" name="threshold-range">
                 </div>
-              </div>
-            </div>
 
-            <div class="col-md-3">
-              <div id="canvas-tools" class="panel panel-default">
-                <div class="panel-body">
-                  <div id="confidence-text">
-                    <b>Confidence:</b>
-                    <span>25</span>%
+                <div class="col-md-3">
+                  <div id="canvas-tools" class="panel panel-default">
+                    <div class="panel-body">
+                      <div id="confidence-text">
+                        <b>Confidence:</b>
+                        <span>25</span>%
+                      </div>
+                      <input id="confidence-range" type="range" min="0" max="100" value="25" class="slider" name="confidence-range">
+                    </div>
                   </div>
-                  <input id="confidence-range" type="range" min="0" max="100" value="25" class="slider" name="confidence-range">
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="model-types">Choose a model</label>
+                    <br/>
+                    <select name="model-types" class="form-control-sm" id="model-types">
+                      <option>YOLOv5s</option>
+                      <option>YOLOv5m</option>
+                      <option>YOLOv5l</option>
+                      <option>YOLOv5x</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="enhanced" name="enhanced">
+                    <label class="form-check-label" for="enhanced">Label Enhancement</label>
+                  </div>
+                  
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="ensemble" name="ensemble">
+                    <label class="form-check-label" for="ensemble">Ensemble models</label>
+                  </div>
+                </div>
+
+              </div>
+
+
+              <div class='no-display'>
+                <input id='file-input'
+                      class='no-display'
+                      type='file'
+                      name='file'
+                      onchange='showPicked(this)'>
+              </div>
+
+              <button class='btn btn-primary' type='button' onclick='showPicker()'>Upload File</button>
+              <button class="btn btn-secondary" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
+
+
+              <div id="wrapper">
+                <button class="btn btn-danger" type="button" id="capture-img" disabled="disabled">Capture</button>
+                <button class="btn btn-success" type="button" id="download-img" disabled="disabled">Download</button>
+              </div>
+
+
+              <div class='upload-label'>
+                <label id='upload-label'></label>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="panel panel-default result-panel">
+                    <div class="panel-body result-card">
+                      <div id='image-display'></div>
+                      <div id="webcam-video"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="model-types">Choose a model</label>
-                <br/>
-                <select name="model-types" class="form-control-sm" id="model-types">
-                  <option>YOLOv5s</option>
-                  <option>YOLOv5m</option>
-                  <option>YOLOv5l</option>
-                  <option>YOLOv5x</option>
-                </select>
+
+              <div class='analyze'>
+                <button id='analyze-button' class='btn btn-outline-success' name='upload-button' type='submit' disabled="disabled">Detect</button>
               </div>
-            </div>
 
-            <div class="col-md-3">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="enhanced" name="enhanced">
-                <label class="form-check-label" for="enhanced">Label Enhancement</label>
-              </div>
-              
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="ensemble" name="ensemble">
-                <label class="form-check-label" for="ensemble">Ensemble models</label>
-              </div>
-            </div>
-
+            </form>
           </div>
-
-
-          <div class='no-display'>
-            <input id='file-input'
-                  class='no-display'
-                  type='file'
-                  name='file'
-                  onchange='showPicked(this)'>
-          </div>
-
-          <button class='btn btn-primary' type='button' onclick='showPicker()'>Upload File</button>
-          <button class="btn btn-secondary" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
-
-
-          <div id="wrapper">
-            <button class="btn btn-danger" type="button" id="capture-img" disabled="disabled">Capture</button>
-            <button class="btn btn-success" type="button" id="download-img" disabled="disabled">Download</button>
-          </div>
-
-
-          <div class='upload-label'>
-            <label id='upload-label'></label>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
-              <div class="panel panel-default result-panel">
-                <div class="panel-body result-card">
-                  <div id='image-display'></div>
-                  <div id="webcam-video"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class='analyze'>
-            <button id='analyze-button' class='btn btn-outline-success' name='upload-button' type='submit' disabled="disabled">Detect</button>
-          </div>
-
-        </form>
+        </div>
       </div>
     </div>
 
 
-    <footer style="position: absolute;right: 0;left: 0;padding: 1rem;text-align: center; box-sizing: border-box;z-index:150;" class="w3-container w3-padding-64 w3-center w3-light-gray w3-xlarge">
-      
+    <footer style="position: absolute;right: 0;left: 0;padding: 1rem;text-align: center; box-sizing: border-box;z-index:150;" class="w3-card w3-container w3-padding-64 panel-body panel panel-default result-panel w3-light-gray w3-center w3-xlarge">
+    
       <a href="https://github.com/yolo-statistical-ml/" target="_blank"><i class="fab fa-github w3-hover-opacity"></i></a>
       <p class="w3-medium" style="font-weight: bold;">Created by <a href="https://github.com/kaylode/"
           target="_blank" style="text-decoration: none;">kaylode</a> and <a href="https://github.com/lannguyen0910/"

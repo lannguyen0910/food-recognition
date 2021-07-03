@@ -23,128 +23,132 @@
 
 
     <div class='center' style="position:relative;">
-      <div class='content'>
-        <form id="file-upload" action = "/analyze" method = "POST" enctype="multipart/form-data">
-          <div class="row">
-            <div class="col-md-3">
-              <div id="canvas-tools" class="panel panel-default">
-                <div class="panel-body">
-                  <div id="threshold-text">
-                    <b>IOU Threshold:</b>
-                    <span>65</span>%
-                  </div>
-                  <input id="threshold-range" type="range" min="0" max="100" value="65" class="slider" name="threshold-range">
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div id="canvas-tools" class="panel panel-default">
-                <div class="panel-body">
-                  <div id="confidence-text">
-                    <b>Confidence:</b>
-                    <span>25</span>%
-                  </div>
-                  <input id="confidence-range" type="range" min="0" max="100" value="25" class="slider" name="confidence-range">
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="model-types">Choose a model</label>
-                <br/>
-                <select name="model-types" class="form-control-sm" id="model-types">
-                  <option>YOLOv5s</option>
-                  <option>YOLOv5m</option>
-                  <option>YOLOv5l</option>
-                  <option>YOLOv5x</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="enhanced" name="enhanced">
-                <label class="form-check-label" for="enhanced">Label Enhancement</label>
-              </div>
-              
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="ensemble" name="ensemble">
-                <label class="form-check-label" for="ensemble">Ensemble models</label>
-              </div>
-            </div>
-
-          </div>
-
-          {% if error_msg %}
-            <div id="alert" class="alert alert-danger alert-dismissible alert-margin" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="closeAlert()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            {{error_msg}}
-            </div>
-            {% endif %}
-
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="panel panel-default margin">
-                <div class="panel-body">
-                  <div class="header-setting">
-                      <b style="font-size:medium;">Detect Image and Video</b>
-                  </div>
-                  <p style="margin-top: 5px; margin-bottom: 0px;">Select From URL</p>
-                  <div>
-                      <input type=url class="form-control" id="url" name="url_link" onchange="trackURL(this.value)" placeholder="http://">
-                  </div>
-                  <button type="submit" id="url-button" name="url-button" class="btn btn-outline-success"
-                      style="margin-top: 10px;border: 1px gray solid" disabled="disabled">Detect by URL</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {% block content %}
-          {% if not error_msg %}
-          <div class="panel panel-default result-panel">
+        <div class="panel panel-default result-panel">
             <div class="panel-body result-card">
-              <div id='result-content'>
-                <div style="text-align: center;">
-                    <b>{{out_name}}</b>
-                </div>
+                <div class='content'>
+                    <form id="file-upload" action = "/analyze" method = "POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-3">
+                            <div id="canvas-tools" class="panel panel-default">
+                                <div class="panel-body">
+                                <div id="threshold-text">
+                                    <b>IOU Threshold:</b>
+                                    <span>65</span>%
+                                </div>
+                                <input id="threshold-range" type="range" min="0" max="100" value="65" class="slider" name="threshold-range">
+                                </div>
+                            </div>
+                            </div>
 
-                <div>
-                    {% if filetype == 'image' %}
-                    <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
-                    {% else %}
-                    <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
-                    {% endif %}
+                            <div class="col-md-3">
+                            <div id="canvas-tools" class="panel panel-default">
+                                <div class="panel-body">
+                                <div id="confidence-text">
+                                    <b>Confidence:</b>
+                                    <span>25</span>%
+                                </div>
+                                <input id="confidence-range" type="range" min="0" max="100" value="25" class="slider" name="confidence-range">
+                                </div>
+                            </div>
+                            </div>
+                            <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="model-types">Choose a model</label>
+                                <br/>
+                                <select name="model-types" class="form-control-sm" id="model-types">
+                                <option>YOLOv5s</option>
+                                <option>YOLOv5m</option>
+                                <option>YOLOv5l</option>
+                                <option>YOLOv5x</option>
+                                </select>
+                            </div>
+                            </div>
+
+                            <div class="col-md-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enhanced" name="enhanced">
+                                <label class="form-check-label" for="enhanced">Label Enhancement</label>
+                            </div>
+                            
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="ensemble" name="ensemble">
+                                <label class="form-check-label" for="ensemble">Ensemble models</label>
+                            </div>
+                            </div>
+
+                        </div>
+
+                        {% if error_msg %}
+                            <div id="alert" class="alert alert-danger alert-dismissible alert-margin" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="closeAlert()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            {{error_msg}}
+                            </div>
+                            {% endif %}
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                            <div class="panel panel-default margin">
+                                <div class="panel-body">
+                                <div class="header-setting">
+                                    <b style="font-size:medium;">Detect Image and Video</b>
+                                </div>
+                                <p style="margin-top: 5px; margin-bottom: 0px;">Select From URL</p>
+                                <div>
+                                    <input type=url class="form-control" id="url" name="url_link" onchange="trackURL(this.value)" placeholder="http://">
+                                </div>
+                                <button type="submit" id="url-button" name="url-button" class="btn btn-outline-success"
+                                    style="margin-top: 10px;border: 1px gray solid" disabled="disabled">Detect by URL</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        {% block content %}
+                        {% if not error_msg %}
+                        <div class="panel panel-default result-panel">
+                            <div class="panel-body result-card">
+                            <div id='result-content'>
+                                <div style="text-align: center;">
+                                    <b>{{out_name}}</b>
+                                </div>
+
+                                <div>
+                                    {% if filetype == 'image' %}
+                                    <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                                    {% else %}
+                                    <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
+                                    {% endif %}
+                                </div>
+                                <!-- {{result_dict}} -->
+                                <tr>
+                                {%for item in result_dict %}
+                                <div class='result-label'> 
+                                    {% if item.calories %}
+                                    <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
+                                    {% else %}
+                                    <h2 id='label'>{{item.names}} || No information </h2>
+                                    {% endif %}
+                                    <!-- <h3 id='calories'></h3> -->
+                                </div>
+                                {% endfor %}
+                                </tr>
+                            </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endblock %}
+                    
+                    </form>
                 </div>
-                <!-- {{result_dict}} -->
-                <tr>
-                {%for item in result_dict %}
-                <div class='result-label'> 
-                    {% if item.calories %}
-                    <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
-                    {% else %}
-                    <h2 id='label'>{{item.names}} || No information </h2>
-                    {% endif %}
-                    <!-- <h3 id='calories'></h3> -->
-                </div>
-                {% endfor %}
-                </tr>
-              </div>
             </div>
-          </div>
-          {% endif %}
-          {% endblock %}
-          
-        </form>
-      </div>
+        </div>
     </div>
 
 
-    <footer style="position: absolute;right: 0;left: 0;padding: 1rem;text-align: center; box-sizing: border-box;z-index:150;" class="w3-container w3-padding-64 w3-center w3-light-gray w3-xlarge">
-      
+    <footer style="position: absolute;right: 0;left: 0;padding: 1rem;text-align: center; box-sizing: border-box;z-index:150;" class="w3-card w3-container w3-padding-64 panel-body panel panel-default result-panel w3-light-gray w3-center w3-xlarge">
+    
       <a href="https://github.com/yolo-statistical-ml/" target="_blank"><i class="fab fa-github w3-hover-opacity"></i></a>
       <p class="w3-medium" style="font-weight: bold;">Created by <a href="https://github.com/kaylode/"
           target="_blank" style="text-decoration: none;">kaylode</a> and <a href="https://github.com/lannguyen0910/"
