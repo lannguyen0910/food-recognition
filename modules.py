@@ -1,3 +1,4 @@
+from re import I
 import cv2
 from PIL import Image
 import numpy as np
@@ -79,7 +80,8 @@ def save_cache(result_dict, cache_name):
     }
 
     for key in result_dict.keys():
-        cache_dict[key] = result_dict[key]
+        if key != 'boxes':
+            cache_dict[key] = result_dict[key]
     df = pd.DataFrame(cache_dict)
 
     df.to_csv(f'./{CACHE_DIR}/{cache_name}.csv', index=False)
@@ -94,7 +96,10 @@ def load_cache(image_name):
         'labels': [],
         'scores': []
     }
-    for idx, row in df.iterrows():
+
+    ann = [i for i in zip(df.x, df.y, df.w, df.h, df.labels, df.scores)]
+
+    for row in ann:
         x, y, w, h, label, score = row
         x = float(x)
         y = float(y)
@@ -176,24 +181,25 @@ def ensemble_models(input_path, image_size):
     result_dict4 = detect(args4, config4)
 
 
-    merged_boxes = np.array([
+    merged_boxes = [
         np.array(result_dict1['boxes']), 
         np.array(result_dict2['boxes']), 
         np.array(result_dict3['boxes']), 
-        np.array(result_dict4['boxes'])])
-    merged_labels = np.array([
+        np.array(result_dict4['boxes'])]
+    merged_labels = [
         np.array(result_dict1['labels']), 
         np.array(result_dict2['labels']), 
         np.array(result_dict3['labels']), 
-        np.array(result_dict4['labels'])])
-    merged_scores = np.array([
+        np.array(result_dict4['labels'])]
+    merged_scores = [
         np.array(result_dict1['scores']), 
         np.array(result_dict2['scores']), 
         np.array(result_dict3['scores']), 
-        np.array(result_dict4['scores'])])
+        np.array(result_dict4['scores'])]
 
-    merged_boxes[:,:,2] += merged_boxes[:,:,0]  #xyxy
-    merged_boxes[:,:,3] += merged_boxes[:,:,1]  #xyxy
+    for i in range(len(merged_boxes)):
+        merged_boxes[i][:,2] += merged_boxes[i][:,0]  #xyxy
+        merged_boxes[i][:,3] += merged_boxes[i][:,1]  #xyxy
 
   
     final_boxes, final_scores, final_classes = box_fusion(
@@ -211,12 +217,17 @@ def ensemble_models(input_path, image_size):
     final_scores = final_scores[indexes]
     final_classes = final_classes[indexes]
 
-   
-    return {
-        'boxes': final_boxes,
-        'labels': final_classes,
-        'scores': final_scores
-    }, class_names
+    result_dict = {
+        'boxes': [],
+        'labels': [],
+        'scores': []
+    }
+
+    for (box, score, label) in zip(final_boxes, final_classes, final_scores):
+        result_dict['boxes'].append(box)
+        result_dict['labels'].append(label)
+        result_dict['scores'].append(score)
+    return result_dict, class_names
 
 def append_food_name(food_dict, class_names):
     food_labels = food_dict['labels']
@@ -261,14 +272,12 @@ def crop_box(image, box, expand=10):
 
     
 
-def label_enhancement(image, cache_name, result_dict):
+def label_enhancement(image, result_dict):
     boxes = np.array(result_dict['boxes'])
     labels = np.array(result_dict['labels'])
     boxes[:,2] += boxes[:,0]  #xyxy
     boxes[:,3] += boxes[:,1]  #xyxy
     
-    cropped_folder = os.path.join(CACHE_DIR, cache_name)
-    os.makedirs(cropped_folder, exist_ok=True)
     # Label starts at 1
     img_list = []
     new_id_list = []
@@ -364,7 +373,7 @@ def get_prediction(
 
     # enhance by using a classifier
     if enhance_labels:
-        result_dict = label_enhancement(ori_img, hashed_key, result_dict)
+        result_dict = label_enhancement(ori_img, result_dict)
 
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
