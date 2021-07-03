@@ -122,10 +122,9 @@ def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
         'classes': labels
     }
 
-    size = max(img_w, img_h)
     outputs = postprocessing(
         outputs, 
-        current_img_size=[size, size],
+        current_img_size=[img_w, img_h],
         min_iou=min_iou,
         min_conf=min_conf,
         output_format='xywh',
@@ -175,10 +174,31 @@ def ensemble_models(input_path, image_size):
     result_dict3 = detect(args3, config3)
     result_dict4 = detect(args4, config4)
 
+
+    merged_boxes = np.array([
+        np.array(result_dict1['boxes']), 
+        np.array(result_dict2['boxes']), 
+        np.array(result_dict3['boxes']), 
+        np.array(result_dict4['boxes'])])
+    merged_labels = np.array([
+        np.array(result_dict1['labels']), 
+        np.array(result_dict2['labels']), 
+        np.array(result_dict3['labels']), 
+        np.array(result_dict4['labels'])])
+    merged_scores = np.array([
+        np.array(result_dict1['scores']), 
+        np.array(result_dict2['scores']), 
+        np.array(result_dict3['scores']), 
+        np.array(result_dict4['scores'])])
+
+    merged_boxes[:,:,2] += merged_boxes[:,:,0]  #xyxy
+    merged_boxes[:,:,3] += merged_boxes[:,:,1]  #xyxy
+
+  
     final_boxes, final_scores, final_classes = box_fusion(
-        [result_dict1['boxes'], result_dict2['boxes'], result_dict3['boxes'], result_dict4['boxes']],
-        [result_dict1['labels'] + result_dict2['labels'] + result_dict3['labels'] + result_dict4['labels']],
-        [result_dict1['scores'] + result_dict2['scores'] + result_dict3['scores'] + result_dict4['scores']],
+        merged_boxes,
+        merged_scores,
+        merged_labels,
         mode="wbf",
         image_size=image_size, 
         iou_threshold=0.9,
@@ -190,6 +210,7 @@ def ensemble_models(input_path, image_size):
     final_scores = final_scores[indexes]
     final_classes = final_classes[indexes]
 
+   
     return {
         'boxes': final_boxes,
         'labels': final_classes,
@@ -292,7 +313,10 @@ def get_prediction(
     model_tag = model_name[-1]
     ensemble_tag = 'ens' if ensemble else ''
 
-    hashed_key += f"_{model_tag}_{ensemble_tag}"
+    if ensemble:
+        hashed_key += f"_{ensemble_tag}"
+    else:
+        hashed_key += f"_{model_tag}"
 
     # check whether cache exists
     if check_cache(hashed_key):
@@ -315,7 +339,9 @@ def get_prediction(
             result_dict = detect(args, config)
         
         else:
-            result_dict, class_names = ensemble_models(input_path) 
+            img = cv2.imread(input_path)
+            h,w,_ = img.shape
+            result_dict, class_names = ensemble_models(input_path, [w,h]) 
         save_cache(result_dict, hashed_key)
         print(f"Save cache to {hashed_key}")
         
