@@ -36,7 +36,7 @@ function showPicked(input) {
     el("upload-label").innerHTML = input.files[0].name;
     var file_url = e.target.result
 
-    if (extension === "mp4"){
+    if (extension === "mp4" || extension === 'avi' || extension === '3gp'){
       var video_html = '<video autoplay id="user-video" controls> <source id="user-source"></source></video>'
       $('#image-display').html(video_html); // replaces previous video
       var video = el("user-video");
@@ -47,7 +47,7 @@ function showPicked(input) {
     }
 
     else if(extension === "jpg" || extension === "jpeg" || extension === "png"){
-      var img_html = '<img id="user-image" src="' + file_url + '" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"/>';
+      var img_html = '<img id="user-image" src="' + file_url + '" style="display: block;margin-left: auto;margin-right: auto;width: 512px; height: 512px"/>';
       $('#image-display').html(img_html); // replaces previous img
 
     }
@@ -205,19 +205,26 @@ function imageExists(image_url){ //https://stackoverflow.com/questions/18837735/
     // http.send();
 
     // return http.status != 404;
-    $.ajax({
+    const myRequest = new Request(image_url, {
       method: 'HEAD',
-      url: image_url,
-      dataType: 'jsonp', //change the datatype to 'jsonp' works in most cases
-      success: (res) => {
-        console.log(res);
-        return true;
+      headers: {
+          "Content-Type": "text/plain"
       },
-      error: (e) =>{
-        console.log(e);
-        return false;
-      }
-    })
+      mode: 'cors',
+      cache: 'default',
+    });
+
+    fetch(myRequest)
+        .then(function (response) {
+            if (response.ok) {
+                return true;
+            } else {
+                return false;
+            }
+            }).catch(function(err) {
+                alert(err);
+            });
+
 }
 
 // youtube video url
@@ -265,8 +272,11 @@ function trackURL(url){
   }
 }
 
-window.onload = function(){
+function closeAlert(){
+  $('#alert').remove();
+}
 
+window.onload = function(){
   $('#threshold-range').on('input', function() {
     $('#threshold-text span').html(this.value);
     threshold = $('#threshold-range').val() / 100;
@@ -276,4 +286,5 @@ window.onload = function(){
     $('#confidence-text span').html(this.value);
     confidence = $('#confidence-range').val() / 100;
   });
+
 }

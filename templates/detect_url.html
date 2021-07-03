@@ -24,7 +24,7 @@
 
     <div class='center' style="position:relative;">
       <div class='content'>
-        <form id="file-upload" action = "/analyze_v2" method = "POST" enctype="multipart/form-data">
+        <form id="file-upload" action = "/analyze" method = "POST" enctype="multipart/form-data">
           <div class="row">
             <div class="col-md-3">
               <div id="canvas-tools" class="panel panel-default">
@@ -76,6 +76,15 @@
 
           </div>
 
+          {% if error_msg %}
+            <div id="alert" class="alert alert-danger alert-dismissible alert-margin" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="closeAlert()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            {{error_msg}}
+            </div>
+            {% endif %}
+
           <div class="row">
             <div class="col-lg-6">
               <div class="panel panel-default margin">
@@ -95,6 +104,7 @@
           </div>
 
           {% block content %}
+          {% if not error_msg %}
           <div class="panel panel-default result-panel">
             <div class="panel-body result-card">
               <div id='result-content'>
@@ -125,6 +135,7 @@
               </div>
             </div>
           </div>
+          {% endif %}
           {% endblock %}
           
         </form>

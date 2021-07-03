@@ -48,7 +48,7 @@ app.config['DETECTION_FOLDER'] = DETECTION_FOLDER
 app.config['VIDEO_FOLDER'] = VIDEO_FOLDER
 
 IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-VIDEO_ALLOWED_EXTENSIONS = {'mp4'}
+VIDEO_ALLOWED_EXTENSIONS = {'mp4', 'avi', '3gp'}
 
 
 def allowed_file_image(filename):
@@ -179,9 +179,13 @@ def analyze():
                 min_iou=min_iou,
                 enhance_labels=enhanced)
 
-        if filetype == 'video':
+        elif filetype == 'video':
             out_name = "Video Result"
             print("Video detection here")
+        
+        else:
+            error_msg = "Invalid input url!!!"
+            return render_template('detect_url.html', error_msg=error_msg)
 
         return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype)
 
