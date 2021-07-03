@@ -3,20 +3,20 @@ import os
 import cv2
 import torch
 from torch.utils.data import Dataset, DataLoader
-from utils.utils import draw_boxes_v2, write_to_video
+from .utils.utils import draw_boxes_v2, write_to_video
 from .utils.postprocess import postprocessing
 from tqdm import tqdm
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
-from augmentations.transforms import get_resize_augmentation
-from augmentations.transforms import MEAN, STD
+from .augmentations.transforms import get_resize_augmentation
+from .augmentations.transforms import MEAN, STD
 
 class VideoSet:
-    def __init__(self, config, input_path):
+    def __init__(self, input_path, image_size, keep_ratio):
         self.input_path = input_path # path to video file
-        self.image_size = config.image_size
+        self.image_size = image_size
         self.transforms = A.Compose([
-            get_resize_augmentation(config.image_size, keep_ratio=config.keep_ratio),
+            get_resize_augmentation(image_size, keep_ratio=keep_ratio),
             A.Normalize(mean=MEAN, std=STD, max_pixel_value=1.0, p=1.0),
             ToTensorV2(p=1.0)
         ])
@@ -104,9 +104,9 @@ class VideoSet:
         return s2
 
 class VideoLoader(DataLoader):
-    def __init__(self, config, video_path):
+    def __init__(self, video_path, image_size, keep_ratio):
         self.video_path = video_path
-        dataset = VideoSet(config, video_path)
+        dataset = VideoSet(video_path, image_size, keep_ratio)
         self.video_info = dataset.video_info
        
         super(VideoLoader, self).__init__(
@@ -143,7 +143,6 @@ class VideoWriter:
         write_to_video(
             img, boxes, labels, 
             scores = scores,
-            tracks=tracks, 
             imshow=False, 
             outvid = self.outvid, 
             obj_list=self.obj_list)
@@ -226,13 +225,16 @@ class VideoDetect:
             "scores": scores_result }
 
 
-class Pipeline:
+class VideoPipeline:
     def __init__(self, args, config):
         self.detector = VideoDetect(args, config)
         self.class_names = self.detector.class_names
         self.video_path = args.input_path
         self.saved_path = args.output_path
-        self.videoloader = VideoLoader(config, self.video_path)
+        self.videoloader = VideoLoader(
+            self.video_path, 
+            image_size=config.image_size, 
+            keep_ratio=config.keep_ratio)
         
     def get_cam_name(self, path):
         filename = os.path.basename(path)
@@ -246,13 +248,6 @@ class Pipeline:
             self.videoloader.dataset.video_info,
             saved_path=self.saved_path,
             obj_list=self.class_names)
-        
-
-        obj_dict = {
-            'frames': [],
-            'labels': [],
-            'boxes': []
-        }
 
         for idx, batch in enumerate(tqdm(self.videoloader)):
             preds = self.detector.run(batch)
@@ -262,22 +257,11 @@ class Pipeline:
                 boxes = preds['boxes'][i]
                 labels = preds['labels'][i]
                 scores = preds['scores'][i]
-                frame_id = batch['frames'][i]
 
                 ori_img = ori_imgs[i]
-                track_result = self.tracker.run(ori_img, boxes, labels, scores)
                 
                 videowriter.write(
                     ori_img,
-                    boxes = track_result['boxes'],
-                    labels = track_result['labels'],
-                    tracks = track_result['tracks'])
-
-                for j in range(len(track_result['boxes'])):
-                    obj_dict['frames'].append(frame_id)
-                    obj_dict['tracks'].append(track_result['tracks'][j])
-                    obj_dict['labels'].append(track_result['labels'][j])
-                    obj_dict['boxes'].append(track_result['boxes'][j])
-
-            
-        return obj_dict
+                    boxes = boxes,
+                    labels = labels,
+                    scores=scores)

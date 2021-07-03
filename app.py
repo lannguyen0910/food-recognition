@@ -18,7 +18,7 @@ from flask import Flask, request, render_template, redirect, url_for
 from io import BytesIO
 from pathlib import Path
 from werkzeug.utils import secure_filename
-from modules import get_prediction
+from modules import get_prediction, get_video_prediction
 from flask_ngrok import run_with_ngrok
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -83,6 +83,7 @@ def download(url):
             pass
         print('Youtube')
         path = download_yt(url)
+        filename = os.path.basename(path)
     else:
         make_dir(app.config['UPLOAD_FOLDER'])
         filename = url.split('/')[-1]
@@ -154,21 +155,21 @@ def analyze():
         print('Upload filepath', filepath)
         filetype = file_type(filepath)
 
+        iou = request.form.get('threshold-range')
+        confidence = request.form.get('confidence-range')
+        model_types = request.form.get('model-types')
+        enhanced = request.form.get('enhanced')
+        ensemble = request.form.get('ensemble')
+        ensemble = True if ensemble == 'on' else False
+        enhanced = True if enhanced == 'on' else False
+        model_types = str.lower(model_types)
+        min_conf = float(confidence)/100
+        min_iou = float(iou)/100
+
         if filetype == 'image':
             out_name = "Image Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
-
-            iou = request.form.get('threshold-range')
-            confidence = request.form.get('confidence-range')
-            model_types = request.form.get('model-types')
-            enhanced = request.form.get('enhanced')
-            ensemble = request.form.get('ensemble')
-            ensemble = True if ensemble == 'on' else False
-            enhanced = True if enhanced == 'on' else False
-            model_types = str.lower(model_types)
-            min_conf = float(confidence)/100
-            min_iou = float(iou)/100
 
             filename2, result_dict = get_prediction(
                 filepath,
@@ -181,8 +182,15 @@ def analyze():
 
         elif filetype == 'video':
             out_name = "Video Result"
-            print("Video detection here")
-        
+            output_path = os.path.join(
+                app.config['DETECTION_FOLDER'], filename)
+            get_video_prediction(
+                filepath,
+                output_path,
+                model_name=model_types,
+                min_conf=min_conf,
+                min_iou=min_iou,
+                enhance_labels=enhanced)
         else:
             error_msg = "Invalid input url!!!"
             return render_template('detect_url.html', error_msg=error_msg)

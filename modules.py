@@ -8,7 +8,8 @@ from model import (
     detect, get_config, Config, 
     download_weights, draw_boxes_v2, 
     get_class_names, postprocessing, 
-    box_fusion, classify, change_box_order)
+    box_fusion, classify, change_box_order,
+    VideoPipeline)
 from api import get_info_from_db
 
 CACHE_DIR = '.cache'
@@ -299,6 +300,41 @@ def label_enhancement(image, result_dict):
         result_dict['names'][id] = new_names[idx]
     
     return result_dict
+
+def get_video_prediction(
+    input_path, 
+    output_path,
+    model_name,
+    min_iou=0.5,
+    min_conf=0.1,
+    enhance_labels=False):
+    
+    ignore_keys = [
+            'min_iou_val',
+            'min_conf_val',
+            'tta',
+            'gpu_devices',
+            'tta_ensemble_mode',
+            'tta_conf_threshold',
+            'tta_iou_threshold',
+        ]
+
+    args = Arguments(model_name=model_name)
+
+    config = get_config(args.weight, ignore_keys)
+    if config is None:  
+        print("Config not found. Load configs from configs/configs.yaml")
+        config = Config(os.path.join('model/configs','configs.yaml'))
+    else:
+        print("Load configs from weight")   
+
+    args.input_path = input_path
+    args.output_path = output_path
+    args.min_conf = min_conf
+    args.min_iou = min_iou
+    video_detect = VideoPipeline(args, config)
+    video_detect.run()
+
 
 def get_prediction(
     input_path, 
