@@ -115,14 +115,14 @@
               </div>
 
               <div class='analyze'>
-                <button id='analyze-button' class='btn btn-outline-success' type='submit' disabled="disabled">Detect</button>
+                <button id='analyze-button' name='upload-button' class='btn btn-outline-success' type='submit' disabled="disabled">Detect</button>
               </div>
 
             </form>
               {% block content %}
-              <div class="panel panel-default result-panel">
-                <div class="panel-body result-card">
-                  <div id='result-content'>
+              <div id='result-content'>
+                <div class="panel panel-default result-panel">
+                  <div class="panel-body result-card">
                       <div>
                           <a href="{{url_for('static', filename='assets/detections/' + fname2)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname2)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
                       <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->

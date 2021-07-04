@@ -9,7 +9,7 @@ function showPicker() {
 function clear() {
   $('#image-display').empty(); // removes previous img
   $('#upload-label').empty(); //removes previous img name
-  $('#result-content').empty();   //remove result content (image + labels ...)
+  $('#result-content').remove();   //remove result div (image + labels ...)
 }
 
 function stopWebcam(){

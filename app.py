@@ -262,6 +262,8 @@ if __name__ == '__main__':
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     if not os.path.exists(DETECTION_FOLDER):
         os.makedirs(DETECTION_FOLDER, exist_ok=True)
+    if not os.path.exists(VIDEO_FOLDER):
+        os.makedirs(VIDEO_FOLDER, exist_ok=True)
     if not os.path.exists(CSV_FOLDER):
         os.makedirs(CSV_FOLDER, exist_ok=True)
 

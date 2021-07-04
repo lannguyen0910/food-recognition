@@ -107,34 +107,34 @@
 
                         {% block content %}
                         {% if not error_msg %}
-                        <div class="panel panel-default result-panel">
-                            <div class="panel-body result-card">
-                            <div id='result-content'>
-                                <div style="text-align: center;">
-                                    <b>{{out_name}}</b>
-                                </div>
+                        <div id='result-content'>
+                            <div class="panel panel-default result-panel">
+                                <div class="panel-body result-card">
+                                    <div style="text-align: center;">
+                                        <b>{{out_name}}</b>
+                                    </div>
 
-                                <div>
-                                    {% if filetype == 'image' %}
-                                    <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
-                                    {% else %}
-                                    <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
-                                    {% endif %}
+                                    <div>
+                                        {% if filetype == 'image' %}
+                                        <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                                        {% else %}
+                                        <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
+                                        {% endif %}
+                                    </div>
+                                    <!-- {{result_dict}} -->
+                                    <tr>
+                                    {%for item in result_dict %}
+                                    <div class='result-label'> 
+                                        {% if item.calories %}
+                                        <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
+                                        {% else %}
+                                        <h2 id='label'>{{item.names}} || No information </h2>
+                                        {% endif %}
+                                        <!-- <h3 id='calories'></h3> -->
+                                    </div>
+                                    {% endfor %}
+                                    </tr>
                                 </div>
-                                <!-- {{result_dict}} -->
-                                <tr>
-                                {%for item in result_dict %}
-                                <div class='result-label'> 
-                                    {% if item.calories %}
-                                    <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
-                                    {% else %}
-                                    <h2 id='label'>{{item.names}} || No information </h2>
-                                    {% endif %}
-                                    <!-- <h3 id='calories'></h3> -->
-                                </div>
-                                {% endfor %}
-                                </tr>
-                            </div>
                             </div>
                         </div>
                         {% endif %}
