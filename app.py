@@ -215,6 +215,11 @@ def analyze():
         data = f.read()
         filename = hashlib.md5(data).hexdigest() + f'{ext}'
 
+        if ext == '.mp4' or ext == '.3gp' or ext == '.avi':
+            filetype = 'video'
+        else:
+            filetype = 'image'
+
         # save file to /static/uploads
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         np_img = np.fromstring(data, np.uint8)
@@ -245,7 +250,9 @@ def analyze():
             min_iou=min_iou,
             enhance_labels=enhanced)
 
-        return render_template("detect.html", fname=filename, fname2=filename, result_dict=result_dict)
+        return render_template("detect.html", filetype=filetype, fname=filename, fname2=filename, result_dict=result_dict)
+
+    return redirect("/")
 
 
 @app.after_request

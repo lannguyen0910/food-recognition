@@ -123,6 +123,7 @@
               <div id='result-content'>
                 <div class="panel panel-default result-panel">
                   <div class="panel-body result-card">
+                    {% if filetype == 'image' %}
                       <div>
                           <a href="{{url_for('static', filename='assets/detections/' + fname2)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname2)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
                       <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
@@ -140,6 +141,9 @@
                         </div>
                         {% endfor %}
                       </tr>
+                    {% else %}
+                      <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname2)}}"></source></video>
+                    {% endif %}
                   </div>
                 </div>
               </div>
