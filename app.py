@@ -40,10 +40,12 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 
 UPLOAD_FOLDER = './static/assets/uploads'
+CSV_FOLDER = './static/assets/csv'
 VIDEO_FOLDER = './static/assets/videos'
 DETECTION_FOLDER = './static/assets/detections'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['CSV_FOLDER'] = CSV_FOLDER
 app.config['DETECTION_FOLDER'] = DETECTION_FOLDER
 app.config['VIDEO_FOLDER'] = VIDEO_FOLDER
 

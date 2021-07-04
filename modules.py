@@ -13,6 +13,8 @@ from model import (
 from api import get_info_from_db
 
 CACHE_DIR = '.cache'
+CSV_FOLDER = './static/assets/csv'
+
 
 class Arguments:
     def __init__(self, model_name=None) -> None:
@@ -70,7 +72,7 @@ def draw_image(out_path, ori_img, result_dict, class_names):
             obj_list = class_names)
 
 
-def save_cache(result_dict, cache_name):
+def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR):
     boxes = np.array(result_dict['boxes'])
     
     cache_dict = {
@@ -85,7 +87,7 @@ def save_cache(result_dict, cache_name):
             cache_dict[key] = result_dict[key]
     df = pd.DataFrame(cache_dict)
 
-    df.to_csv(f'./{CACHE_DIR}/{cache_name}.csv', index=False)
+    df.to_csv(f'./{cache_dir}/{cache_name}.csv', index=False)
 
 def check_cache(cache_name):
     return os.path.isfile(f'./{CACHE_DIR}/{cache_name}.csv')
@@ -410,7 +412,9 @@ def get_prediction(
 
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
-    save_cache(result_dict, ori_hashed_key+'_info')
+
+    # Save food info as CSV
+    save_cache(result_dict, os.path.join(CSV_FOLDER,ori_hashed_key+'_info'))
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
