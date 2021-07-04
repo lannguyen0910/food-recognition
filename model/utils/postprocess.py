@@ -170,7 +170,7 @@ def postprocessing(
                 [boxes],
                 [scores],
                 [labels],
-                image_size=current_img_size[0],
+                image_size=current_img_size,
                 mode=mode,
                 iou_threshold=min_iou)
 
