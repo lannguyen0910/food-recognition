@@ -128,11 +128,12 @@ class VideoWriter:
         self.obj_list = obj_list
 
         video_name = self.video_info['name']
-        outpath =os.path.join(self.saved_path, video_name)
+        outpath = self.saved_path
         self.FPS = self.video_info['fps']
         self.WIDTH = self.video_info['width']
         self.HEIGHT = self.video_info['height']
         self.NUM_FRAMES = self.video_info['num_frames']
+   
         self.outvid = cv2.VideoWriter(
             outpath,   
             cv2.VideoWriter_fourcc(*'mp4v'), 
@@ -150,7 +151,6 @@ class VideoWriter:
 class VideoDetect:
     def __init__(self, args, config):
         self.device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')   
-        self.debug = args.debug
         self.config = config
         self.min_iou = args.min_iou
         self.min_conf = args.min_conf
