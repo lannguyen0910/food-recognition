@@ -40,7 +40,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 
 UPLOAD_FOLDER = './static/assets/uploads'
-CSV_FOLDER = './static/assets/csv'
+CSV_FOLDER = './static/csv'
 VIDEO_FOLDER = './static/assets/videos'
 DETECTION_FOLDER = './static/assets/detections'
 
@@ -88,8 +88,6 @@ def download(url):
         filename = os.path.basename(path)
     else:
         make_dir(app.config['UPLOAD_FOLDER'])
-        filename = url.split('/')[-1]
-        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2)',
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                    'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
@@ -97,6 +95,15 @@ def download(url):
                    'Accept-Language': 'en-US,en;q=0.8',
                    'Connection': 'keep-alive'}
         r = requests.get(url, stream=True, headers=headers)
+
+        # Get cache name by hashing image
+        data = r.content
+        ori_filename = url.split('/')[-1]
+        _, ext = os.path.splitext(ori_filename)
+        filename = hashlib.md5(data).hexdigest() + f'{ext}'
+
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
         with open(path, "wb") as file:
             file.write(r.content)
 
@@ -255,6 +262,8 @@ if __name__ == '__main__':
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     if not os.path.exists(DETECTION_FOLDER):
         os.makedirs(DETECTION_FOLDER, exist_ok=True)
+    if not os.path.exists(CSV_FOLDER):
+        os.makedirs(CSV_FOLDER, exist_ok=True)
 
     args = parser.parse_args()
 

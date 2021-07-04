@@ -13,7 +13,7 @@ from model import (
 from api import get_info_from_db
 
 CACHE_DIR = '.cache'
-CSV_FOLDER = './static/assets/csv'
+CSV_FOLDER = './static/csv'
 
 
 class Arguments:
@@ -414,7 +414,7 @@ def get_prediction(
     result_dict = append_food_info(result_dict)
 
     # Save food info as CSV
-    save_cache(result_dict, os.path.join(CSV_FOLDER,ori_hashed_key+'_info'))
+    save_cache(result_dict, ori_hashed_key+'_info', CSV_FOLDER)
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
