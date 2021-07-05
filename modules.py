@@ -14,6 +14,7 @@ from api import get_info_from_db
 
 CACHE_DIR = '.cache'
 CSV_FOLDER = './static/csv'
+METADATA_FOLDER = './static/metadata'
 
 
 class Arguments:
@@ -72,18 +73,19 @@ def draw_image(out_path, ori_img, result_dict, class_names):
             obj_list = class_names)
 
 
-def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR):
-    boxes = np.array(result_dict['boxes'])
-    
-    cache_dict = {
-        'x': boxes[:, 0],
-        'y': boxes[:, 1],
-        'w': boxes[:, 2],
-        'h': boxes[:, 3],
-    }
+def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=None):
+    if 'boxes' not in exclude:
+        boxes = np.array(result_dict['boxes'])
+        
+        cache_dict = {
+            'x': boxes[:, 0],
+            'y': boxes[:, 1],
+            'w': boxes[:, 2],
+            'h': boxes[:, 3],
+        }
 
     for key in result_dict.keys():
-        if key != 'boxes':
+        if key != 'boxes' and key not in exclude:
             cache_dict[key] = result_dict[key]
     df = pd.DataFrame(cache_dict)
 
@@ -116,6 +118,31 @@ def load_cache(image_name):
         result_dict['scores'].append(score)
 
     return result_dict
+
+def drop_duplicate_fill0(result_dict):
+    labels = result_dict['labels']
+    num_items = len(labels)
+
+    label_set = set()
+    keep_index = []
+    for i in range(num_items):
+        if labels[i] not in label_set:
+            label_set.add(labels[i])
+        else:
+            keep_index.append(i)
+
+    new_result_dict = {}
+
+    for key in result_dict.keys():
+        new_result_dict[key] = []
+        for i in keep_index:
+            value = result_dict[key][i]
+            if value is None:
+                value = 0
+            new_result_dict[key].append(value)
+    
+    return new_result_dict
+
 
 def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
     
@@ -413,8 +440,12 @@ def get_prediction(
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
 
+    # Save metadata food info as CSV
+    save_cache(result_dict, ori_hashed_key+'_metadata', METADATA_FOLDER, exclude=['boxes'])
+    
     # Save food info as CSV
-    save_cache(result_dict, ori_hashed_key+'_info', CSV_FOLDER)
+    csv_result_dict = drop_duplicate_fill0(result_dict)
+    save_cache(csv_result_dict, ori_hashed_key+'_info', CSV_FOLDER, exclude=['boxes'])
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)

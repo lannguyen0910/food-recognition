@@ -43,6 +43,7 @@ UPLOAD_FOLDER = './static/assets/uploads'
 CSV_FOLDER = './static/csv'
 VIDEO_FOLDER = './static/assets/videos'
 DETECTION_FOLDER = './static/assets/detections'
+METADATA_FOLDER = './static/metadata'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['CSV_FOLDER'] = CSV_FOLDER
@@ -284,6 +285,8 @@ if __name__ == '__main__':
         os.makedirs(VIDEO_FOLDER, exist_ok=True)
     if not os.path.exists(CSV_FOLDER):
         os.makedirs(CSV_FOLDER, exist_ok=True)
+    if not os.path.exists(METADATA_FOLDER):
+        os.makedirs(METADATA_FOLDER, exist_ok=True)
 
     args = parser.parse_args()
 
