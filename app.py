@@ -255,14 +255,17 @@ def analyze():
             error_msg = "Invalid input url!!!"
             return render_template('detect_url.html', error_msg=error_msg)
 
-        if 'url-button' in request.form:
-            csv_name = filename.split('/')[-1].split('.')[0] + '_info.csv'
-            print('csv_name: ', csv_name)
-            return render_template('detect_url.html', out_name=out_name, fname=filename.split('/')[-1], filetype=filetype, csv_name=csv_name)
-
-        csv_name = filename.split('/')[-1].split('.')[0] + '_info.csv'
+        filename = os.path.basename(filename)
+        csv_name, _ = os.path.splitext(filename)
+        csv_name = os.path.join(app.config['CSV_FOLDER'], csv_name + '_info.csv')
+        print("filename", filename)
         print('csv_name: ', csv_name)
-        return render_template('detect.html', out_name=out_name, fname=filename.split('/')[-1], filetype=filetype, csv_name=csv_name)
+
+        if 'url-button' in request.form:
+            
+            return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name)
+
+        return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name)
 
     return redirect("/")
 
