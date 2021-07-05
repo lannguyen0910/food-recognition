@@ -177,19 +177,24 @@ def analyze():
     if request.method == 'POST':
         result_dict = None
         filename = None
-        file_type = None
+        filetype = None
+        csv_name = None
         if 'url-button' in request.form:
             url = request.form['url_link']
             filename, filepath = download(url)
-            print('Filename', filename)
-            print('Upload filepath', filepath)
-            filetype = file_type(filepath)
+            # print('Filename', filename)
+            # print('Upload filepath', filepath)
+            filetype = file_type(filename)
+            # print('Filetype: ', filetype)
 
         if 'upload-button' in request.form:
             f = request.files['file']
             ori_file_name = secure_filename(f.filename)
             _, ext = os.path.splitext(ori_file_name)
+            # print('Ori Filename: ', ori_file_name)
+            # print('f.filename: ', f.filename)
             filetype = file_type(ori_file_name)
+            # print('Filetype: ', filetype)
 
             if filetype == 'image':
                 # Get cache name by hashing image
@@ -225,7 +230,7 @@ def analyze():
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
 
-            filename2, result_dict = get_prediction(
+            filename, result_dict = get_prediction(
                 filepath,
                 output_path,
                 model_name=model_types,
@@ -238,7 +243,7 @@ def analyze():
             out_name = "Video Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
-            get_video_prediction(
+            filename, result_dict = get_video_prediction(
                 filepath,
                 output_path,
                 model_name=model_types,
@@ -250,56 +255,13 @@ def analyze():
             return render_template('detect_url.html', error_msg=error_msg)
 
         if 'url-button' in request.form:
-            return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype)
+            csv_name = filename.split('/')[-1] + '_info.csv'
+            print('csv_name: ', csv_name)
+            return render_template('detect_url.html', out_name=out_name, fname=filename.split('/')[-1], filetype=filetype, csv_name=csv_name)
 
-        return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype)
-
-    if 'upload-button' in request.form:
-        f = request.files['file']
-        ori_file_name = secure_filename(f.filename)
-        _, ext = os.path.splitext(ori_file_name)
-
-        # Get cache name by hashing image
-        data = f.read()
-        csv_name = hashlib.md5(data).hexdigest() + '_info.csv'
-        filename = hashlib.md5(data).hexdigest() + f'{ext}'
-
-        if ext == '.mp4' or ext == '.3gp' or ext == '.avi':
-            filetype = 'video'
-        else:
-            filetype = 'image'
-
-        # save file to /static/uploads
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        np_img = np.fromstring(data, np.uint8)
-        img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-        cv2.imwrite(filepath, img)
-
-        # predict image
-        output_path = os.path.join(app.config['DETECTION_FOLDER'], filename)
-
-        iou = request.form.get('threshold-range')
-        confidence = request.form.get('confidence-range')
-        model_types = request.form.get('model-types')
-        enhanced = request.form.get('enhanced')
-        ensemble = request.form.get('ensemble')
-
-        ensemble = True if ensemble == 'on' else False
-        enhanced = True if enhanced == 'on' else False
-        model_types = str.lower(model_types)
-        min_conf = float(confidence)/100
-        min_iou = float(iou)/100
-
-        filename2, result_dict = get_prediction(
-            filepath,
-            output_path,
-            model_name=model_types,
-            ensemble=ensemble,
-            min_conf=min_conf,
-            min_iou=min_iou,
-            enhance_labels=enhanced)
-
-        return render_template("detect.html", filetype=filetype, fname=filename, fname2=filename, csv_name=csv_name, result_dict=result_dict)
+        csv_name = filename.split('/')[-1] + '_info.csv'
+        print('csv_name: ', csv_name)
+        return render_template('detect.html', out_name=out_name, fname=filename.split('/')[-1], filetype=filetype, csv_name=csv_name)
 
     return redirect("/")
 
