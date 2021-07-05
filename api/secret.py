@@ -26,10 +26,13 @@ API ={
 
 def get_response_from_edamam(response):
     response_dict = response.json()
-    result = response_dict['parsed'][0]
+    result = response_dict['parsed']
+    if len(result) == 0:
+        result = response_dict['hints']
+    result = result[0] 
     food_info = result['food']
     
-    food_label = food_info['label']
+    food_label = response_dict["text"]
     food_id = food_info['foodId']
     food_nutrients = food_info['nutrients']
 
