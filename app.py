@@ -165,12 +165,29 @@ def detect_by_url_page():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    if 'url-button' in request.form:
-        url = request.form['url_link']
-        filename, filepath = download(url)
-        print('Filename', filename)
-        print('Upload filepath', filepath)
-        filetype = file_type(filepath)
+    if request.method == 'POST':
+        if 'url-button' in request.form:
+            url = request.form['url_link']
+            filename, filepath = download(url)
+            print('Filename', filename)
+            print('Upload filepath', filepath)
+            filetype = file_type(filepath)
+
+        if 'upload-button' in request.form:
+            f = request.files['file']
+            ori_file_name = secure_filename(f.filename)
+            _, ext = os.path.splitext(ori_file_name)
+
+            # Get cache name by hashing image
+            data = f.read()
+            filename = hashlib.md5(data).hexdigest() + f'{ext}'
+            filetype = file_type(filename)
+
+            # save file to /static/uploads
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            np_img = np.fromstring(data, np.uint8)
+            img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+            cv2.imwrite(filepath, img)
 
         iou = request.form.get('threshold-range')
         confidence = request.form.get('confidence-range')
@@ -211,52 +228,9 @@ def analyze():
         else:
             error_msg = "Invalid input url!!!"
             return render_template('detect_url.html', error_msg=error_msg)
-
-        return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype)
-
-    if 'upload-button' in request.form:
-        f = request.files['file']
-        ori_file_name = secure_filename(f.filename)
-        _, ext = os.path.splitext(ori_file_name)
-
-        # Get cache name by hashing image
-        data = f.read()
-        filename = hashlib.md5(data).hexdigest() + f'{ext}'
-
-        if ext == '.mp4' or ext == '.3gp' or ext == '.avi':
-            filetype = 'video'
-        else:
-            filetype = 'image'
-
-        # save file to /static/uploads
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        np_img = np.fromstring(data, np.uint8)
-        img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-        cv2.imwrite(filepath, img)
-
-        # predict image
-        output_path = os.path.join(app.config['DETECTION_FOLDER'], filename)
-
-        iou = request.form.get('threshold-range')
-        confidence = request.form.get('confidence-range')
-        model_types = request.form.get('model-types')
-        enhanced = request.form.get('enhanced')
-        ensemble = request.form.get('ensemble')
-
-        ensemble = True if ensemble == 'on' else False
-        enhanced = True if enhanced == 'on' else False
-        model_types = str.lower(model_types)
-        min_conf = float(confidence)/100
-        min_iou = float(iou)/100
-
-        filename2, result_dict = get_prediction(
-            filepath,
-            output_path,
-            model_name=model_types,
-            ensemble=ensemble,
-            min_conf=min_conf,
-            min_iou=min_iou,
-            enhance_labels=enhanced)
+        
+        if 'url-button' in request.form:
+            return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype)
 
         return render_template("detect.html", filetype=filetype, fname=filename, fname2=filename, result_dict=result_dict)
 
