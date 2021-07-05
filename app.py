@@ -75,6 +75,14 @@ def download_yt(url):
 
     return path
 
+def hash_video(video_path):
+    _, ext = os.path.splitext(video_path)
+    stream = cv2.VideoCapture(video_path)
+    success, ori_frame = stream.read()
+    stream.close()
+    image_bytes = cv2.imencode('.jpg', ori_frame)[1].tobytes()
+    filename = hashlib.md5(image_bytes).hexdigest() + f'{ext}'
+    return filename
 
 def download(url):
     ext = tldextract.extract(url)
@@ -85,7 +93,7 @@ def download(url):
             pass
         print('Youtube')
         path = download_yt(url)
-        filename = os.path.basename(path)
+        filename = hash_video(path)
     else:
         make_dir(app.config['UPLOAD_FOLDER'])
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2)',
