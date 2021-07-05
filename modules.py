@@ -40,11 +40,11 @@ class Arguments:
             
 weight_urls = {
     'yolov5s': "1-3TXxsF_CYjPzQqEVudNUtMA5nexc8TG",
-    'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI",
+    # 'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI",
     "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
     "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP",
     "effnetb4": "1-4AZSXhKAViZdM5PkhoeOZITVFM0WKIm",
-    "yolov5m_extra": "1-HBTIM8pqXbppBiOHBVC9unWkUPjiZ_U"
+    "yolov5m": "1-HBTIM8pqXbppBiOHBVC9unWkUPjiZ_U"
 }
 
 def download_pretrained_weights(name, cached=None):
@@ -73,16 +73,17 @@ def draw_image(out_path, ori_img, result_dict, class_names):
             obj_list = class_names)
 
 
-def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=None):
+def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
+    cache_dict={}
     if 'boxes' not in exclude:
         boxes = np.array(result_dict['boxes'])
-        
-        cache_dict = {
-            'x': boxes[:, 0],
-            'y': boxes[:, 1],
-            'w': boxes[:, 2],
-            'h': boxes[:, 3],
-        }
+        if len(boxes) != 0:
+            cache_dict.update({
+                'x': boxes[:, 0],
+                'y': boxes[:, 1],
+                'w': boxes[:, 2],
+                'h': boxes[:, 3],
+            })       
 
     for key in result_dict.keys():
         if key != 'boxes' and key not in exclude:
@@ -128,7 +129,6 @@ def drop_duplicate_fill0(result_dict):
     for i in range(num_items):
         if labels[i] not in label_set:
             label_set.add(labels[i])
-        else:
             keep_index.append(i)
 
     new_result_dict = {}
@@ -149,26 +149,27 @@ def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
     boxes = np.array(result_dict['boxes'])
     scores = np.array(result_dict['scores'])
     labels = np.array(result_dict['labels'])
-    boxes[:,2] += boxes[:,0] 
-    boxes[:,3] += boxes[:,1] 
+    if len(boxes) != 0:
+        boxes[:,2] += boxes[:,0] 
+        boxes[:,3] += boxes[:,1] 
 
-    outputs = {
-        'bboxes': boxes,
-        'scores': scores,
-        'classes': labels
-    }
+        outputs = {
+            'bboxes': boxes,
+            'scores': scores,
+            'classes': labels
+        }
 
-    outputs = postprocessing(
-        outputs, 
-        current_img_size=[img_w, img_h],
-        min_iou=min_iou,
-        min_conf=min_conf,
-        output_format='xywh',
-        mode='nms')
+        outputs = postprocessing(
+            outputs, 
+            current_img_size=[img_w, img_h],
+            min_iou=min_iou,
+            min_conf=min_conf,
+            output_format='xywh',
+            mode='nms')
 
-    boxes = outputs['bboxes'] 
-    labels = outputs['classes']  
-    scores = outputs['scores']
+        boxes = outputs['bboxes'] 
+        labels = outputs['classes']  
+        scores = outputs['scores']
 
     return {
         'boxes': boxes,
@@ -304,6 +305,8 @@ def crop_box(image, box, expand=10):
 def label_enhancement(image, result_dict):
     boxes = np.array(result_dict['boxes'])
     labels = np.array(result_dict['labels'])
+    if len(boxes) == 0:
+        return result_dict
     boxes[:,2] += boxes[:,0]  #xyxy
     boxes[:,3] += boxes[:,1]  #xyxy
     
@@ -441,15 +444,15 @@ def get_prediction(
     result_dict = append_food_info(result_dict)
 
     # Save metadata food info as CSV
-    save_cache(result_dict, ori_hashed_key+'_metadata', METADATA_FOLDER, exclude=['boxes'])
+    save_cache(result_dict, ori_hashed_key+'_metadata', METADATA_FOLDER)
     
-    # Save food info as CSV
-    csv_result_dict = drop_duplicate_fill0(result_dict)
-    save_cache(csv_result_dict, ori_hashed_key+'_info', CSV_FOLDER, exclude=['boxes'])
-
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
 
     result_list = convert_dict_to_list(result_dict)
-    return output_path, result_list
 
+    # Save food info as CSV
+    csv_result_dict = drop_duplicate_fill0(result_dict)
+    save_cache(csv_result_dict, ori_hashed_key+'_info', CSV_FOLDER, exclude=['boxes'])
+
+    return output_path, result_list
