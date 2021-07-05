@@ -79,7 +79,8 @@ def hash_video(video_path):
     _, ext = os.path.splitext(video_path)
     stream = cv2.VideoCapture(video_path)
     success, ori_frame = stream.read()
-    stream.close()
+    stream.release()
+    stream=None
     image_bytes = cv2.imencode('.jpg', ori_frame)[1].tobytes()
     filename = hashlib.md5(image_bytes).hexdigest() + f'{ext}'
     return filename
@@ -92,8 +93,14 @@ def download(url):
         except:
             pass
         print('Youtube')
-        path = download_yt(url)
-        filename = hash_video(path)
+        ori_path = download_yt(url)
+        filename = hash_video(ori_path)
+
+        path = os.path.join(app.config['VIDEO_FOLDER'], filename)
+        try:
+            os.rename(ori_path, path)
+        except:
+            pass
     else:
         make_dir(app.config['UPLOAD_FOLDER'])
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2)',
@@ -177,17 +184,24 @@ def analyze():
             f = request.files['file']
             ori_file_name = secure_filename(f.filename)
             _, ext = os.path.splitext(ori_file_name)
+            filetype = file_type(ori_file_name)
+            
+            if filetype == 'image':
+                # Get cache name by hashing image
+                data = f.read()
+                filename = hashlib.md5(data).hexdigest() + f'{ext}'
 
-            # Get cache name by hashing image
-            data = f.read()
-            filename = hashlib.md5(data).hexdigest() + f'{ext}'
-            filetype = file_type(filename)
-
-            # save file to /static/uploads
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            np_img = np.fromstring(data, np.uint8)
-            img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-            cv2.imwrite(filepath, img)
+                # save file to /static/uploads
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                np_img = np.fromstring(data, np.uint8)
+                img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+                cv2.imwrite(filepath, img)
+            elif filetype == 'video':
+                temp_filepath = os.path.join(app.config['UPLOAD_FOLDER'], ori_file_name)
+                f.save(temp_filepath)
+                filename = hash_video(temp_filepath)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                os.rename(temp_filepath, filepath)
 
         iou = request.form.get('threshold-range')
         confidence = request.form.get('confidence-range')
@@ -268,4 +282,4 @@ if __name__ == '__main__':
         else:
             port = hostname[1]
         host = hostname[0]
-        app.run(host=host, port=port, debug=args.debug)
+        app.run(host=host, port=port, debug=args.debug, use_reloader=False)
