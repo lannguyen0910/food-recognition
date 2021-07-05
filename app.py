@@ -255,11 +255,11 @@ def analyze():
             return render_template('detect_url.html', error_msg=error_msg)
 
         if 'url-button' in request.form:
-            csv_name = filename.split('/')[-1] + '_info.csv'
+            csv_name = filename.split('/')[-1].split('.')[0] + '_info.csv'
             print('csv_name: ', csv_name)
             return render_template('detect_url.html', out_name=out_name, fname=filename.split('/')[-1], filetype=filetype, csv_name=csv_name)
 
-        csv_name = filename.split('/')[-1] + '_info.csv'
+        csv_name = filename.split('/')[-1].split('.')[0] + '_info.csv'
         print('csv_name: ', csv_name)
         return render_template('detect.html', out_name=out_name, fname=filename.split('/')[-1], filetype=filetype, csv_name=csv_name)
 
