@@ -173,6 +173,9 @@ def detect_by_url_page():
 @app.route('/analyze', methods=['POST'])
 def analyze():
     if request.method == 'POST':
+        result_dict=None
+        filename = None
+        file_type=None
         if 'url-button' in request.form:
             url = request.form['url_link']
             filename, filepath = download(url)
