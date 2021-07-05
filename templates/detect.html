@@ -124,10 +124,13 @@
                 <div class="panel panel-default result-panel">
                   <div class="panel-body result-card">
                     {% if filetype == 'image' %}
-                      <div>
+                      <div id="image-result">
                           <a href="{{url_for('static', filename='assets/detections/' + fname2)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname2)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
                       <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
+                      
                       </div>
+                      <label id="csv_file" disabled="disabled">{{csv_name}}</label>
+                      
                       <!-- {{result_dict}} -->
                       <tr>
                         {%for item in result_dict %}
@@ -163,8 +166,12 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/client.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/chart.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/all.js') }}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.14.3/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datasource@0.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
   </body>
