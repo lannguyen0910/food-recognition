@@ -388,7 +388,7 @@ def get_prediction(
         ]
     
     # get hashed key from image path
-    ori_hashed_key = os.path.basename(input_path)[:-4]
+    ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
 
     # additional tags
     model_tag = model_name[-1]
