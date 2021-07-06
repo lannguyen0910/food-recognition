@@ -172,7 +172,7 @@ def detect_by_url_page():
     return render_template("url.html")
 
 
-@app.route('/analyze', methods=['POST'])
+@app.route('/analyze', methods=['POST', 'GET'])
 def analyze():
     if request.method == 'POST':
         result_dict = None
@@ -256,17 +256,18 @@ def analyze():
 
         filename = os.path.basename(filename)
         csv_name, _ = os.path.splitext(filename)
-        csv_name = os.path.join(app.config['CSV_FOLDER'], csv_name + '_info.csv')
+        csv_name = os.path.join(
+            app.config['CSV_FOLDER'], csv_name + '_info.csv')
         print("filename", filename)
         print('csv_name: ', csv_name)
 
         if 'url-button' in request.form:
-            
+
             return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name)
 
         return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name)
 
-    return redirect("/")
+    return redirect(url_for('/'))
 
 
 @app.after_request
@@ -291,7 +292,6 @@ if __name__ == '__main__':
         os.makedirs(METADATA_FOLDER, exist_ok=True)
 
     args = parser.parse_args()
-
 
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
