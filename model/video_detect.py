@@ -11,6 +11,10 @@ from albumentations.pytorch.transforms import ToTensorV2
 from .augmentations.transforms import get_resize_augmentation
 from .augmentations.transforms import MEAN, STD
 
+# Use global model from detect.py, if model name changes, reload model
+from .detect import DETECTOR
+
+
 class VideoSet:
     def __init__(self, input_path, image_size, keep_ratio):
         self.input_path = input_path # path to video file
@@ -150,6 +154,7 @@ class VideoWriter:
 
 class VideoDetect:
     def __init__(self, args, config):
+        global DETECTOR
         self.device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')   
         self.config = config
         self.min_iou = args.min_iou
@@ -158,28 +163,18 @@ class VideoDetect:
         self.keep_ratio=config.keep_ratio
         self.fusion_mode=config.fusion_mode
 
-        if args.tta:
-            self.tta = TTA(
-                min_conf=args.tta_conf_threshold, 
-                min_iou=args.tta_iou_threshold, 
-                postprocess_mode=args.tta_ensemble_mode)
-        else:
-            self.tta = None
-
-        if args.weight is not None:
-            self.class_names, num_classes = get_class_names(args.weight)
+       
+        self.class_names, num_classes = get_class_names(args.weight)
         self.class_names.insert(0, 'Background')
 
-        net = get_model(
-            args, config,
-            num_classes=num_classes)
-
-        self.num_classes = num_classes
-        self.model = Detector(model = net, device = self.device)
-        self.model.eval()
-
-        if args.weight is not None:                
-            load_checkpoint(self.model, args.weight)
+        if DETECTOR is None or DETECTOR.model_name != config.model_name:
+            net = get_model(
+                args, config,
+                num_classes=num_classes)
+            self.num_classes = num_classes
+            DETECTOR = Detector(model = net, device = self.device)
+            load_checkpoint(DETECTOR, args.weight)
+        DETECTOR.eval()
 
     def run(self, batch):
         with torch.no_grad():
@@ -188,9 +183,9 @@ class VideoDetect:
             scores_result = []
                 
             if self.tta is not None:
-                preds = self.tta.make_tta_predictions(self.model, batch)
+                preds = self.tta.make_tta_predictions(DETECTOR, batch)
             else:
-                preds = self.model.inference_step(batch)
+                preds = DETECTOR.inference_step(batch)
 
             for idx, outputs in enumerate(preds):
                 img_w = batch['image_ws'][idx]

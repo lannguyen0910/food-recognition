@@ -16,6 +16,9 @@ parser.add_argument('--weight', type=str ,help='trained weight')
 parser.add_argument('--input_path', type=str, help='path to an image to inference')
 parser.add_argument('--output_path', type=str, help='path to save csv result file')
 
+# Global model, only changes when model name changes
+CLASSIFIER = None
+
 class ClassificationTestset():
     def __init__(self, config, img_list):
         self.img_list = img_list # list of cv2 images
@@ -49,8 +52,8 @@ class ClassificationTestset():
         return f"Number of found images: {len(self.img_list)}"
   
 def classify(weight, img_list):
+    global CLASSIFIER
     config = get_config(weight)
-    os.environ['CUDA_VISIBLE_DEVICES'] = config.gpu_devices
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
     testset = ClassificationTestset(config, img_list)
@@ -64,23 +67,25 @@ def classify(weight, img_list):
 
     class_names, num_classes = get_class_names(weight)
 
-    net = BaseTimmModel(
-        name=config.model_name, 
-        num_classes=num_classes)
-    model = Classifier( model = net,  device = device)
-    load_checkpoint(model, weight)
-    model.eval()
+    if CLASSIFIER is None or CLASSIFIER.model_name != config.model_name:
+        net = BaseTimmModel(
+            name=config.model_name, 
+            num_classes=num_classes)
+        CLASSIFIER = Classifier( model = net,  device = device)
+        load_checkpoint(CLASSIFIER, weight)
 
-    ## Print info
-    print(config)
-   
+        ## Print info
+        print(config)
+
+    CLASSIFIER.eval()
+
     pred_list = []
     prob_list = []
 
     with tqdm(total=len(testloader)) as pbar:
         with torch.no_grad():
             for idx, batch in enumerate(testloader):
-                preds, probs = model.inference_step(batch, return_probs=True)
+                preds, probs = CLASSIFIER.inference_step(batch, return_probs=True)
                 for idx, (pred, prob) in enumerate(zip(preds, probs)):
                     pred_list.append(class_names[pred])
                     prob_list.append(prob)
