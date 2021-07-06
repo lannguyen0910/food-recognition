@@ -38,7 +38,7 @@ class Arguments:
             self.weight=tmp_path
             
 weight_urls = {
-    'yolov5s': "1-3TXxsF_CYjPzQqEVudNUtMA5nexc8TG",
+    'yolov5s': "1-OsfyTMNw8Qo1maJutNyKjaPDeE25rVa",
     # 'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI",
     "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
     "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP",
@@ -452,5 +452,9 @@ def get_prediction(
     # Save food info as CSV
     csv_result_dict = drop_duplicate_fill0(result_dict)
     save_cache(csv_result_dict, ori_hashed_key+'_info', CSV_FOLDER, exclude=['boxes', "labels", "scores"])
+    
+    # Transpose CSV
+    df = pd.read_csv(os.path.join(CSV_FOLDER, ori_hashed_key+'_info.csv'))
+    df.set_index('names').T.to_csv(os.path.join(CSV_FOLDER, ori_hashed_key+'_info2.csv'))
 
     return output_path, result_list
