@@ -71,7 +71,7 @@ def classify(weight, img_list):
         net = BaseTimmModel(
             name=config.model_name, 
             num_classes=num_classes)
-        CLASSIFIER = Classifier( model = net,  device = device)
+        CLASSIFIER = Classifier( model = net,  device = device, freeze=True)
         load_checkpoint(CLASSIFIER, weight)
 
         ## Print info

@@ -120,7 +120,7 @@ def detect(args, config):
     
     if DETECTOR is None or DETECTOR.model_name != config.model_name:
         net = get_model(args, config, num_classes=num_classes)
-        DETECTOR = Detector(model = net, device = device)
+        DETECTOR = Detector(model = net, freeze=True, device = device)
         load_checkpoint(DETECTOR, args.weight)
         ## Print info
         print(config)
@@ -140,10 +140,8 @@ def detect(args, config):
     with tqdm(total=len(testloader)) as pbar:
         with torch.no_grad():
             for idx, batch in enumerate(testloader):
-                if args.tta is not None:
-                    preds = args.tta.make_tta_predictions(DETECTOR, batch)
-                else:
-                    preds = DETECTOR.inference_step(batch)
+              
+                preds = DETECTOR.inference_step(batch)
 
                 for idx, outputs in enumerate(preds):
                     img_w = batch['image_ws'][idx]
