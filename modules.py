@@ -16,7 +16,6 @@ CACHE_DIR = '.cache'
 CSV_FOLDER = './static/csv'
 METADATA_FOLDER = './static/metadata'
 
-
 class Arguments:
     def __init__(self, model_name=None) -> None:
         self.model_name = model_name
@@ -366,7 +365,6 @@ def get_video_prediction(
     args.min_iou = min_iou
     video_detect = VideoPipeline(args, config)
     video_detect.run()
-
 
 def get_prediction(
     input_path, 

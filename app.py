@@ -23,7 +23,6 @@ from flask_ngrok import run_with_ngrok
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
 parser.add_argument('--ngrok', action='store_true',
                     default=False, help="Run on local or ngrok")
@@ -292,6 +291,9 @@ if __name__ == '__main__':
         os.makedirs(METADATA_FOLDER, exist_ok=True)
 
     args = parser.parse_args()
+
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     if args.ngrok:
         run_with_ngrok(app)

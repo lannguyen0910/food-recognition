@@ -15,6 +15,9 @@ parser.add_argument('--tta_iou_threshold', type=float, default=0.9, help='tta io
 
 CACHE_DIR='./.cache'
 
+# Global model, only changes when model name changes
+DETECTOR = None
+
 class Testset():
     def __init__(self, config, input_path, transforms=None):
         self.input_path = input_path # path to image folder or a single image
@@ -87,7 +90,8 @@ class Testset():
         return f"Number of found images: {len(self.all_image_paths)}"
 
 def detect(args, config):
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
+    global DETECTOR
+    
     num_gpus = len(args.gpus.split(','))
     devices_info = get_devices_info(args.gpus)
 
@@ -98,14 +102,6 @@ def detect(args, config):
         A.Normalize(mean=MEAN, std=STD, max_pixel_value=1.0, p=1.0),
         ToTensorV2(p=1.0)
     ])
-
-    if args.tta:
-        args.tta = TTA(
-            min_conf=args.tta_conf_threshold, 
-            min_iou=args.tta_iou_threshold, 
-            postprocess_mode=args.tta_ensemble_mode)
-    else:
-        args.tta = None
 
     testset = Testset(
         config, 
@@ -119,23 +115,20 @@ def detect(args, config):
         collate_fn=testset.collate_fn
     )
 
-    if args.weight is not None:
-        class_names, num_classes = get_class_names(args.weight)
+    class_names, num_classes = get_class_names(args.weight)
     class_names.insert(0, 'Background')
-    net = get_model(args, config, num_classes=num_classes)
+    
+    if DETECTOR is None or DETECTOR.model_name != config.model_name:
+        net = get_model(args, config, num_classes=num_classes)
+        DETECTOR = Detector(model = net, device = device)
+        load_checkpoint(DETECTOR, args.weight)
+        ## Print info
+        print(config)
+        
+    DETECTOR.eval()
 
-    model = Detector(model = net, device = device)
-    model.eval()
 
-    if args.weight is not None:                
-        load_checkpoint(model, args.weight)
-
-    ## Print info
-    print(config)
-    print(testset)
-    print(f"Nubmer of gpus: {num_gpus}")
-    print(devices_info)
-
+    
 
     result_dict = {
         'boxes': [],
@@ -148,9 +141,9 @@ def detect(args, config):
         with torch.no_grad():
             for idx, batch in enumerate(testloader):
                 if args.tta is not None:
-                    preds = args.tta.make_tta_predictions(model, batch)
+                    preds = args.tta.make_tta_predictions(DETECTOR, batch)
                 else:
-                    preds = model.inference_step(batch)
+                    preds = DETECTOR.inference_step(batch)
 
                 for idx, outputs in enumerate(preds):
                     img_w = batch['image_ws'][idx]
@@ -186,24 +179,3 @@ def detect(args, config):
                 pbar.set_description(f'Empty images: {empty_imgs}')
 
     return result_dict
-
-if __name__ == '__main__':
-    args = parser.parse_args() 
-
-    ignore_keys = [
-        'min_iou_val',
-        'min_conf_val',
-        'tta',
-        'gpu_devices',
-        'tta_ensemble_mode',
-        'tta_conf_threshold',
-        'tta_iou_threshold',
-    ]
-    config = get_config(args.weight, ignore_keys)
-    if config is None:
-        print("Config not found. Load configs from configs/configs.yaml")
-        config = Config(os.path.join('configs','configs.yaml'))
-    else:
-        print("Load configs from weight")                 
-    detect(args, config)
-    
