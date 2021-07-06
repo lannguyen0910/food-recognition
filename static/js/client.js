@@ -47,7 +47,7 @@ function showPicked(input) {
     }
 
     else if(extension === "jpg" || extension === "jpeg" || extension === "png"){
-      var img_html = '<img id="user-image" src="' + file_url + '" style="display: block;margin-left: auto;margin-right: auto;width: 512px; height: 512px"/>';
+      var img_html = '<img id="user-image" src="' + file_url + '" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"/>';
       $('#image-display').html(img_html); // replaces previous img
 
     }
