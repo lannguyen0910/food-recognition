@@ -451,6 +451,6 @@ def get_prediction(
 
     # Save food info as CSV
     csv_result_dict = drop_duplicate_fill0(result_dict)
-    save_cache(csv_result_dict, ori_hashed_key+'_info', CSV_FOLDER, exclude=['boxes'])
+    save_cache(csv_result_dict, ori_hashed_key+'_info', CSV_FOLDER, exclude=['boxes', "labels", "scores"])
 
     return output_path, result_list
