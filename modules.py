@@ -364,7 +364,7 @@ def get_video_prediction(
     args.min_conf = min_conf
     args.min_iou = min_iou
     video_detect = VideoPipeline(args, config)
-    video_detect.run()
+    return video_detect.run()
 
 def get_prediction(
     input_path, 
@@ -457,4 +457,4 @@ def get_prediction(
     df = pd.read_csv(os.path.join(CSV_FOLDER, ori_hashed_key+'_info.csv'))
     df.set_index('names').T.to_csv(os.path.join(CSV_FOLDER, ori_hashed_key+'_info2.csv'))
 
-    return output_path, result_list
+    return output_path

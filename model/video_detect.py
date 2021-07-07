@@ -182,10 +182,7 @@ class VideoDetect:
             labels_result = []
             scores_result = []
                 
-            if self.tta is not None:
-                preds = self.tta.make_tta_predictions(DETECTOR, batch)
-            else:
-                preds = DETECTOR.inference_step(batch)
+            preds = DETECTOR.inference_step(batch)
 
             for idx, outputs in enumerate(preds):
                 img_w = batch['image_ws'][idx]
@@ -260,3 +257,5 @@ class VideoPipeline:
                     boxes = boxes,
                     labels = labels,
                     scores=scores)
+
+        return self.saved_path

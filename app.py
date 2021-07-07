@@ -231,7 +231,7 @@ def analyze():
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
 
-            filename, result_dict = get_prediction(
+            filename = get_prediction(
                 filepath,
                 output_path,
                 model_name=model_types,
@@ -244,7 +244,7 @@ def analyze():
             out_name = "Video Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
-            filename, result_dict = get_video_prediction(
+            filename = get_video_prediction(
                 filepath,
                 output_path,
                 model_name=model_types,
@@ -270,7 +270,7 @@ def analyze():
 
         return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
-    return redirect(url_for('/'))
+    return redirect('/')
 
 
 @app.after_request
