@@ -24,6 +24,7 @@
     </div>
 
     <div class='center' style="position:relative;">
+      {% block content %}
       <div class="panel panel-default result-panel">
         <div class="panel-body w3-card">
           <div class='content'>
@@ -105,10 +106,12 @@
                   <div class="panel panel-default result-panel">
                     <div class="panel-body result-card">
                       <div id='image-display'>
+                        {% if filetype == 'image' %}
                         <img id="user-image" src="{{url_for('static', filename='assets/uploads/' + fname)}}" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px">
+                        {% else %}
+                        <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/uploads/' + fname)}}" type="video/mp4"></source></video>
+                        {% endif %}
                       </div>
-
-                      <div id="webcam-video"></div>
                     </div>
                   </div>
                 </div>
@@ -123,7 +126,7 @@
           </div>
         </div>
       </div>
-      {% block content %}
+      
         <div id='result-content'>
           <div class="panel panel-default result-panel">
             <div class="panel-body w3-card">
@@ -152,7 +155,7 @@
                   {% endfor %}
                 </tr> -->
               {% else %}
-                <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
+                <video autoplay id="result-video" controls> <source id="result-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
               {% endif %}
             </div>
           </div>
