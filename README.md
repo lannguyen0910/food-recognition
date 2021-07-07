@@ -1,6 +1,6 @@
 # Online Food Detection using YOLOv5
 
-![alt text](./demo/pipline.png)
+![alt text](./demo/pipeline.png)
 
 ## How to run
 - Clone the repo
