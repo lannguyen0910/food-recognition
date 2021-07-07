@@ -36,7 +36,7 @@
                         <b>IOU Threshold:</b>
                         <span>25</span>%
                       </div>
-                      <input id="threshold-range" type="range" min="0" max="100" value="65" class="slider" name="threshold-range">
+                      <input id="threshold-range" type="range" min="0" max="100" value="25" class="slider" name="threshold-range">
                     </div>
                   </div>
                 </div>
@@ -48,7 +48,7 @@
                         <b>Confidence:</b>
                         <span>15</span>%
                       </div>
-                      <input id="confidence-range" type="range" min="0" max="100" value="25" class="slider" name="confidence-range">
+                      <input id="confidence-range" type="range" min="0" max="100" value="15" class="slider" name="confidence-range">
                     </div>
                   </div>
                 </div>
@@ -130,11 +130,13 @@
               <div style="text-align: center;font-size:20px;">
                   <b>{{out_name}}</b>
               </div>
+              <br/>
               {% if filetype == 'image' %}
                 <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
                 <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
 
                 <label id="csv_file" style="display:none">{{csv_name}}</label>
+                <label id="csv_file2" style="display:none">{{csv_name2}}</label>
                 
                 <!-- {{result_dict}}
                 <tr>
@@ -157,11 +159,19 @@
           {% if filetype == 'image' %}
           <div class="panel panel-default result-panel">
             <div class="panel-body w3-card">
-              <div style="text-align: center;font-size:20px;">
-                  <b>Chart Statistic</b>
+
+              <div style="text-align:center; font-size:20px;">
+                <b>Display Chart</b>
               </div>
+              <select style="margin-top: 1em" class="form-control-sm" value="2" onfocus="this.selectedIndex = -1;" onchange="getChart(this);" >
+                <option value="1">By Product</option>
+                <option value="2">By Info</option>
+              </select>
+              
               <!-- <div id="image-result"></div> -->
-              <canvas id="container" style="width:100%; height:480px;"></canvas>
+              
+              <canvas id="container1" style="width:100%; height:480px; display:none"></canvas>
+              <canvas id="container2" style="width:100%; height:480px; display:none"></canvas>
             </div>
           </div>
           {% endif %}

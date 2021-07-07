@@ -179,6 +179,7 @@ def analyze():
         filename = None
         filetype = None
         csv_name = None
+        csv_name2 = None
         if 'url-button' in request.form:
             url = request.form['url_link']
             filename, filepath = download(url)
@@ -256,16 +257,18 @@ def analyze():
 
         filename = os.path.basename(filename)
         csv_name, _ = os.path.splitext(filename)
-        csv_name = os.path.join(
+        csv_name1 = os.path.join(
             app.config['CSV_FOLDER'], csv_name + '_info.csv')
+        csv_name2 = os.path.join(
+            app.config['CSV_FOLDER'], csv_name + '_info2.csv')
         print("filename", filename)
-        print('csv_name: ', csv_name)
+        print('csv_name: ', csv_name1)
 
         if 'url-button' in request.form:
 
-            return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name)
+            return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
-        return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name)
+        return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
     return redirect(url_for('/'))
 
