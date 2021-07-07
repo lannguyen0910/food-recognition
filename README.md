@@ -1,4 +1,6 @@
-# yolo-statistical-ml
+# Online Food Detection using YOLOv5
+
+![alt text](./demo/pipline.png)
 
 ## How to run
 - Clone the repo
