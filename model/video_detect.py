@@ -140,7 +140,7 @@ class VideoWriter:
    
         self.outvid = cv2.VideoWriter(
             outpath,   
-            cv2.VideoWriter_fourcc(*'mp4v'), 
+            cv2.VideoWriter_fourcc(*'H264'), 
             self.FPS, 
             (self.WIDTH, self.HEIGHT))
 
@@ -151,6 +151,9 @@ class VideoWriter:
             imshow=False, 
             outvid = self.outvid, 
             obj_list=self.obj_list)
+
+    def release(self):
+        self.outvid.release()
 
 class VideoDetect:
     def __init__(self, args, config):
@@ -257,5 +260,5 @@ class VideoPipeline:
                     boxes = boxes,
                     labels = labels,
                     scores=scores)
-
+        videowriter.release()
         return self.saved_path
