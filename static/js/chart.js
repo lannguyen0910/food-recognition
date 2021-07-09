@@ -63,6 +63,7 @@ function getChart(val){
     var canvas1 = document.querySelector("#container1");
     var canvas2 = document.querySelector("#container2");
     if(val.value === "1"){
+        $('#display-chart').empty();
         canvas1.style.display = "block";
         canvas2.style.display = 'none'
         // Read csv, bypass browser cache, and create chart
@@ -154,6 +155,7 @@ function getChart(val){
         });
     }
     else {
+        $('#display-chart').empty();
         canvas2.style.display = "block";
         canvas1.style.display = 'none'
         $.get(filename2, {'_': $.now()}, function(csvString) {
@@ -177,7 +179,6 @@ function getChart(val){
                 });
             }
 
-            console.log("series: ", SERIES);
             console.log("series1: ", SERIES1);
 
             var datasets = SERIES1.map(function(el) {

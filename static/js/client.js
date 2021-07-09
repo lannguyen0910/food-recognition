@@ -1,17 +1,17 @@
 var el = x => document.getElementById(x);
 var detectBtn = document.querySelector("#analyze-button");
 
-
 function showPicker() {
   $("#file-input").click();
 }
 
 function clear() {
-  $('#image-display').empty(); // removes previous img
-  $('#upload-label').empty(); //removes previous img name
+  $('#image-display').empty(); // removes upload img
+  $('#upload-label').empty(); //removes upload img's filename
   $('#result-content').remove();   //remove result div (image + labels ...)
 }
 
+// Stop streaming webcam and empty some buttons
 function stopWebcam(){
   window.stream.getTracks().forEach(function(track) {
     track.stop();
@@ -22,7 +22,7 @@ function stopWebcam(){
   btnNewPhoto.setAttribute("disabled","disabled");
 }
 
-// Upload file 
+// Upload image or video session
 function showPicked(input) {
   if(window.stream){
     stopWebcam();
@@ -52,16 +52,16 @@ function showPicked(input) {
 
     }
 
-    $('#webcam-video').prop('disabled', true); //disable image upload
+    $('#webcam-video').prop('disabled', true); //disable webcam when upload file
   
   };
 
   detectBtn.removeAttribute("disabled");
+
   reader.readAsDataURL(input.files[0]);
 }
 
-
-// Webcam
+// Webcam session
 var messageArea = null,
   wrapperArea = null,
   btnNewPhoto = null,
@@ -121,6 +121,7 @@ function runWebcam() {
       }
       clear();
       detectBtn.setAttribute('disabled', 'disabled'); //disable detection
+
       
       messageArea.style.display = 'block';
       wrapperArea.style.display = "block";
@@ -148,6 +149,7 @@ function runWebcam() {
     });
 };
 
+// Capture image on webcam
 function takeAPhoto() {
   canvasPhoto.getContext("2d").drawImage(videoCamera, 0, 0, videoCamera.width, videoCamera.height);
 
@@ -164,10 +166,10 @@ function takeAPhoto() {
   // var timestamp = new Date().getTime().toString();
   // messageArea.innerHTML = timestamp +'.png';
   btnDownload.removeAttribute("disabled");
-  // detectBtn.removeAttribute("disabled"); //enable detect
 
 };
 
+// Download capture image from webcam to device
 function downloadPhoto() {
   canvasPhoto.toBlob(function (blob) {
     var link = document.createElement("a");
@@ -263,6 +265,7 @@ function isValidHttpUrl(string) {
 //   return true;
 // }
 
+// Check input URL wether it has 'http' or 'https' protocol
 function trackURL(url){
   if (isValidHttpUrl(url)){
     detectURLBtn.removeAttribute("disabled");
@@ -272,9 +275,29 @@ function trackURL(url){
   }
 }
 
+// Click to close alert notification
 function closeAlert(){
   $('#alert').remove();
 }
+
+// Send image source from client to server under base64 format
+// var sendBase64ToServer = function(base64){
+//     var httpPost = new XMLHttpRequest(),
+//         path = "/",
+//         data = JSON.stringify({image: base64});
+//         console.log(data);
+//     httpPost.onreadystatechange = function(err) {
+//             if (httpPost.readyState == 4 && httpPost.status == 200){
+//                 console.log(httpPost.responseText);
+//             } else {
+//                 console.log(err);
+//             }
+//         };
+//     // Set the content type of the request to json since that's what's being sent
+//     httpPost.open("POST", path, true);
+//     httpPost.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//     httpPost.send(data);
+// };
 
 window.onload = function(){
   $('#threshold-range').on('input', function() {
