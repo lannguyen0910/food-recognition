@@ -39,11 +39,10 @@ class Arguments:
             
 weight_urls = {
     'yolov5s': "1-OsfyTMNw8Qo1maJutNyKjaPDeE25rVa",
-    # 'yolov5m': "1-EDbsoPOlYlkZGjol5sDSG4bhlJbgkDI",
+    "yolov5m": "1-34kzPyJbiP7gcxMmW1QxRyB7quYnSTb",
     "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
     "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP",
     "effnetb4": "1-4AZSXhKAViZdM5PkhoeOZITVFM0WKIm",
-    "yolov5m": "1-HBTIM8pqXbppBiOHBVC9unWkUPjiZ_U"
 }
 
 def download_pretrained_weights(name, cached=None):
