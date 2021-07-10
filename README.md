@@ -80,11 +80,20 @@ We also perform the aggregation of the two data sets above into one. The new set
 We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, and the training and data processing steps are reinstalled by us using Pytorch. When training, data augmentation methods are applied to minimize the model's easy overfit.
 <br>
 
+## 🌟 **Server**
+The two functions: ```get_prediction``` and ```get_video_prediction``` are two inference functions for images and videos. Implemented in ```modules.py```, where the image detection process (get_prediction) will call the Edamam API to get nutritional information in the food. We also save nutritional information in csv files in the folder ```/static/csv```.
+<br>
+
+We provide the user with the ability to customize the threshold of confidence and iou so that the user can find a suitable threshold for the input image. In order not to have to rerun the whole model every time these parameters are changed, when the image is sent from the client, the server will perform a ```perceptual hash``` encryption algorithm to encrypt the image and using that resulting string to name the image when saving to the server. This helps when the client sends an image whose encoding already exists in the database, the server will only post-process the previously predicted result without having to re-execute the prediction.
+<br>
+
+In addition, the team also saved the models as ```global variables```. When starting Flask Server, the model will be initialized only once. Only when there is a change in model selection, this variable will be reinitialized, otherwise the model will not be reinitialized when there are new image queries, this will somewhat reduce the processing time.
+
 ## 🌟 **Additional Methods**
 <details>
 <summary>To increase the variety of dishes, we apply a classification model:</summary>
 <br>
-After testing and observing, we use a simple and effective model: EfficientNet. EfficientNet is proposed by Google and is one of the state-of-the-art models in this classification problem, and efficiency is also guaranteed. We apply the EfficientNet model source code from rwightman, we select the <b>EfficientNet-B4</b> version for retraining on the aggregated dataset. This model is used as an additional improvement to the YOLOv5 model in case the model detects a dish labeled as “Other Food”, only then EfficientNet is applied to predict the label again for this dish.
+After testing and observing, we use a simple and effective model: EfficientNet. EfficientNet is proposed by Google and is one of the state-of-the-art models in this classification problem, and efficiency is also guaranteed. We apply the EfficientNet model source code from rwightman, we select the <b>EfficientNet-B4</b> version for retraining on the aggregated dataset. This model is used as an additional improvement to the YOLOv5 model in case the model detects a dish labeled as "Other Food", only then EfficientNet is applied to predict the label again for this dish.
   
 </details>
 <details>
@@ -179,8 +188,8 @@ We conclude that the learned models are quite good compared to such huge data wi
 ## 💡 **Further Improvements**
 In the process of implementing the project, our team encountered many difficulties, thanks to the research and study of many sources, we can solve important issues. However, still have to accept shortcomings in terms of hardware as well as resources. In addition, the team still see the possibility of improving the system if the training dataset is processed more carefully, such as:
 - We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate.
-- In addition, <b>when using Ngrok on Google Colab</b>, the team encountered an error that FFMPEG on OpenCV does not support the <b>.mp4</b> format, so the video will not be displayed on the website. To fix this we had to recompile OpenCV, and because that took a long time, the team still couldn't finish for now. However, this error was fixed when running at localhost.
-- Finally, due to the limited knowledge of web development, the team still encountered some difficulties. For example, in dealing post requests using ajax, fetch, ... from client to server, which leads to certain limitations.
+- In addition, ```when using Ngrok on Google Colab```, the team encountered an error that FFMPEG on OpenCV does not support the ```.mp4``` format, so the video will not be displayed on the website. To fix this we had to recompile OpenCV, and because that took a long time, the team still couldn't finish for now. However, this error was fixed when running at localhost.
+- Finally, due to the limited knowledge of web development, the team still encountered some difficulties. For example, in dealing post requests using ```ajax, fetch, ...``` from client to server, which leads to certain limitations.
 
 In the future, we hope to solve all of the above problems and continue to develop the application on mobile device like Android.
 <br>
