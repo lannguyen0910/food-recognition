@@ -82,19 +82,22 @@ We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to
 
 ## 🌟 **Additional Methods**
 <details>
-<summary>To increase the variety of dishes, we apply a classification model.</summary>
+<summary>To increase the variety of dishes, we apply a classification model:</summary>
 <br>
 After testing and observing, we use a simple and effective model: EfficientNet. EfficientNet is proposed by Google and is one of the state-of-the-art models in this classification problem, and efficiency is also guaranteed. We apply the EfficientNet model source code from rwightman, we select the <b>EfficientNet-B4</b> version for retraining on the aggregated dataset. This model is used as an additional improvement to the YOLOv5 model in case the model detects a dish labeled as “Other Food”, only then EfficientNet is applied to predict the label again for this dish.
   
 </details>
 <details>
-<summary>To increase the accuracy of the algorithm, we use the ensemble models technique.</summary>
-For each image, models with different versions are used to predict, the results are then aggregated using the "weighted box fusion" method to give the final result.
+<summary>To increase the accuracy of the algorithm, we use the ensemble models technique:</summary>
 <br>
+  
+For each image, models with different versions are used to predict, the results are then aggregated using the "weighted box fusion" method to give the final result.
   
 </details>
 <details>
-<summary>To increase users' interactivity with the application.</summary>
+<summary>To increase users' interactivity with the application:</summary>
+<br>
+  
 When a dish is predicted, we provide more information about the nutritional level of that dish to the user. This information is queried from the application's database, which will be periodically updated from the Edamam API - an API that allows querying the nutrition of a dish by dish name. When doing prediction, the nutrition information will be saved along with the dish name under <b>CSV</b> format. We then fetch the CSV file on the client site to proceed drawing nutritrion statistics chart using <a href="https://github.com/chartjs/Chart.js">Chart.js</a> library. There are a total of 2 chart types, which appear when the user clicks on that chart type.
 </details>
 
@@ -110,7 +113,8 @@ When a dish is predicted, we provide more information about the nutritional leve
 
 ## 📝 **Appendix**
 <details open>
-<summary>mAP of each model</summary>
+<summary>mAP of each model:</summary>
+  <br>
   
 Due to hardware limitations, only two models YOLOv5s and YOLOv5m were trained on the entire dataset, the other two models, YOLOv5l and YOLOv5x, were trained on only a small set of data.
   <br>
@@ -138,14 +142,14 @@ Due to hardware limitations, only two models YOLOv5s and YOLOv5m were trained on
 <br>
 
 <details>
-  <summary>The loss and the learning rate through the loops of the 2 models YOLOv5l and YOLOv5x , have different values due to different image sizes.</summary>
+  <summary>The loss and the learning rate through the loops of the 2 models YOLOv5l and YOLOv5x , have different values due to different image sizes:</summary>
   <br>
   
   <img src="demo/yolov5l,x.PNG" width="100%" /> 
 </details>
 
 <details>
-  <summary>Losses and mAP of 2 models YOLOv5l and YOLOv5x. </summary>
+  <summary>Losses and mAP of 2 models YOLOv5l and YOLOv5x:</summary>
   <br>
   
   <img src="demo/yolov5l,x_val.PNG" width="100%" /> 
@@ -156,7 +160,7 @@ The results on valset are quite similar between the two models, the highest mAPs
 </details>
 
 <details>
-  <summary>The YOLOv5s and YOLOv5m models were trained on the entire large dataset and converged after 100 epochs, both trained with the same configuration. The result of the training process of YOLOv5s and YOLOv5m models are as follows</summary>
+  <summary>The YOLOv5s and YOLOv5m models were trained on the entire large dataset and converged after 100 epochs, both trained with the same configuration. The result of the training process of YOLOv5s and YOLOv5m models are as follows:</summary>
   <br>
   
 
