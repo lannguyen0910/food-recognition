@@ -8,7 +8,6 @@ timm
 omegaconf
 pycocotools
 gdown==3.13.0
-aiohttp
 tldextract
 pytube
 flask-cors

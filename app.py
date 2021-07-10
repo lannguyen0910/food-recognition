@@ -1,6 +1,3 @@
-import aiohttp
-import asyncio
-import sys
 import os
 import argparse
 import requests
@@ -13,9 +10,7 @@ import tldextract
 import pytube
 
 from genericpath import exists
-from PIL import Image
 from flask import Flask, request, render_template, redirect, url_for
-from io import BytesIO
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction, get_video_prediction
