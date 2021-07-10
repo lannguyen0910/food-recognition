@@ -170,6 +170,16 @@ It was observed that the YOLOv5m model converged faster than the YOLOv5s, and al
 <br>
 
 We conclude that the learned models are quite good compared to such huge data with such a variety of dishes, and their complexity is also guaranteed to be suitable for practical applications. We show that the system is scalable and has high practical significance for the people of Vietnam in particular and the world in general.
+<br>
+
+## 💡 **Further Improvements**
+In the process of implementing the project, our team encountered many difficulties, thanks to the research and study of many sources, we can solve important issues. However, still have to accept shortcomings in terms of hardware as well as resources. In addition, the team still see the possibility of improving the system if the training dataset is processed more carefully, such as:
+- We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate.
+- In addition, <b>when using Ngrok on Google Colab</b>, the team encountered an error that FFMPEG on OpenCV does not support the <b>.mp4</b> format, so the video will not be displayed on the website. To fix this we had to recompile OpenCV, and because that took a long time, the team still couldn't finish for now. However, this error was fixed when running at localhost.
+- Finally, due to the limited knowledge of web development, the team still encountered some difficulties. For example, in dealing post requests using ajax, fetch, ... from client to server, which leads to certain limitations.
+
+In the future, we hope to solve all of the above problems and continue to develop the application on mobile device like Android.
+<br>
 
 ## 📙 **References**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5
@@ -177,4 +187,3 @@ We conclude that the learned models are quite good compared to such huge data wi
 - Awesome object detection's custom template: https://github.com/kaylode/custom-template/tree/detection
 - Edamam API: https://developer.edamam.com/food-database-api-docs
 - Chart.js: https://github.com/chartjs/Chart.js
-
