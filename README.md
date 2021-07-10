@@ -1,4 +1,4 @@
-# **Online Food Detection using YOLOv5**
+# 🍞 🍖 🍗 **Online Food Detection using YOLOv5** 🍔 🍟 🍕
 
 ![alt text](./demo/pipeline.png)
 
@@ -97,7 +97,23 @@ For each image, models with different versions are used to predict, the results 
 <summary>To increase users' interactivity with the application.</summary>
 When a dish is predicted, we provide more information about the nutritional level of that dish to the user. This information is queried from the application's database, which will be periodically updated from the Edamam API - an API that allows querying the nutrition of a dish by dish name. When doing prediction, the nutrition information will be saved along with the dish name under <b>CSV</b> format. We then fetch the CSV file on the client site to proceed drawing nutritrion statistics chart using <a href="https://github.com/chartjs/Chart.js">Chart.js</a> library. There are a total of 2 chart types, which appear when the user clicks on that chart type.
 </details>
-<br>
+
+## 🍱 **Sample Results**
+<p float="left">
+  <img src="demo/2.jpg" width="100%" /> 
+  <img src="demo/1.jpg" width="100%" />
+  <img src="demo/3.jpg" width="100%" />
+</p>
+<p float="left">
+  <img src="demo/4.jpg" width="100%" />
+  <img src="demo/5.jpg" width="100%" /> 
+  <img src="demo/6.jpg" width="100%" />
+</p>
+
+## 📝 **Appendix**
+<details>
+  <summary></summary>
+</details>
 
 ## 📙 **References**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5
