@@ -30,8 +30,18 @@ html {
 
 .about-section {
     padding: 40px;
+    padding-top: 20px;
     text-align: center;
-    background-color: #474e5d;
+    background-color: #484f5e;
+    color: white;
+    position: relative;
+}
+
+.about-section2 {
+    padding: 40px;
+    padding-top: 20px;
+    text-align: center;
+    background-color: #5c616b;
     color: white;
     position: relative;
 }

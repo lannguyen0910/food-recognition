@@ -7,7 +7,7 @@ var filename2 = csv_file2.textContent;
 console.log("Filename: ", filename);
 console.log("Filename2: ", filename2);
 
-var TITLE = 'Food Statistical Chart';
+var TITLE = 'Nutrition Statistics Chart';
 
 // `false` for vertical column chart, `true` for horizontal bar chart
 var HORIZONTAL = false;
