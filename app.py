@@ -78,7 +78,7 @@ def hash_video(video_path):
     stream.release()
     stream = None
     image_bytes = cv2.imencode('.jpg', ori_frame)[1].tobytes()
-    filename = hashlib.md5(image_bytes).hexdigest() + f'{ext}'
+    filename = hashlib.sha256(image_bytes).hexdigest() + f'{ext}'
     return filename
 
 
@@ -95,7 +95,7 @@ def download(url):
 
         path = os.path.join(app.config['VIDEO_FOLDER'], filename)
         try:
-            os.rename(ori_path, path)
+            Path(ori_path).rename(path)
         except:
             pass
     else:
@@ -112,7 +112,7 @@ def download(url):
         data = r.content
         ori_filename = url.split('/')[-1]
         _, ext = os.path.splitext(ori_filename)
-        filename = hashlib.md5(data).hexdigest() + f'{ext}'
+        filename = hashlib.sha256(data).hexdigest() + f'{ext}'
 
         path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
@@ -195,7 +195,7 @@ def analyze():
             if filetype == 'image':
                 # Get cache name by hashing image
                 data = f.read()
-                filename = hashlib.md5(data).hexdigest() + f'{ext}'
+                filename = hashlib.sha256(data).hexdigest() + f'{ext}'
 
                 # save file to /static/uploads
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
