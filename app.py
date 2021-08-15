@@ -45,7 +45,7 @@ app.config['DETECTION_FOLDER'] = DETECTION_FOLDER
 app.config['VIDEO_FOLDER'] = VIDEO_FOLDER
 
 IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-VIDEO_ALLOWED_EXTENSIONS = {'mp4', 'avi', '3gp'}
+VIDEO_ALLOWED_EXTENSIONS = {'mp4', 'avi', '3gpp', '3gp'}
 
 
 def allowed_file_image(filename):
