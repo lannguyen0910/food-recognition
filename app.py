@@ -65,7 +65,7 @@ def make_dir(path):
 
 def download_yt(url):
     youtube = pytube.YouTube(url)
-    video = youtube.streams.first()
+    video = youtube.streams.get_highest_resolution()
     path = video.download(app.config['VIDEO_FOLDER'])
 
     return path
