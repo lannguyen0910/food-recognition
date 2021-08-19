@@ -155,7 +155,7 @@ function takeAPhoto() {
 
   var img = document.createElement('img');
   img.id = 'user-image';
-  img.src = canvasPhoto.toDataURL();
+  img.src = canvasPhoto.toDataURL('image/jpg', 1.0);
   $('#image-display').prepend(img);
 
   window.stream.getTracks().forEach(function(track) {
@@ -166,6 +166,7 @@ function takeAPhoto() {
   // var timestamp = new Date().getTime().toString();
   // messageArea.innerHTML = timestamp +'.png';
   btnDownload.removeAttribute("disabled");
+  // detectBtn.removeAttribute("disabled");
 
 };
 
@@ -281,23 +282,46 @@ function closeAlert(){
 }
 
 // Send image source from client to server under base64 format
-// var sendBase64ToServer = function(base64){
-//     var httpPost = new XMLHttpRequest(),
-//         path = "/",
-//         data = JSON.stringify({image: base64});
-//         console.log(data);
-//     httpPost.onreadystatechange = function(err) {
-//             if (httpPost.readyState == 4 && httpPost.status == 200){
-//                 console.log(httpPost.responseText);
-//             } else {
-//                 console.log(err);
-//             }
-//         };
-//     // Set the content type of the request to json since that's what's being sent
-//     httpPost.open("POST", path, true);
-//     httpPost.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-//     httpPost.send(data);
-// };
+var sendBase64ToServer = function(base64){
+    var httpPost = new XMLHttpRequest(),
+        path = "/analyze",
+        data = JSON.stringify({image: base64});
+        console.log(data);
+    httpPost.onreadystatechange = function(err) {
+            if (httpPost.readyState == 4 && httpPost.status == 200){
+                console.log(httpPost.responseText);
+            } else {
+                console.log(err);
+            }
+        };
+    // Set the content type of the request to json since that's what's being sent
+    httpPost.open("POST", path, true);
+    httpPost.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    httpPost.send(data);
+};
+
+function base64ToBlob(base64, mime) 
+{
+    mime = mime || '';
+    var sliceSize = 1024;
+    var byteChars = window.atob(base64);
+    var byteArrays = [];
+
+    for (var offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
+        var slice = byteChars.slice(offset, offset + sliceSize);
+
+        var byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        var byteArray = new Uint8Array(byteNumbers);
+
+        byteArrays.push(byteArray);
+    }
+
+    return new Blob(byteArrays, {type: mime});
+}
 
 window.onload = function(){
   $('#threshold-range').on('input', function() {
@@ -310,4 +334,56 @@ window.onload = function(){
     confidence = $('#confidence-range').val() / 100;
   });
 
+  // var url = '/analyze';                
+  // var image = $('#user-image').attr('src');
+  // var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
+  // var blob = base64ToBlob(base64ImageContent, 'image/png');                
+  // var formData = new FormData();
+  // formData.append('picture', blob);
+
+  // $('#file-upload' )
+  // .submit( function( e ) {
+  //   $.ajax( {
+  //     url: url,
+  //     type: 'POST',
+  //     data: formData,
+  //     processData: false,
+  //     contentType: false
+  //   } );
+  //   e.preventDefault();
+  // } );
 }
+
+$(document).ready(function(){
+  var url = '/analyze';                
+  var image = $('#user-image').attr('src');
+  // var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
+  // var blob = base64ToBlob(base64ImageContent, 'image/png');                
+  // var formData = new FormData();
+  // formData.append('picture', blob);
+
+  $(form).on('submit', function(event){
+    $.ajax( {
+      url: url,
+      type: 'POST',
+      data: JSON.stringify({image: image}),
+      processData: false,
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      crossDomain: true,
+      xhrFields: {
+          withCredentials: false
+      },
+      success: function (data, textStatus, jQxhr)
+        {
+            $('body').append(data);
+            console.log(data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+
+    event.preventDefault();
+  });
+});

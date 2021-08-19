@@ -15,7 +15,7 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction, get_video_prediction
 from flask_ngrok import run_with_ngrok
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 
 parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
@@ -168,8 +168,10 @@ def detect_by_url_page():
 
 
 @app.route('/analyze', methods=['POST', 'GET'])
+@cross_origin(supports_credentials=True)
 def analyze():
     if request.method == 'POST':
+        print("Request json: ", request.get_json())
         result_dict = None
         filename = None
         filetype = None
@@ -270,6 +272,7 @@ def analyze():
 
 @app.after_request
 def add_header(response):
+    response.headers.add('Access-Control-Allow-Credentials', True)
     if 'Cache-Control' not in response.headers:
         response.headers['Cache-Control'] = 'public, no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
         response.headers['Pragma'] = 'no-cache'
