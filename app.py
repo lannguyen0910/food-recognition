@@ -8,6 +8,7 @@ import pytube
 import hashlib
 import tldextract
 import pytube
+import ssl
 
 from genericpath import exists
 from flask import Flask, request, render_template, redirect, url_for
@@ -25,6 +26,8 @@ parser.add_argument('--host',  type=str,
                     default='192.168.100.4:4000', help="Local IP")
 parser.add_argument('--debug', action='store_true',
                     default=False, help="Run app in debug mode")
+
+ASSETS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -309,4 +312,8 @@ if __name__ == '__main__':
         else:
             port = hostname[1]
         host = hostname[0]
-        app.run(host=host, port=port, debug=args.debug, use_reloader=False)
+
+        app.run(host=host, port=port, debug=args.debug, use_reloader=False,
+                ssl_context='adhoc')
+
+# python app.py --host localhost:8000
