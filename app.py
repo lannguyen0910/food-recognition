@@ -272,7 +272,10 @@ def analyze():
 
 @app.after_request
 def add_header(response):
+    # include cookie for every request
     response.headers.add('Access-Control-Allow-Credentials', True)
+
+    # prevent the client from caching the response
     if 'Cache-Control' not in response.headers:
         response.headers['Cache-Control'] = 'public, no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
         response.headers['Pragma'] = 'no-cache'

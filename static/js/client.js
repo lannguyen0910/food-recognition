@@ -353,37 +353,3 @@ window.onload = function(){
   //   e.preventDefault();
   // } );
 }
-
-$(document).ready(function(){
-  var url = '/analyze';                
-  var image = $('#user-image').attr('src');
-  // var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
-  // var blob = base64ToBlob(base64ImageContent, 'image/png');                
-  // var formData = new FormData();
-  // formData.append('picture', blob);
-
-  $(form).on('submit', function(event){
-    $.ajax( {
-      url: url,
-      type: 'POST',
-      data: JSON.stringify({image: image}),
-      processData: false,
-      contentType: 'application/json; charset=utf-8',
-      dataType: 'json',
-      crossDomain: true,
-      xhrFields: {
-          withCredentials: false
-      },
-      success: function (data, textStatus, jQxhr)
-        {
-            $('body').append(data);
-            console.log(data);
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            console.log(errorThrown);
-        }
-    });
-
-    event.preventDefault();
-  });
-});
