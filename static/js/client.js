@@ -1,5 +1,6 @@
 var el = x => document.getElementById(x);
 var detectBtn = document.querySelector("#analyze-button");
+var img;
 
 function showPicker() {
   $("#file-input").click();
@@ -153,7 +154,7 @@ function runWebcam() {
 function takeAPhoto() {
   canvasPhoto.getContext("2d").drawImage(videoCamera, 0, 0, videoCamera.width, videoCamera.height);
 
-  var img = document.createElement('img');
+  img = document.createElement('img');
   img.id = 'user-image';
   img.src = canvasPhoto.toDataURL('image/jpg', 1.0);
   $('#image-display').prepend(img);
@@ -166,8 +167,10 @@ function takeAPhoto() {
   // var timestamp = new Date().getTime().toString();
   // messageArea.innerHTML = timestamp +'.png';
   btnDownload.removeAttribute("disabled");
-  // detectBtn.removeAttribute("disabled");
+  detectBtn.removeAttribute("disabled");
 
+  // console.log("src: ", img.src);
+  // sendBase64ToServer(img.src);
 };
 
 // Download capture image from webcam to device
@@ -334,22 +337,36 @@ window.onload = function(){
     confidence = $('#confidence-range').val() / 100;
   });
 
-  // var url = '/analyze';                
-  // var image = $('#user-image').attr('src');
-  // var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
-  // var blob = base64ToBlob(base64ImageContent, 'image/png');                
-  // var formData = new FormData();
-  // formData.append('picture', blob);
 
-  // $('#file-upload' )
-  // .submit( function( e ) {
-  //   $.ajax( {
-  //     url: url,
-  //     type: 'POST',
-  //     data: formData,
-  //     processData: false,
-  //     contentType: false
-  //   } );
-  //   e.preventDefault();
-  // } );
+
+
+  detectBtn.addEventListener('click', function(e) {
+    var url = '/analyze';                
+    var image = img.src;
+    var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
+    var blob = base64ToBlob(base64ImageContent, 'image/png');                
+    var formData = new FormData();
+    formData.append('picture', blob);
+
+    // sendBase64ToServer(img.src);
+    $.ajax({
+      url: url,
+      data: formData,// the formData function is available in almost all new browsers.
+      type:"POST",
+      contentType:false,
+      processData:false,
+      cache:false,
+      dataType:"json", // Change this according to your response from the server.
+      error:function(err){
+          console.error(err);
+      },
+      success:function(data){
+          console.log(data);
+      },
+      complete:function(){
+          console.log("Request finished.");
+      }
+  });
+  //   // e.preventDefault();
+  },false);
 }

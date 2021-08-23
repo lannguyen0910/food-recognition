@@ -9,9 +9,12 @@ import hashlib
 import tldextract
 import pytube
 import ssl
+import io
+import base64
 
+from PIL import Image
 from genericpath import exists
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, make_response
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction, get_video_prediction
@@ -157,7 +160,9 @@ path = Path(__file__).parent
 
 @app.route('/')
 def homepage():
-    return render_template("index.html")
+    resp = make_response(render_template("index.html"))
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 
 @app.route('/about')
@@ -174,12 +179,30 @@ def detect_by_url_page():
 @cross_origin(supports_credentials=True)
 def analyze():
     if request.method == 'POST':
-        print("Request json: ", request.get_json())
-        result_dict = None
+        out_name = None
+        filepath = None
         filename = None
         filetype = None
         csv_name = None
         csv_name2 = None
+        # print("Request get json: ", request.get_json())
+
+        # if 'image' in request.json:
+        #     print('Webcam image')
+        #     data = request.json['image']
+
+        #     # print("data: ", data)
+        #     encode_img = data.replace('data:image/png;base64,', '')
+        #     # print("encode_img: ", encode_img)
+        #     decoded_img = Image.open(io.BytesIO(base64.b64decode(encode_img)))
+        #     print("decoded_img: ", decoded_img)
+
+        #     filename = hashlib.sha256(decoded_img).hexdigest() + '.png'
+        #     # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        #     # decoded_img.save(filepath)
+        #     return render_template('detect.html')
+        print("File: ", request.files)
+
         if 'url-button' in request.form:
             url = request.form['url_link']
             filename, filepath = download(url)
@@ -188,7 +211,7 @@ def analyze():
             filetype = file_type(filename)
             # print('Filetype: ', filetype)
 
-        if 'upload-button' in request.form:
+        elif 'upload-button' in request.form:
             f = request.files['file']
             ori_file_name = secure_filename(f.filename)
             _, ext = os.path.splitext(ori_file_name)
@@ -231,26 +254,32 @@ def analyze():
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
 
-            filename = get_prediction(
-                filepath,
-                output_path,
-                model_name=model_types,
-                ensemble=ensemble,
-                min_conf=min_conf,
-                min_iou=min_iou,
-                enhance_labels=enhanced)
+            filename = filepath
+            print("Filename: ", filename)
+            # filename = get_prediction(
+            #     filepath,
+            #     output_path,
+            #     model_name=model_types,
+            #     ensemble=ensemble,
+            #     min_conf=min_conf,
+            #     min_iou=min_iou,
+            #     enhance_labels=enhanced)
 
         elif filetype == 'video':
             out_name = "Video Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
-            filename = get_video_prediction(
-                filepath,
-                output_path,
-                model_name=model_types,
-                min_conf=min_conf,
-                min_iou=min_iou,
-                enhance_labels=enhanced)
+
+            filename = filepath
+            print("Filename: ", filename)
+
+            # filename = get_video_prediction(
+            #     filepath,
+            #     output_path,
+            #     model_name=model_types,
+            #     min_conf=min_conf,
+            #     min_iou=min_iou,
+            #     enhance_labels=enhanced)
         else:
             error_msg = "Invalid input url!!!"
             return render_template('detect_url.html', error_msg=error_msg)
@@ -300,7 +329,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     if args.ngrok:
         run_with_ngrok(app)
@@ -316,4 +345,4 @@ if __name__ == '__main__':
         app.run(host=host, port=port, debug=args.debug, use_reloader=False,
                 ssl_context='adhoc')
 
-# python app.py --host localhost:8000
+# python app.py --host localhost:8000 --debug
