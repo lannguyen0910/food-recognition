@@ -8,6 +8,7 @@ import pytube
 import hashlib
 import tldextract
 import pytube
+import time
 import ssl
 import io
 import base64
@@ -183,27 +184,50 @@ def analyze():
         filepath = None
         filename = None
         filetype = None
-        csv_name = None
+        csv_name1 = None
         csv_name2 = None
-        # print("Request get json: ", request.get_json())
 
-        # if 'image' in request.json:
-        #     print('Webcam image')
-        #     data = request.json['image']
-
-        #     # print("data: ", data)
-        #     encode_img = data.replace('data:image/png;base64,', '')
-        #     # print("encode_img: ", encode_img)
-        #     decoded_img = Image.open(io.BytesIO(base64.b64decode(encode_img)))
-        #     print("decoded_img: ", decoded_img)
-
-        #     filename = hashlib.sha256(decoded_img).hexdigest() + '.png'
-        #     # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        #     # decoded_img.save(filepath)
-        #     return render_template('detect.html')
         print("File: ", request.files)
 
-        if 'url-button' in request.form:
+        if 'picture' in request.files:
+            print('Webcam image')
+            f = request.files['picture']
+            # data = f.read()
+
+            # encode_img = data.replace('data:image/png;base64,', '')
+            # decoded_img = Image.open(io.BytesIO(base64.b64decode(encode_img)))
+
+            # filename = hashlib.sha256(decoded_img).hexdigest() + '.png'
+            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # decoded_img.save(filepath)
+
+            # ori_file_name = secure_filename(f.filename)
+            # _, ext = os.path.splitext(ori_file_name)
+            # print('Ori Filename: ', ori_file_name)
+            # print('f.filename: ', f.filename)
+            # filetype = file_type(ori_file_name)
+            # print('Filetype: ', filetype)
+
+
+            # print("Data: ", data)
+            # filename = hashlib.sha256(data).hexdigest() + f'{ext}'
+
+            # save file to /static/uploads
+            filename = time.strftime("%Y%m%d-%H%M%S") + '.png'
+            print("filename: ", filename)
+
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print("filepath: ", filepath)
+
+            # np_img = np.fromstring(data, np.uint8)
+            # img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+            img = Image.open(f.stream)
+            img.show()
+            img.save(filepath)
+
+            return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+
+        elif 'url-button' in request.form:
             url = request.form['url_link']
             filename, filepath = download(url)
             # print('Filename', filename)
