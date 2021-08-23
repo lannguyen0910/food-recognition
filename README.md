@@ -45,10 +45,11 @@ cd YOLOv5-Online-Food-Detection/
 ```
 pip install -r requirements.txt
 ```
-- Start the app normally 
+- Start the app normally. Run in insecure connection (```http``` not ```https```)
 ```
 python app.py --host=localhost:8000
 ```
+**Ps:** You can generate SSL key and certificate for the app to run properly!
 
 ## 🌟 **Run using Google Colab with Ngrok**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
