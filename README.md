@@ -1,10 +1,10 @@
-# 🍔🍟🍗 **Online Food Detection using YOLOv5** 🍞🍖🍕
+# 🍔🍟🍗 **Food Detection with YOLOv5** 🍞🍖🍕
 
 ![alt text](./demo/pipeline.png)
 
 ## 🌳 **Folder Structure**
 ```
-YOLOv5-Online-Food-Detection
+food-detection-yolov5
 |
 │   app.py                    # Flask server
 |   modules.py                # inference stage, export result files, csv,...
@@ -45,17 +45,17 @@ cd YOLOv5-Online-Food-Detection/
 ```
 pip install -r requirements.txt
 ```
-- Start the app normally. Run in insecure connection (```http``` not ```https```)
+- Start the app. Safe to run in insecure connection (```http``` not ```https```)
 ```
 python app.py --host=localhost:8000
 ```
-**Ps:** You can generate SSL key and certificate for the app to run properly!
+**Ps:** You can generate SSL certificate to run the app properly!
 
 ## 🌟 **Run using Google Colab with Ngrok**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
 <!-- - (https://colab.research.google.com/drive/1SFDqNEQA9hrVA6zFn7wb0il-wV2Unou8?usp=sharing)-->
 
-## 🌟 **Train YOLOv5** 
+## 🌟 **Train YOLOv5 using our object detection's template** 
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1PYMr192Y7Rc6SFLhq9ZVPQ64-9YM2fiF?usp=sharing)
 <br>
 
