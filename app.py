@@ -176,6 +176,11 @@ def detect_by_url_page():
     return render_template("url.html")
 
 
+@app.route('/webcam')
+def detect_by_webcam_page():
+    return render_template("webcam.html")
+
+
 @app.route('/analyze', methods=['POST', 'GET'])
 @cross_origin(supports_credentials=True)
 def analyze():
@@ -189,43 +194,20 @@ def analyze():
 
         print("File: ", request.files)
 
-        if 'picture' in request.files:
-            print('Webcam image')
-            f = request.files['picture']
-            # data = f.read()
+        if 'webcam-button' in request.form:
+            print('Request.form: ', request.form)
+            f = request.files['blob-file']
 
-            # encode_img = data.replace('data:image/png;base64,', '')
-            # decoded_img = Image.open(io.BytesIO(base64.b64decode(encode_img)))
+            ori_file_name = secure_filename(f.filename)
+            filetype = file_type(ori_file_name)
 
-            # filename = hashlib.sha256(decoded_img).hexdigest() + '.png'
-            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            # decoded_img.save(filepath)
-
-            # ori_file_name = secure_filename(f.filename)
-            # _, ext = os.path.splitext(ori_file_name)
-            # print('Ori Filename: ', ori_file_name)
-            # print('f.filename: ', f.filename)
-            # filetype = file_type(ori_file_name)
-            # print('Filetype: ', filetype)
-
-
-            # print("Data: ", data)
-            # filename = hashlib.sha256(data).hexdigest() + f'{ext}'
+            filename = time.strftime("%Y%m%d-%H%M%S") + '.png'
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
             # save file to /static/uploads
-            filename = time.strftime("%Y%m%d-%H%M%S") + '.png'
-            print("filename: ", filename)
-
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print("filepath: ", filepath)
-
-            # np_img = np.fromstring(data, np.uint8)
-            # img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
             img = Image.open(f.stream)
-            img.show()
+            # img.show()
             img.save(filepath)
-
-            return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
         elif 'url-button' in request.form:
             url = request.form['url_link']
@@ -278,32 +260,27 @@ def analyze():
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
 
-            filename = filepath
-            print("Filename: ", filename)
-            # filename = get_prediction(
-            #     filepath,
-            #     output_path,
-            #     model_name=model_types,
-            #     ensemble=ensemble,
-            #     min_conf=min_conf,
-            #     min_iou=min_iou,
-            #     enhance_labels=enhanced)
+            filename = get_prediction(
+                filepath,
+                output_path,
+                model_name=model_types,
+                ensemble=ensemble,
+                min_conf=min_conf,
+                min_iou=min_iou,
+                enhance_labels=enhanced)
 
         elif filetype == 'video':
             out_name = "Video Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
 
-            filename = filepath
-            print("Filename: ", filename)
-
-            # filename = get_video_prediction(
-            #     filepath,
-            #     output_path,
-            #     model_name=model_types,
-            #     min_conf=min_conf,
-            #     min_iou=min_iou,
-            #     enhance_labels=enhanced)
+            filename = get_video_prediction(
+                filepath,
+                output_path,
+                model_name=model_types,
+                min_conf=min_conf,
+                min_iou=min_iou,
+                enhance_labels=enhanced)
         else:
             error_msg = "Invalid input url!!!"
             return render_template('detect_url.html', error_msg=error_msg)
@@ -314,6 +291,7 @@ def analyze():
             app.config['CSV_FOLDER'], csv_name + '_info.csv')
         csv_name2 = os.path.join(
             app.config['CSV_FOLDER'], csv_name + '_info2.csv')
+
         print("filename", filename)
         print('csv_name: ', csv_name1)
 
@@ -353,7 +331,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     if args.ngrok:
         run_with_ngrok(app)
