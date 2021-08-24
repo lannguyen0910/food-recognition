@@ -175,13 +175,22 @@ window.onload = function(){
     confidence = $('#confidence-range').val() / 100;
   });
 
+  var form = $('#file-upload');
   detectBtn.addEventListener('click', function(e) {
+
     var url = '/analyze';                
     var image = img.src;
     var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
     var blob = base64ToBlob(base64ImageContent, 'image/png');                
-    var formData = new FormData();
-    formData.append('picture', blob);
+    
+    let blobFile = document.getElementById('blob-file');
+    let file = new File([blob], "img.png",{type:"image/png", lastModified:new Date().getTime()});
+    let container = new DataTransfer();
+
+    container.items.add(file);
+    blobFile.files = container.files;
+
+    formData = new FormData(form);
 
     $.ajax({
       url: url,
