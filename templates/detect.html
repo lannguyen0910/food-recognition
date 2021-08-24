@@ -19,6 +19,7 @@
         <a href="/" class="w3-bar-item w3-button" style="font-size:18px;text-decoration:none;font-family:Verdana, sans-serif;"><b>Food</b> Detector</a>  
         <a href="/about" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">About</a>       
         <a href="/url" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">Detect by url</a>       
+        <a href="/webcam" class="w3-bar-item w3-button" style="font-size:18px;float:right;text-decoration:none;font-family:Verdana, sans-serif;">Detect by webcam</a>       
 
       </div>
     </div>
@@ -133,32 +134,20 @@
               <div style="text-align: center;font-size:20px;">
                   <b>{{out_name}}</b>
               </div>
+
               <br/>
               {% if filetype == 'image' %}
                 <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
-                <!-- <img id='result-image' class='no-display' alt='Result Image' height='300'> -->
-
                 <label id="csv_file" style="display:none">{{csv_name}}</label>
                 <label id="csv_file2" style="display:none">{{csv_name2}}</label>
                 
-                <!-- {{result_dict}}
-                <tr>
-                  {%for item in result_dict %}
-                  <div class='result-label'> 
-                    {% if item.calories %}
-                      <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
-                    {% else %}
-                      <h2 id='label'>{{item.names}} || No information </h2>
-                    {% endif %}
-                      <h3 id='calories'></h3> 
-                  </div>
-                  {% endfor %}
-                </tr> -->
               {% else %}
                 <video autoplay id="result-video" controls> <source id="result-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
               {% endif %}
+
             </div>
           </div>
+
           {% if filetype == 'image' %}
           <div class="panel panel-default result-panel">
             <div class="panel-body w3-card">
@@ -191,7 +180,7 @@
 
     </footer>
 
-    <script src="{{ url_for('static', filename='js/client.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/file.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/chart.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/all.js') }}" defer></script>
