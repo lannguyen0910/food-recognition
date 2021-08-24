@@ -38,18 +38,18 @@ food-detection-yolov5
 ## 🌟 **How to run locally (require GPU)**
 - Clone the repo
 ```
-git clone https://github.com/lannguyen0910/YOLOv5-Online-Food-Detection
-cd YOLOv5-Online-Food-Detection/
+git clone https://github.com/lannguyen0910/food-detection-yolov5
+cd food-detection-yolov5/
 ```
 - Install dependencies
 ```
 pip install -r requirements.txt
 ```
-- Start the app. Safe to run in insecure connection (```http``` not ```https```)
+- Start the app. Safe to run in insecure connection ```http```
 ```
 python app.py --host=localhost:8000
 ```
-**Ps:** You can generate SSL certificate to run the app properly!
+**!!! You can generate SSL certificate to run the app in ```https``` !!!**
 
 ## 🌟 **Run using Google Colab with Ngrok**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
@@ -187,12 +187,11 @@ We conclude that the learned models are quite good compared to such huge data wi
 <br>
 
 ## 💡 **Further Improvements**
-In the process of implementing the project, our team encountered many difficulties, thanks to the research and study of many sources, we can solve important issues. However, still have to accept shortcomings in terms of hardware as well as resources. In addition, the team still see the possibility of improving the system if the training dataset is processed more carefully, such as:
-- We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate.
-- In addition, ```when using Ngrok on Google Colab```, the team encountered an error that FFMPEG on OpenCV does not support the ```.mp4``` format, so the video will not be displayed on the website. To fix this we had to recompile OpenCV, and because that took a long time, the team still couldn't finish for now. However, this error was fixed when running at localhost.
-- Finally, due to the limited knowledge of web development, the team still encountered some difficulties. For example, in dealing post requests using ```ajax, fetch, ...``` from client to server, which leads to certain limitations.
+In the process of implementing the project, our team encountered many difficulties, thanks to the research and study of many sources, we can solve important issues. However, still have to accept shortcomings in terms of hardware as well as resources. Some of the problems we had:
+- We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate. You can try to train on other food datasets for better experience!
+- In addition, we encountered an issue that ```OpenCV``` does not support ```FFmpeg```, so the video will not be displayed on the browser, or even the detection video will not be exported as we use ```OpenCV VideoWriter```. To fix this you have to compile ```OpenCV``` with ```FFmpeg``` on your local machine. You can try compile it on Google Colab, but we can't do it for now.
 
-In the future, we hope to solve all of the above problems and continue to develop the application on mobile device like Android.
+**In the future, we hope to solve all of the above problems and continue to develop the app on mobile device like Android. Feel free to make a contribution to the project, we will appreciate a lot!**
 <br>
 
 ## 📙 **References**
