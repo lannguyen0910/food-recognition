@@ -1,13 +1,12 @@
-
 var csv_file = document.querySelector("#csv_file");
 var csv_file2 = document.querySelector("#csv_file2");
+var canvas1 = document.querySelector("#container1");
+var canvas2 = document.querySelector("#container2");
 
 var filename =  csv_file.textContent;
 var filename2 = csv_file2.textContent;
-console.log("Filename: ", filename);
-console.log("Filename2: ", filename2);
 
-var TITLE = 'Nutrition Statistics Chart';
+var TITLE = 'Nutrients Statistics Chart';
 
 // `false` for vertical column chart, `true` for horizontal bar chart
 var HORIZONTAL = false;
@@ -60,18 +59,17 @@ var SHOW_GRID = true;
 var SHOW_LEGEND = true; 
 
 function getChart(val){
-    var canvas1 = document.querySelector("#container1");
-    var canvas2 = document.querySelector("#container2");
     if(val.value === "1"){
         $('#display-chart').empty();
         canvas1.style.display = "block";
         canvas2.style.display = 'none'
+
         // Read csv, bypass browser cache, and create chart
         $.get(filename, {'_': $.now()}, function(csvString) {
 
-            var rows = Papa.parse(csvString, {header: true, skipEmptyLines: true}).data;
+            let rows = Papa.parse(csvString, {header: true, skipEmptyLines: true}).data;
 
-            var datasets = SERIES.map(function(el) {
+            let datasets = SERIES.map(function(el) {
                 return {
                     label: el.name,
                     labelDirty: el.column,
@@ -86,12 +84,12 @@ function getChart(val){
                 })
             });
 
-            var barChartData = {
+            let barChartData = {
                 labels: rows.map(function(el) { return el[LABELS] }),
                 datasets: datasets
             };
 
-            var ctx = document.getElementById('container1').getContext('2d');
+            let ctx = document.getElementById('container1').getContext('2d');
 
             new Chart(ctx, {
             type: HORIZONTAL ? 'horizontalBar' : 'bar',
@@ -159,14 +157,12 @@ function getChart(val){
         canvas2.style.display = "block";
         canvas1.style.display = 'none'
         $.get(filename2, {'_': $.now()}, function(csvString) {
-            var rows = Papa.parse(csvString, {header: true, skipEmptyLines: true}).data;
+            let rows = Papa.parse(csvString, {header: true, skipEmptyLines: true}).data;
 
-            var names = Object.keys(rows[0]).slice(1);
+            let names = Object.keys(rows[0]).slice(1);
 
-            console.log("names: ", names);
-
-            var SERIES1 = [];
-            var info = ['calories', 'protein', 'fat', 'carbs', 'fiber'];
+            let SERIES1 = [];
+            let info = ['calories', 'protein', 'fat', 'carbs', 'fiber'];
 
             for(let i=0;i<names.length;i++){
                 let randomColor = Math.floor(Math.random()*16777215).toString(16);
@@ -179,9 +175,7 @@ function getChart(val){
                 });
             }
 
-            console.log("series1: ", SERIES1);
-
-            var datasets = SERIES1.map(function(el) {
+            let datasets = SERIES1.map(function(el) {
                 return {
                     label: el.name,
                     labelDirty: el.column,
@@ -197,11 +191,10 @@ function getChart(val){
                 })
             });
 
-            var barChartData = {
-            labels: info,
-            datasets: datasets
+            let barChartData = {
+                labels: info,
+                datasets: datasets
             };
-            console.log("barChartData: ", barChartData);
 
             var ctx = document.getElementById('container2').getContext('2d');
 

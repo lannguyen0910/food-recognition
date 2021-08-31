@@ -8,7 +8,7 @@ var messageArea = null,
 
 var detectBtn = document.querySelector("#analyze-button");
 
-function clear() {
+function clearContent() {
   $('#image-display').empty(); // removes upload img
   $('#upload-label').empty(); //removes upload img's filename
   $('#result-content').remove();   //remove result div (image + labels ...)
@@ -19,7 +19,7 @@ function runWebcam() {
   messageArea = document.querySelector("#upload-label");
   wrapperArea = document.querySelector("#wrapper");
 
-  var video_canvas_html = '<video id="video1" playsinline autoplay></video>' + '<br/>' + '<canvas id="image-canvas"></canvas>';
+  let video_canvas_html = '<video id="video1" playsinline autoplay></video>' + '<br/>' + '<canvas id="image-canvas"></canvas>';
   $('#webcam-video').html(video_canvas_html);
 
   btnNewPhoto = document.querySelector("#capture-img");
@@ -40,7 +40,7 @@ function runWebcam() {
 
   if (navigator.mediaDevices.getUserMedia === undefined) {
     navigator.mediaDevices.getUserMedia = function (constraints) {
-      var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+      let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
       if (!getUserMedia) {
         return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
@@ -62,8 +62,8 @@ function runWebcam() {
       } else {
         videoCamera.src = window.URL.createObjectURL(stream);
       }
-      clear();
-      detectBtn.setAttribute('disabled', 'disabled'); //disable detection
+      clearContent();
+      detectBtn.setAttribute('disabled', 'disabled'); //disable detection button
 
       
       messageArea.style.display = 'block';
@@ -114,7 +114,7 @@ function takeAPhoto() {
 // Download capture image from webcam to device
 function downloadPhoto() {
   canvasPhoto.toBlob(function (blob) {
-    var link = document.createElement("a");
+    let link = document.createElement("a");
     link.download = "photo.jpg";
     link.setAttribute("href", URL.createObjectURL(blob));
     link.dispatchEvent(new MouseEvent("click"));
@@ -124,7 +124,7 @@ function downloadPhoto() {
 
 // Send image source from client to server under base64 format
 var sendBase64ToServer = function(base64){
-    var httpPost = new XMLHttpRequest(),
+    let httpPost = new XMLHttpRequest(),
         path = "/analyze",
         data = JSON.stringify({image: base64});
         console.log(data);
@@ -144,19 +144,19 @@ var sendBase64ToServer = function(base64){
 function base64ToBlob(base64, mime) 
 {
     mime = mime || '';
-    var sliceSize = 1024;
-    var byteChars = window.atob(base64);
-    var byteArrays = [];
+    let sliceSize = 1024;
+    let byteChars = window.atob(base64);
+    let byteArrays = [];
 
-    for (var offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
-        var slice = byteChars.slice(offset, offset + sliceSize);
+    for (let offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
+        let slice = byteChars.slice(offset, offset + sliceSize);
 
-        var byteNumbers = new Array(slice.length);
-        for (var i = 0; i < slice.length; i++) {
+        let byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
             byteNumbers[i] = slice.charCodeAt(i);
         }
 
-        var byteArray = new Uint8Array(byteNumbers);
+        let byteArray = new Uint8Array(byteNumbers);
 
         byteArrays.push(byteArray);
     }
@@ -175,13 +175,13 @@ window.onload = function(){
     confidence = $('#confidence-range').val() / 100;
   });
 
-  var form = $('#file-upload');
+  const form = $('#file-upload');
   detectBtn.addEventListener('click', function(e) {
 
-    var url = '/analyze';                
-    var image = img.src;
-    var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
-    var blob = base64ToBlob(base64ImageContent, 'image/png');                
+    let url = '/analyze';                
+    let image = img.src;
+    let base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
+    let blob = base64ToBlob(base64ImageContent, 'image/png');                
     
     let blobFile = document.getElementById('blob-file');
     let file = new File([blob], "img.png",{type:"image/png", lastModified:new Date().getTime()});
