@@ -70,7 +70,21 @@ def make_dir(path):
         os.makedirs(path)
 
 
+def file_type(path):
+    filename = path.split('/')[-1]
+    if allowed_file_image(filename):
+        filetype = 'image'
+    elif allowed_file_video(filename):
+        filetype = 'video'
+    else:
+        filetype = 'invalid'
+    return filetype
+
+
 def download_yt(url):
+    """
+    Download youtube video by url and save to video folder
+    """
     youtube = pytube.YouTube(url)
     video = youtube.streams.get_highest_resolution()
     path = video.download(app.config['VIDEO_FOLDER'])
@@ -79,6 +93,9 @@ def download_yt(url):
 
 
 def hash_video(video_path):
+    """
+    Hash a frame in video and use as a filename
+    """
     _, ext = os.path.splitext(video_path)
     stream = cv2.VideoCapture(video_path)
     success, ori_frame = stream.read()
@@ -90,6 +107,10 @@ def hash_video(video_path):
 
 
 def download(url):
+    """
+    Handle input url from client 
+    """
+
     ext = tldextract.extract(url)
     if ext.domain == 'youtube':
         try:
@@ -114,6 +135,7 @@ def download(url):
                    'Accept-Language': 'en-US,en;q=0.8',
                    'Connection': 'keep-alive'}
         r = requests.get(url, stream=True, headers=headers)
+        print('Image Url')
 
         # Get cache name by hashing image
         data = r.content
@@ -130,10 +152,14 @@ def download(url):
 
 
 def save_upload(file):
+    """
+    Save uploaded image and video if its format is allowed
+    """
     filename = secure_filename(file.filename)
     if allowed_file_image(filename):
         make_dir(app.config['UPLOAD_FOLDER'])
         path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
     elif allowed_file_video(filename):
         try:
             make_dir(app.config['VIDEO_FOLDER'])
@@ -145,40 +171,29 @@ def save_upload(file):
     return path
 
 
-def file_type(path):
-    filename = path.split('/')[-1]
-    if allowed_file_image(filename):
-        filetype = 'image'
-    elif allowed_file_video(filename):
-        filetype = 'video'
-    else:
-        filetype = 'invalid'
-    return filetype
-
-
 path = Path(__file__).parent
 
 
 @app.route('/')
 def homepage():
-    resp = make_response(render_template("index.html"))
+    resp = make_response(render_template("upload-file.html"))
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
 
 @app.route('/about')
 def about_page():
-    return render_template("about.html")
+    return render_template("about-page.html")
 
 
 @app.route('/url')
 def detect_by_url_page():
-    return render_template("url.html")
+    return render_template("input-url.html")
 
 
 @app.route('/webcam')
 def detect_by_webcam_page():
-    return render_template("webcam.html")
+    return render_template("webcam-capture.html")
 
 
 @app.route('/analyze', methods=['POST', 'GET'])
@@ -195,7 +210,9 @@ def analyze():
         print("File: ", request.files)
 
         if 'webcam-button' in request.form:
-            print('Request.form: ', request.form)
+            """
+            Get webcam capture
+            """
             f = request.files['blob-file']
 
             ori_file_name = secure_filename(f.filename)
@@ -210,32 +227,36 @@ def analyze():
             img.save(filepath)
 
         elif 'url-button' in request.form:
+            """
+            Get image/video from input url
+            """
             url = request.form['url_link']
             filename, filepath = download(url)
-            # print('Filename', filename)
-            # print('Upload filepath', filepath)
+
             filetype = file_type(filename)
-            # print('Filetype: ', filetype)
 
         elif 'upload-button' in request.form:
+            """
+            Get uploaded file
+            """
             f = request.files['file']
+
             ori_file_name = secure_filename(f.filename)
             _, ext = os.path.splitext(ori_file_name)
-            # print('Ori Filename: ', ori_file_name)
-            # print('f.filename: ', f.filename)
+
             filetype = file_type(ori_file_name)
-            # print('Filetype: ', filetype)
 
             if filetype == 'image':
                 # Get cache name by hashing image
                 data = f.read()
                 filename = hashlib.sha256(data).hexdigest() + f'{ext}'
 
-                # save file to /static/uploads
+                # Save file to /static/uploads
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 np_img = np.fromstring(data, np.uint8)
                 img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
                 cv2.imwrite(filepath, img)
+
             elif filetype == 'video':
                 temp_filepath = os.path.join(
                     app.config['UPLOAD_FOLDER'], ori_file_name)
@@ -244,6 +265,7 @@ def analyze():
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 os.rename(temp_filepath, filepath)
 
+        # Get all inputs in form
         iou = request.form.get('threshold-range')
         confidence = request.form.get('confidence-range')
         model_types = request.form.get('model-types')
@@ -256,6 +278,9 @@ def analyze():
         min_iou = float(iou)/100
 
         if filetype == 'image':
+            """
+            Get filename of detected image
+            """
             out_name = "Image Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
@@ -270,6 +295,9 @@ def analyze():
                 enhance_labels=enhanced)
 
         elif filetype == 'video':
+            """
+            Get filename of detected video
+            """
             out_name = "Video Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
@@ -283,33 +311,33 @@ def analyze():
                 enhance_labels=enhanced)
         else:
             error_msg = "Invalid input url!!!"
-            return render_template('detect_url.html', error_msg=error_msg)
+            return render_template('detect-input-url.html', error_msg=error_msg)
 
         filename = os.path.basename(filename)
         csv_name, _ = os.path.splitext(filename)
+
         csv_name1 = os.path.join(
             app.config['CSV_FOLDER'], csv_name + '_info.csv')
         csv_name2 = os.path.join(
             app.config['CSV_FOLDER'], csv_name + '_info2.csv')
 
-        print("filename", filename)
-        print('csv_name: ', csv_name1)
-
         if 'url-button' in request.form:
+            return render_template('detect-input-url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
-            return render_template('detect_url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+        elif 'webcam-button' in request.form:
+            return render_template('detect-webcam-capture.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
-        return render_template('detect.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+        return render_template('detect-upload-file.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
     return redirect('/')
 
 
 @app.after_request
 def add_header(response):
-    # include cookie for every request
+    # Include cookie for every request
     response.headers.add('Access-Control-Allow-Credentials', True)
 
-    # prevent the client from caching the response
+    # Prevent the client from caching the response
     if 'Cache-Control' not in response.headers:
         response.headers['Cache-Control'] = 'public, no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
         response.headers['Pragma'] = 'no-cache'
@@ -347,4 +375,4 @@ if __name__ == '__main__':
         app.run(host=host, port=port, debug=args.debug, use_reloader=False,
                 ssl_context='adhoc')
 
-# python app.py --host localhost:8000 --debug
+# Run: python app.py --host localhost:8000
