@@ -46,11 +46,11 @@ html {
     position: relative;
 }
 
-.container {
+.container1 {
     padding: 0 16px;
 }
 
-.container::after,
+.container1::after,
 .row1::after {
     content: "";
     clear: both;
