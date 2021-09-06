@@ -9,9 +9,6 @@ import hashlib
 import tldextract
 import pytube
 import time
-import ssl
-import io
-import base64
 
 from PIL import Image
 from genericpath import exists

@@ -12,5 +12,6 @@ tldextract
 pytube
 flask-cors
 flask_ngrok
+cryptography
 numba>=0.49.0 # not directly required, pinned by Snyk to avoid a vulnerability
 rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
