@@ -7,7 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.TextureView;
 import android.view.ViewStub;
 
@@ -16,12 +16,13 @@ import androidx.annotation.WorkerThread;
 import androidx.camera.core.ImageProxy;
 
 import org.pytorch.IValue;
+import org.pytorch.LiteModuleLoader;
 import org.pytorch.Module;
-import org.pytorch.PyTorchAndroid;
 import org.pytorch.Tensor;
 import org.pytorch.torchvision.TensorImageUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -48,11 +49,6 @@ public class FoodDetectionActivity extends AbstractCameraXActivity<FoodDetection
         return ((ViewStub) findViewById(R.id.object_detection_texture_view_stub))
                 .inflate()
                 .findViewById(R.id.object_detection_texture_view);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -88,8 +84,13 @@ public class FoodDetectionActivity extends AbstractCameraXActivity<FoodDetection
     @WorkerThread
     @Nullable
     protected AnalysisResult analyzeImage(ImageProxy image, int rotationDegrees) {
-        if (mModule == null) {
-            mModule = PyTorchAndroid.loadModuleFromAsset(getAssets(), "yolov5s.torchscript.pt");
+        try {
+            if (mModule == null) {
+                mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "yolov5s.torchscript.ptl"));
+            }
+        } catch (IOException e) {
+            Log.e("Object Detection", "Error reading assets", e);
+            return null;
         }
         Bitmap bitmap = imgToBitmap(image.getImage());
         Matrix matrix = new Matrix();
@@ -109,10 +110,5 @@ public class FoodDetectionActivity extends AbstractCameraXActivity<FoodDetection
 
         final ArrayList<Result> results = PrePostProcessor.outputsToNMSPredictions(outputs, imgScaleX, imgScaleY, ivScaleX, ivScaleY, 0, 0);
         return new AnalysisResult(results);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }
