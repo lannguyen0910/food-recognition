@@ -45,19 +45,19 @@ cd food-detection-yolov5/
 ```
 pip install -r requirements.txt
 ```
-- Start the app. Safe to run in insecure connection ```http```
+- Start the app. Safe to run in insecure connection ```http```. You can generate SSL certificate to run the app in ```https```
 ```
 python app.py --host=localhost:8000
 ```
-**!!! You can generate SSL certificate to run the app in ```https``` !!!**
 
-## 🌟 **Run using Google Colab with Ngrok**
+🚨 UPDATE: The weights are now deprecated, you can only use ```YOLOv5s``` model. Feel free to train your own datasets using our template in the below section.
+
+## 🌟 **Run on Google Colab**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
 <!-- - (https://colab.research.google.com/drive/1SFDqNEQA9hrVA6zFn7wb0il-wV2Unou8?usp=sharing)-->
 
 ## 🌟 **Train YOLOv5 using our object detection's template** 
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1PYMr192Y7Rc6SFLhq9ZVPQ64-9YM2fiF?usp=sharing)
-<br>
 
 ## 🌟 **Datasets**
 <details>
