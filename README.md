@@ -50,7 +50,12 @@ pip install -r requirements.txt
 python app.py --host=localhost:8000
 ```
 
-🚨 UPDATE: The weights are now deprecated, you can only use ```YOLOv5s``` model. Feel free to train your own datasets using our template in the below section.
+Or run this command
+```
+flask run
+```
+
+🚨 UPDATE: The weights are now deprecated, cannot run the app for now. We are going to upload the new weights as soon as possible, feel free to train your own datasets using our template in the below section.
 
 ## 🌟 **Run on Google Colab**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
