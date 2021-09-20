@@ -9,10 +9,10 @@ import hashlib
 import tldextract
 import pytube
 import time
+import base64
 
 from PIL import Image
-from genericpath import exists
-from flask import Flask, request, render_template, redirect, url_for, make_response
+from flask import Flask, request, render_template, redirect, make_response, jsonify
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from modules import get_prediction, get_video_prediction
@@ -327,6 +327,47 @@ def analyze():
         return render_template('detect-upload-file.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
     return redirect('/')
+
+
+@app.route('/api', methods=['POST'])
+def api_call():
+    if request.method == 'POST':
+        response = {}
+        if not request.json or 'url' not in request.json:
+            response['code'] = 404
+            return jsonify(response)
+        else:
+            # get the base64 encoded string
+            url = request.json['url']
+            filename, filepath = download(url)
+
+            model_types = request.json['model_types']
+            ensemble = request.json['ensemble']
+            min_conf = request.json['min_conf']
+            min_iou = request.json['min_iou']
+            enhanced = request.json['enhanced']
+
+            output_path = os.path.join(
+                app.config['DETECTION_FOLDER'], filename)
+
+            get_prediction(
+                filepath,
+                output_path,
+                model_name=model_types,
+                ensemble=ensemble,
+                min_conf=min_conf,
+                min_iou=min_iou,
+                enhance_labels=enhanced)
+
+            with open(output_path, "rb") as f:
+                res_im_bytes = f.read()
+            res_im_b64 = base64.b64encode(res_im_bytes).decode("utf8")
+            response['res_image'] = res_im_b64
+            response['filename'] = filename
+            response['code'] = 200
+            return jsonify(response)
+    else:
+        return jsonify({"code": 400})
 
 
 @app.after_request
