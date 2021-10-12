@@ -1,3 +1,7 @@
 __pycache__
 */__pycache__
 .vscode
+images
+annos
+food-app
+annotations.json

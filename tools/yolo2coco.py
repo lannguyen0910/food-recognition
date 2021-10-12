@@ -1,31 +1,13 @@
-import numpy as np
 import json
 import os
 import argparse
 from tqdm import tqdm
-import torch
-from PIL import Image
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
-idx_classes = [
-    'Aortic enlargement',
-    'Atelectasis',
-    'Calcification',
-    'Cardiomegaly',
-    'Consolidation',
-    'ILD',
-    'Infiltration',
-    'Lung Opacity',
-    'Nodule/Mass',
-    'Other lesion',
-    'Pleural effusion',
-    'Pleural thickening',
-    'Pneumothorax',
-    'Pulmonary fibrosis',
-    'No Finding'
-]
-img_w, img_h = (1024, 1024)
+idx_classes = ['Apple', 'Artichoke', 'Asparagus', 'Bagel', 'Banana', 'Beer', 'Bread', 'Broccoli', 'Burrito', 'Cabbage', 'Cake', 'Candy', 'Cantaloupe', 'Carrot', 'Cheese', 'Cocktail', 'Coffee', 'Cookie', 'Crab', 'Croissant', 'Cucumber', 'Dessert', 'Doughnut', 'Egg', 'Fruit', 'Grape',
+               'Grapefruit', 'Guacamole', 'Hamburger', 'Honeycomb', 'Juice', 'Lemon', 'Lobster', 'Mango', 'Milk', 'Muffin', 'Mushroom', 'Orange', 'Oyster', 'Pancake', 'Pasta', 'Pastry', 'Peach', 'Pear', 'Pineapple', 'Pizza', 'Pomegranate', 'Popcorn', 'Potato', 'Pretzel', 'Pumpkin', 'Radish', 'Salad', 'Sandwich', 'Shrimp', 'Squash', 'Squid', 'Strawberry', 'Sushi', 'Taco', 'Tart', 'Tea', 'Tomato', 'Vegetable', 'Waffle', 'Watermelon', 'Wine', 'Zucchini']
+img_w, img_h = (1024, 768)
+
+classes = {v: k for k, v in enumerate(idx_classes)}
 
 
 def convert(args):
@@ -42,7 +24,7 @@ def convert(args):
 
     for idx, cls in enumerate(idx_classes):
         cls_dict = {
-            'supercategory': 'X-Ray',
+            'supercategory': 'Meal-Beverage',
             'id': idx+1,
             'name': cls
         }
@@ -52,7 +34,8 @@ def convert(args):
     ann_idx = 1
     for path in tqdm(paths):
         frame_name = path[:-4]
-        img_idx = "".join(frame_name.split('_')[1:])
+        img_idx = 1
+
         ann_name = os.path.join(ann_path, frame_name+'.txt')
         img_name = os.path.join(img_path, frame_name+'.jpg')
 
@@ -60,7 +43,7 @@ def convert(args):
             data = f.read()
             for line in data.splitlines():
                 item = line.split()
-                cls = int(item[0])
+                cls = int(classes[item[0]])
                 w = float(item[3]) * img_w
                 h = float(item[4]) * img_h
                 x = float(item[1]) * img_w - w/2
@@ -89,6 +72,8 @@ def convert(args):
 
         my_dict['images'].append(img_dict)
 
+        img_idx += 1
+
     with open(out_path, 'w') as outfile:
         json.dump(my_dict, outfile)
 
@@ -104,3 +89,4 @@ if __name__ == '__main__':
                         default='./annotations.json', help='path to output json file')
     args = parser.parse_args()
     convert(args)
+
