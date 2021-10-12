@@ -47,12 +47,12 @@ pip install -r requirements.txt
 ```
 - Start the app. Safe to run in insecure connection ```http```. You can generate SSL certificate to run the app in ```https```
 ```
-python app.py --host=localhost:8000
+python app.py --host=localhost:3000
 ```
 
-Or run this command
+Or run this command in your terminal
 ```
-flask run
+run.bat
 ```
 
 🚨 UPDATE: The weights are now deprecated, cannot run the app for now. We are going to upload the new weights as soon as possible, feel free to train your own datasets using our template in the below section.
