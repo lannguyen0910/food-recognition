@@ -1,4 +1,4 @@
-# 🍔🍟🍗 **Food Detection with YOLOv5** 🍞🍖🍕
+<h1 align="center">🍔🍟🍗 Food Detection with YOLOv5 🍞🍖🍕</h1>
 
 ![alt text](./demo/pipeline.png)
 
@@ -45,7 +45,10 @@ cd food-detection-yolov5/
 ```
 pip install -r requirements.txt
 ```
-- Start the app. Safe to run in insecure connection ```http```. You can generate SSL certificate to run the app in ```https```
+
+- Rebuild FFmpeg with OpenCV to display MP4 video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the colab notebook bellow: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
+
+- Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```
 ```
 python app.py --host=localhost:3000
 ```
@@ -192,16 +195,12 @@ We conclude that the learned models are quite good compared to such huge data wi
 <br>
 
 ## 💡 **Further Improvements**
-In the process of implementing the project, our team encountered many difficulties, thanks to the research and study of many sources, we can solve important issues. However, still have to accept shortcomings in terms of hardware as well as resources. Some of the problems we had:
 - We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate. You can try to train on other food datasets for better experience!
-- In addition, we encountered an issue that ```OpenCV``` does not support ```FFmpeg```, so the video will not be displayed on the browser, or even the detection video will not be exported as we use ```OpenCV VideoWriter```. To fix this you have to compile ```OpenCV``` with ```FFmpeg``` on your local machine. You can try compile it on Google Colab, but we can't do it for now.
 
-**In the future, we hope to solve all of the above problems and continue to develop the app on mobile device like Android. Feel free to make a contribution to the project, we will appreciate a lot!**
-<br>
+- Feel free to make a contribution to the project by pulling an request or making an issue.
 
 ## 📙 **References**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5
-- Inspiration from: https://ultralytics.com/yolov5
 - Awesome object detection's custom template: https://github.com/kaylode/custom-template/tree/detection
 - Edamam API: https://developer.edamam.com/food-database-api-docs
 - Chart.js: https://github.com/chartjs/Chart.js
