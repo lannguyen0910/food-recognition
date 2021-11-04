@@ -3,6 +3,10 @@
 ![alt text](./demo/pipeline.png)
 
 ## 🌳 **Folder Structure**
+
+<details>
+  <summary><strong>Details</strong></summary>
+
 ```
 food-detection-yolov5
 |
@@ -33,7 +37,8 @@ food-detection-yolov5
 │   └─── index.html           # upload files' page
 │   └─── url.html             # input URLs' page    
 ```
-<br>
+</details> 
+ 
 
 ## 🌟 **How to run locally (require GPU)**
 - Clone the repo
@@ -66,7 +71,7 @@ run.bat
 
 ## 🌟 **Train YOLOv5 using our object detection's template** 
 - Update new datasets: [drive](https://drive.google.com/drive/folders/1PEOSkUGjPip2tXw2NfLP_SdXyKRGU5L1?usp=sharing)
-- You can try merging all the train/val annatation.json file of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
+- You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
 - Remember that we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [template](https://github.com/kaylode/custom-template/tree/detection)
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1PYMr192Y7Rc6SFLhq9ZVPQ64-9YM2fiF?usp=sharing)
 
