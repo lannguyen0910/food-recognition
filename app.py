@@ -110,19 +110,17 @@ def download(url):
 
     ext = tldextract.extract(url)
     if ext.domain == 'youtube':
-        try:
-            make_dir(app.config['VIDEO_FOLDER'])
-        except:
-            pass
+
+        make_dir(app.config['VIDEO_FOLDER'])
+
         print('Youtube')
         ori_path = download_yt(url)
         filename = hash_video(ori_path)
 
         path = os.path.join(app.config['VIDEO_FOLDER'], filename)
-        try:
-            Path(ori_path).rename(path)
-        except:
-            pass
+
+        Path(ori_path).rename(path)
+
     else:
         make_dir(app.config['UPLOAD_FOLDER'])
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2)',
@@ -158,11 +156,9 @@ def save_upload(file):
         path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
     elif allowed_file_video(filename):
-        try:
-            make_dir(app.config['VIDEO_FOLDER'])
-        except:
-            pass
+        make_dir(app.config['VIDEO_FOLDER'])
         path = os.path.join(app.config['VIDEO_FOLDER'], filename)
+
     file.save(path)
 
     return path
@@ -207,11 +203,9 @@ def analyze():
         print("File: ", request.files)
 
         if 'webcam-button' in request.form:
-            """
-            Get webcam capture
-            """
-            f = request.files['blob-file']
+            # Get webcam capture
 
+            f = request.files['blob-file']
             ori_file_name = secure_filename(f.filename)
             filetype = file_type(ori_file_name)
 
@@ -224,20 +218,17 @@ def analyze():
             img.save(filepath)
 
         elif 'url-button' in request.form:
-            """
-            Get image/video from input url
-            """
+            # Get image/video from input url
+
             url = request.form['url_link']
             filename, filepath = download(url)
 
             filetype = file_type(filename)
 
         elif 'upload-button' in request.form:
-            """
-            Get uploaded file
-            """
-            f = request.files['file']
+            # Get uploaded file
 
+            f = request.files['file']
             ori_file_name = secure_filename(f.filename)
             _, ext = os.path.splitext(ori_file_name)
 
@@ -275,9 +266,8 @@ def analyze():
         min_iou = float(iou)/100
 
         if filetype == 'image':
-            """
-            Get filename of detected image
-            """
+            # Get filename of detected image
+
             out_name = "Image Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
@@ -292,9 +282,8 @@ def analyze():
                 enhance_labels=enhanced)
 
         elif filetype == 'video':
-            """
-            Get filename of detected video
-            """
+            # Get filename of detected video
+
             out_name = "Video Result"
             output_path = os.path.join(
                 app.config['DETECTION_FOLDER'], filename)
@@ -366,8 +355,8 @@ def api_call():
             response['filename'] = filename
             response['code'] = 200
             return jsonify(response)
-    else:
-        return jsonify({"code": 400})
+
+    return jsonify({"code": 400})
 
 
 @app.after_request
