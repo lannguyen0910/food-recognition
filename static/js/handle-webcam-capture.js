@@ -90,7 +90,7 @@ function runWebcam() {
     .catch(function (err) {
       messageArea.innerHTML = err.name + ": " + err.message;
     });
-};
+}
 
 // Capture image on webcam
 function takeAPhoto() {
@@ -109,7 +109,7 @@ function takeAPhoto() {
   btnDownload.removeAttribute("disabled");
   detectBtn.removeAttribute("disabled");
 
-};
+}
 
 // Download capture image from webcam to device
 function downloadPhoto() {
@@ -120,7 +120,7 @@ function downloadPhoto() {
     link.dispatchEvent(new MouseEvent("click"));
 
   }, "image/jpeg", 1);
-};
+}
 
 // Send image source from client to server under base64 format
 var sendBase64ToServer = function(base64){
