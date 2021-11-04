@@ -65,6 +65,9 @@ run.bat
 <!-- - (https://colab.research.google.com/drive/1SFDqNEQA9hrVA6zFn7wb0il-wV2Unou8?usp=sharing)-->
 
 ## 🌟 **Train YOLOv5 using our object detection's template** 
+- Update new datasets: [drive](https://drive.google.com/drive/folders/1PEOSkUGjPip2tXw2NfLP_SdXyKRGU5L1?usp=sharing)
+- You can try merging all the train/val annatation.json file of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
+- Remember that we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [template](https://github.com/kaylode/custom-template/tree/detection)
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1PYMr192Y7Rc6SFLhq9ZVPQ64-9YM2fiF?usp=sharing)
 
 ## 🌟 **Datasets**

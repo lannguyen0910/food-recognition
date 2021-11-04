@@ -4,4 +4,12 @@ __pycache__
 images
 annos
 food-app
-annotations.json
+*.json
+*.zip
+MAFood121
+vn_food
+data
+school_lunch
+data_ocr
+OID
+base.yaml
