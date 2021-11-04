@@ -1,6 +1,17 @@
-<h1 align="center">🍔🍟🍗 Food Detection with YOLOv5 🍞🍖🍕</h1>
+<h1 align="center">🍔🍟🍗 Food Analysis with YOLOv5 🍞🍖🍕</h1>
 
-![alt text](./demo/pipeline.png)
+<p align="center">
+ <a><img  src="./demo/pipeline.png"></a>
+  <br>
+  <a style="font-size: 100px; text-color:red;"> <strong> Awesome Food Detector</strong> </a>
+</p>
+
+
+<p align="center">
+  <a href="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/overview/master"><img src="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/badge/master?s=9716a4eb0076053fa36e0d967bba5161b85b8fb5" alt="CodeFactor" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="Python" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg" alt="MIT" /></a>
+</p>
 
 ## 🌳 **Folder Structure**
 
