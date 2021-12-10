@@ -77,7 +77,8 @@ Or run this command in your terminal to clear cache files after running.
 run.bat
 ```
 
-🚨 **UPDATE**: The weights are now deprecated, cannot run the app for now. We are going to upload the new weights as soon as possible, feel free to train your own datasets using our template in the below section.
+🚨 **UPDATE**: New [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). Need to train more, esspecially the yolov5x' weights.
+
 
 ## 🌟 **Run on Google Colab**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
@@ -86,8 +87,8 @@ run.bat
 ## 🌟 **Train YOLOv5 using our object detection's template** 
 - Update new datasets: [detection-dataset](https://drive.google.com/drive/folders/1qivPtnHk6OpvsTyRUGOF1c2a86CMwBY1?usp=sharing) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing)
 - You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
-- Remember that we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [template](https://github.com/kaylode/custom-template/tree/detection)
-- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1PYMr192Y7Rc6SFLhq9ZVPQ64-9YM2fiF?usp=sharing)
+- Remember when we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [detection-template](https://github.com/kaylode/custom-template/tree/detection) & [classification-template](https://github.com/kaylode/custom-template/tree/classification)
+- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1gl_Y6nVKyfAhAgqxJdIIBeb02gu1BNYQ/view?usp=sharing)
 
 ## 🌟 **Datasets**
 <details>
