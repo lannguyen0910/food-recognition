@@ -36,13 +36,13 @@ class Arguments:
                 self.model_name, 
                 cached=tmp_path)
             self.weight=tmp_path
-            
+
 weight_urls = {
-    'yolov5s': "1-OsfyTMNw8Qo1maJutNyKjaPDeE25rVa",
-    "yolov5m": "1-34kzPyJbiP7gcxMmW1QxRyB7quYnSTb",
-    "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
-    "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP",
-    "effnetb4": "1-4AZSXhKAViZdM5PkhoeOZITVFM0WKIm",
+    'yolov5s': "1-VtqCdkoJS6SleVpyG6pliv30K-qxMH3",
+    "yolov5m": "1-2ZkyUqesNx9iR_0GJ1zkBB8dm030Gta",
+    "yolov5l": "1_Mp8DYAoqU-RwcH0g1nzi3wBZl8CV9d7",
+    "yolov5x": "1-ebAHxIaaTjkrgC129oe_63nmC1qsA9N",
+    "effnetb4": "1-K_iDfuhxQFHIF9HTy8SvfnIFwjqxtaX",
 }
 
 def download_pretrained_weights(name, cached=None):
