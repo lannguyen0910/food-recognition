@@ -77,7 +77,7 @@ Or run this command in your terminal to clear cache files after running.
 run.bat
 ```
 
-🚨 **UPDATE**: New [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). Need to train more, esspecially the yolov5x' weights.
+🚨 **UPDATE**: New [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). Just for demo, the accuracy is still very low on our custom datasets, will update the weights gradually.
 
 
 ## 🌟 **Run on Google Colab**
