@@ -1,0 +1,43 @@
+settings:
+  #################   DATASET CONFIG   ###################
+
+  project_name: "food-classification" # also the folder name of the dataset that under ./data folder
+  train_imgs: train/
+  val_imgs: val/
+  test_imgs:
+
+  #################   TRAINING CONFIG   ###################
+
+  model_name: "efficientnet_b4" #[]
+  loss_fn: "ce" #[smoothce | ce | focal]
+
+  # pretrained_backbone: ''                  # Pretrained backbone
+
+  gpu_devices: "0" # supports multi-gpus
+  num_epochs: 100
+  batch_size: 32
+  num_workers: 2
+
+  image_size: [512, 512] # should be square to prevent bugs [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
+  keep_ratio: False # whether to use resize padding
+
+  mixup: True
+
+  # learning rate policy
+  lr_policy:
+    name: "adam" #[adam|sgd]
+    lr: 0.001 #[adam: 1e-3 | sgd: 1e-2]
+    momentum: 0.937
+    weight_decay: 0.0005
+
+  lr_scheduler:
+    name:
+      "cosine" #[plateau | cosine | 1cycle-yolo | 1cycle]
+      # if need to specify more scheduler arguments, do it here
+
+  # gradient accumulation
+  mixed_precision: True # whether to use nvidia apex
+  total_accumulate_steps: 128 # step * batch_size, not use if equal 0
+
+  # Test time augmentation
+  tta: False # whether to use TTA while validation
