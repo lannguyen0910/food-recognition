@@ -1,3 +1,9 @@
 __pycache__
 */__pycache__
 .vscode
+*.zip
+annos
+annotations
+OID
+MAFood121
+food-classify
