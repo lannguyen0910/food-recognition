@@ -261,7 +261,7 @@ def ensemble_models(input_path, image_size):
 
 def append_food_name(food_dict, class_names):
     food_labels = food_dict['labels']
-    food_names = [class_names[int(i)] for i in food_labels]
+    food_names = [' '.join(class_names[int(i)].split('-')) for i in food_labels]
     food_dict['names'] = food_names
     return food_dict
 

@@ -17,3 +17,5 @@ food-101.tar.gz
 food-101
 food-classify
 weights
+classification.yaml
+detection.yaml
