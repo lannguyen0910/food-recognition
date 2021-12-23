@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from copy import copy
 from pathlib import Path
 from sys import platform
+import urllib
 
 import cv2
 import matplotlib
@@ -17,6 +18,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torchvision
+import logging
 import yaml
 from scipy.cluster.vq import kmeans
 from scipy.signal import butter, filtfilt
@@ -32,6 +34,16 @@ matplotlib.rc('font', **{'size': 11})
 # Prevent OpenCV from multithreading (to use PyTorch DataLoader)
 cv2.setNumThreads(0)
 
+def set_logging(name=None, verbose=True):
+    # Sets level and returns logger
+    for h in logging.root.handlers:
+        logging.root.removeHandler(h)  # remove all handlers associated with the root logger object
+    rank = int(os.getenv('RANK', -1))  # rank in world for Multi-GPU trainings
+    logging.basicConfig(format="%(message)s", level=logging.INFO if (verbose and rank in (-1, 0)) else logging.WARNING)
+    return logging.getLogger(name)
+
+
+LOGGER = set_logging(__name__)  # define globally (used in train.py, val.py, detect.py, etc.)
 
 @contextmanager
 def torch_distributed_zero_first(local_rank: int):
@@ -44,6 +56,51 @@ def torch_distributed_zero_first(local_rank: int):
     if local_rank == 0:
         torch.distributed.barrier()
 
+
+def colorstr(*input):
+    # Colors a string https://en.wikipedia.org/wiki/ANSI_escape_code, i.e.  colorstr('blue', 'hello world')
+    # color arguments, string
+    *args, string = input if len(input) > 1 else ('blue', 'bold', input[0])
+    colors = {'black': '\033[30m',  # basic colors
+              'red': '\033[31m',
+              'green': '\033[32m',
+              'yellow': '\033[33m',
+              'blue': '\033[34m',
+              'magenta': '\033[35m',
+              'cyan': '\033[36m',
+              'white': '\033[37m',
+              'bright_black': '\033[90m',  # bright colors
+              'bright_red': '\033[91m',
+              'bright_green': '\033[92m',
+              'bright_yellow': '\033[93m',
+              'bright_blue': '\033[94m',
+              'bright_magenta': '\033[95m',
+              'bright_cyan': '\033[96m',
+              'bright_white': '\033[97m',
+              'end': '\033[0m',  # misc
+              'bold': '\033[1m',
+              'underline': '\033[4m'}
+    return ''.join(colors[x] for x in args) + f'{string}' + colors['end']
+
+def print_args(name, opt):
+    # Print argparser arguments
+    LOGGER.info(colorstr(f'{name}: ') + ', '.join(f'{k}={v}' for k, v in vars(opt).items()))
+
+def url2file(url):
+    # Convert URL to filename, i.e. https://url.com/file.txt?auth -> file.txt
+    url = str(Path(url)).replace(':/', '://')  # Pathlib turns :// -> :/
+    file = Path(urllib.parse.unquote(url)).name.split('?')[0]  # '%2F' to '/', split https://url.com/file.txt?auth
+    return file
+
+def file_size(path):
+    # Return file/dir size (MB)
+    path = Path(path)
+    if path.is_file():
+        return path.stat().st_size / 1E6
+    elif path.is_dir():
+        return sum(f.stat().st_size for f in path.glob('**/*') if f.is_file()) / 1E6
+    else:
+        return 0.0
 
 def init_seeds(seed=0):
     random.seed(seed)
