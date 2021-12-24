@@ -113,24 +113,18 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
 def export_torchscript(model, im, file, optimize, prefix=colorstr('TorchScript:')):
     # YOLOv5 TorchScript model export
     try:
-        LOGGER.info(
-            f'\n{prefix} starting export with torch {torch.__version__}...')
-        f = file.with_suffix('.torchscript')
+        print(f'\n{prefix} starting export with torch {torch.__version__}...')
+        f = file.with_suffix('.torchscript.pt')
+        fl = file.with_suffix('.torchscript.ptl')
 
         ts = torch.jit.trace(model, im, strict=False)
-        print('ts: ', ts)
+        (optimize_for_mobile(ts) if optimize else ts).save(f)
+        (optimize_for_mobile(ts) if optimize else ts)._save_for_lite_interpreter(str(fl))
 
-        d = {"shape": im.shape, "stride": int(
-            max(model.stride)), "names": model.names}
-        extra_files = {'config.txt': json.dumps(d)}  # torch._C.ExtraFilesMap()
-        print('Dumped!')
-        (optimize_for_mobile(ts) if optimize else ts).save(
-            str(f), _extra_files=extra_files)
-        print('Optimize!')
-        LOGGER.info(
-            f'{prefix} export success, saved as {f} ({file_size(f):.1f} MB)')
+        print(f'{prefix} export success, saved as {f} ({file_size(f):.1f} MB)')
+        print(f'{prefix} export success, saved as {fl} ({file_size(fl):.1f} MB)')
     except Exception as e:
-        LOGGER.info(f'{prefix} export failure: {e}')
+        print(f'{prefix} export failure: {e}')
 
 
 @torch.no_grad()
@@ -142,7 +136,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         half=False,  # FP16 half-precision export
         inplace=False,  # set YOLOv5 Detect() inplace=True
         train=False,  # model.train() mode
-        optimize=False,  # TorchScript: optimize for mobile
+        optimize=True,  # TorchScript: optimize for mobile
         dynamic=False,  # ONNX/TF: dynamic axes
         ):
     t = time.time()
@@ -191,11 +185,12 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         model.model[-1].export = True  # set Detect() layer export=True
         _ = model(im)  # dry run
 
-        traced_script_module = torch.jit.trace(model, im)
-        f = weights.replace('.pth', '.torchscript')  # onnx filename
+        export_torchscript(model, im, file, optimize)
 
-        traced_script_module.save(f)
-        # export_torchscript(model, im, file, optimize)
+        # traced_script_module = torch.jit.trace(model, im)
+        # f = weights.replace('.pth', '.torchscript.pt')  # onnx filename
+
+        # traced_script_module.save(f)
 
     # Finish
     LOGGER.info(f'\nExport complete ({time.time() - t:.2f}s)'
