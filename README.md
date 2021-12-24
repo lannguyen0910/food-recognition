@@ -1,8 +1,23 @@
-# 🍔🍟🍗 **Food Detection with YOLOv5** 🍞🍖🍕
+<h1 align="center">🍔🍟🍗 Food Analysis with YOLOv5 🍞🍖🍕</h1>
 
-![alt text](./demo/pipeline.png)
+<p align="center">
+ <a><img  src="./demo/pipeline.png"></a>
+  <br>
+  <a style="font-size: 100px; text-color:red;"> <strong> Awesome Food Detector</strong> </a>
+</p>
+
+
+<p align="center">
+  <a href="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/overview/master"><img src="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/badge/master?s=9716a4eb0076053fa36e0d967bba5161b85b8fb5" alt="CodeFactor" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="Python" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg" alt="MIT" /></a>
+</p>
 
 ## 🌳 **Folder Structure**
+
+<details>
+  <summary><strong>Details</strong></summary>
+
 ```
 food-detection-yolov5
 |
@@ -33,31 +48,48 @@ food-detection-yolov5
 │   └─── index.html           # upload files' page
 │   └─── url.html             # input URLs' page    
 ```
-<br>
+</details> 
+ 
 
-## 🌟 **How to run locally (require GPU)**
-- Clone the repo
+## 🌟 **How to run locally (require CUDA)**
+- Clone the repo.
 ```
 git clone https://github.com/lannguyen0910/food-detection-yolov5
 cd food-detection-yolov5/
 ```
-- Install dependencies
+- Install dependencies.
 ```
 pip install -r requirements.txt
 ```
-- Start the app. Safe to run in insecure connection ```http```
-```
-python app.py --host=localhost:8000
-```
-**!!! You can generate SSL certificate to run the app in ```https``` !!!**
 
-## 🌟 **Run using Google Colab with Ngrok**
+- (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display MP4 video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the colab notebook bellow: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
+```
+sudo apt-get install ffmpeg
+```
+
+- Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
+```
+python app.py --host=localhost:3000
+```
+
+Or run this command in your terminal to clear cache files after running.
+```
+run.bat
+```
+
+🚨 **UPDATE**: 
+- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). Just for demo, the accuracy is still very low on our custom datasets, will update the weights gradually.
+- Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights.
+
+## 🌟 **Run on Google Colab**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
 <!-- - (https://colab.research.google.com/drive/1SFDqNEQA9hrVA6zFn7wb0il-wV2Unou8?usp=sharing)-->
 
 ## 🌟 **Train YOLOv5 using our object detection's template** 
-- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1PYMr192Y7Rc6SFLhq9ZVPQ64-9YM2fiF?usp=sharing)
-<br>
+- Update new datasets: [detection-dataset](https://drive.google.com/drive/folders/1qivPtnHk6OpvsTyRUGOF1c2a86CMwBY1?usp=sharing) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing)
+- You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
+- Remember when we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [detection-template](https://github.com/kaylode/custom-template/tree/detection) & [classification-template](https://github.com/kaylode/custom-template/tree/classification)
+- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1gl_Y6nVKyfAhAgqxJdIIBeb02gu1BNYQ/view?usp=sharing)
 
 ## 🌟 **Datasets**
 <details>
@@ -187,16 +219,12 @@ We conclude that the learned models are quite good compared to such huge data wi
 <br>
 
 ## 💡 **Further Improvements**
-In the process of implementing the project, our team encountered many difficulties, thanks to the research and study of many sources, we can solve important issues. However, still have to accept shortcomings in terms of hardware as well as resources. Some of the problems we had:
 - We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate. You can try to train on other food datasets for better experience!
-- In addition, we encountered an issue that ```OpenCV``` does not support ```FFmpeg```, so the video will not be displayed on the browser, or even the detection video will not be exported as we use ```OpenCV VideoWriter```. To fix this you have to compile ```OpenCV``` with ```FFmpeg``` on your local machine. You can try compile it on Google Colab, but we can't do it for now.
 
-**In the future, we hope to solve all of the above problems and continue to develop the app on mobile device like Android. Feel free to make a contribution to the project, we will appreciate a lot!**
-<br>
+- Feel free to make a contribution to the project by pulling an request or making an issue.
 
 ## 📙 **References**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5
-- Inspiration from: https://ultralytics.com/yolov5
 - Awesome object detection's custom template: https://github.com/kaylode/custom-template/tree/detection
 - Edamam API: https://developer.edamam.com/food-database-api-docs
 - Chart.js: https://github.com/chartjs/Chart.js

@@ -36,13 +36,13 @@ class Arguments:
                 self.model_name, 
                 cached=tmp_path)
             self.weight=tmp_path
-            
+
 weight_urls = {
-    'yolov5s': "1-OsfyTMNw8Qo1maJutNyKjaPDeE25rVa",
-    "yolov5m": "1-34kzPyJbiP7gcxMmW1QxRyB7quYnSTb",
-    "yolov5l": "1-BfDjNXAjphIeJ0F1eJUborsHflwbeiI",
-    "yolov5x": "1-5BSu6v9x9Dpdrya_o8RluzDV9aUSTgP",
-    "effnetb4": "1-4AZSXhKAViZdM5PkhoeOZITVFM0WKIm",
+    'yolov5s': "103KodPawOJW56EINgwyDc0uFiAHg7ps8",
+    "yolov5m": "10RTh_BMm-Ow_zxWeSFIUSXhyaAKlpy1u",
+    "yolov5l": "1-me51mvmgWnOSlysLMdKRFWeRu-0ZWf_",
+    "yolov5x": "1-mz9V9Y69k2isJLe-gn5OQcWzxaDMw3N",
+    "effnetb4": "1-K_iDfuhxQFHIF9HTy8SvfnIFwjqxtaX",
 }
 
 def download_pretrained_weights(name, cached=None):
@@ -261,7 +261,7 @@ def ensemble_models(input_path, image_size):
 
 def append_food_name(food_dict, class_names):
     food_labels = food_dict['labels']
-    food_names = [class_names[int(i)] for i in food_labels]
+    food_names = [' '.join(class_names[int(i)].split('-')) for i in food_labels]
     food_dict['names'] = food_names
     return food_dict
 
