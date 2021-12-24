@@ -178,7 +178,7 @@ def export_onnx(model, im, file, opset, train, dynamic, simplify, prefix=colorst
 
 @torch.no_grad()
 def run(weights=ROOT / 'yolov5s.pt',  # weights path
-        imgsz=(640, 640),  # image (height, width)
+        imgsz=(320, 320),  # image (height, width)
         batch_size=1,  # batch size
         device='cpu',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         include=('torchscript'),  # include formats
@@ -209,6 +209,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
     gs = int(max(model.stride))  # grid size (max stride)
     # verify img_size are gs-multiples
     imgsz = [check_img_size(x, gs) for x in imgsz]
+    print('Image size: ', imgsz)
     # image size(1,3,320,192) BCHW iDetection
     print('Device: ', device)
     im = torch.zeros(batch_size, 3, *imgsz).to(device)
@@ -260,6 +261,8 @@ def parse_opt():
                         help='available formats are (torchscript)')
     parser.add_argument('--opset', type=int, default=12,
                         help='ONNX: opset version')
+    parser.add_argument('--imgsz', '--img', '--img-size', nargs='+',
+                        type=int, default=[320, 320], help='image (h, w)')
     opt = parser.parse_args()
     print_args(FILE.stem, opt)
     return opt
