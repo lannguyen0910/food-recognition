@@ -4,7 +4,7 @@ Usage:
 """
 
 from model.models.yolo.utils.torch_utils import select_device
-from model.models.yolo.utils.general import (LOGGER, check_img_size, colorstr, file_size, print_args,
+from model.models.yolo.utils.general import (LOGGER, check_img_size, check_requirements, colorstr, file_size, print_args,
                                              url2file)
 from model.models.yolo.utils.activations import SiLU
 from model.models.yolo.yolo import Detect
@@ -127,6 +127,55 @@ def export_torchscript(model, im, file, optimize, prefix=colorstr('TorchScript:'
         print(f'{prefix} export failure: {e}')
 
 
+def export_onnx(model, im, file, opset, train, dynamic, simplify, prefix=colorstr('ONNX:')):
+    # YOLOv5 ONNX export
+    try:
+        check_requirements(('onnx',))
+        import onnx
+
+        LOGGER.info(
+            f'\n{prefix} starting export with onnx {onnx.__version__}...')
+        f = file.with_suffix('.onnx')
+
+        torch.onnx.export(model, im, f, verbose=False, opset_version=opset,
+                          training=torch.onnx.TrainingMode.TRAINING if train else torch.onnx.TrainingMode.EVAL,
+                          do_constant_folding=not train,
+                          input_names=['images'],
+                          output_names=['output'],
+                          dynamic_axes={'images': {0: 'batch', 2: 'height', 3: 'width'},  # shape(1,3,640,640)
+                                        # shape(1,25200,85)
+                                        'output': {0: 'batch', 1: 'anchors'}
+                                        } if dynamic else None)
+
+        # Checks
+        model_onnx = onnx.load(f)  # load onnx model
+        onnx.checker.check_model(model_onnx)  # check onnx model
+        # LOGGER.info(onnx.helper.printable_graph(model_onnx.graph))  # print
+
+        # Simplify
+        if simplify:
+            try:
+                check_requirements(('onnx-simplifier',))
+                import onnxsim
+
+                LOGGER.info(
+                    f'{prefix} simplifying with onnx-simplifier {onnxsim.__version__}...')
+                model_onnx, check = onnxsim.simplify(
+                    model_onnx,
+                    dynamic_input_shape=dynamic,
+                    input_shapes={'images': list(im.shape)} if dynamic else None)
+                assert check, 'assert check failed'
+                onnx.save(model_onnx, f)
+            except Exception as e:
+                LOGGER.info(f'{prefix} simplifier failure: {e}')
+        LOGGER.info(
+            f'{prefix} export success, saved as {f} ({file_size(f):.1f} MB)')
+        LOGGER.info(
+            f"{prefix} run --dynamic ONNX model inference with: 'python detect.py --weights {f}'")
+    except Exception as e:
+        LOGGER.info(f'{prefix} export failure: {e}')
+
+
 @torch.no_grad()
 def run(weights=ROOT / 'yolov5s.pt',  # weights path
         imgsz=(640, 640),  # image (height, width)
@@ -137,7 +186,9 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         inplace=False,  # set YOLOv5 Detect() inplace=True
         train=False,  # model.train() mode
         optimize=True,  # TorchScript: optimize for mobile
-        dynamic=False,  # ONNX/TF: dynamic axes
+        simplify=True,  # ONNX: simplify model
+        opset=12,  # ONNX: opset version
+        dynamic=True,  # ONNX/TF: dynamic axes
         ):
     t = time.time()
     include = [x.lower() for x in include]
@@ -191,6 +242,8 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         # f = weights.replace('.pth', '.torchscript.pt')  # onnx filename
 
         # traced_script_module.save(f)
+    if 'onnx' in include:  # OpenVINO requires ONNX
+        export_onnx(model, im, file, opset, train, dynamic, simplify)
 
     # Finish
     LOGGER.info(f'\nExport complete ({time.time() - t:.2f}s)'
@@ -205,6 +258,8 @@ def parse_opt():
     parser.add_argument('--include', nargs='+',
                         default=['torchscript'],
                         help='available formats are (torchscript)')
+    parser.add_argument('--opset', type=int, default=12,
+                        help='ONNX: opset version')
     opt = parser.parse_args()
     print_args(FILE.stem, opt)
     return opt
