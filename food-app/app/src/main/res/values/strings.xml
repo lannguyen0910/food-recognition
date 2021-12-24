@@ -1,0 +1,9 @@
+<resources>
+    <string name="image_view">Image View</string>
+    <string name="detect">Detect</string>
+    <string name="run_model">Running the model...</string>
+    <string name="restart">Restart</string>
+    <string name="select">Select</string>
+    <string name="live">Live</string>
+    <string name="app_name">food-detector</string>
+</resources>
