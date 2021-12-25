@@ -80,6 +80,8 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
 
         ckpt = Detector(model=net, device='cpu')
 
+        load_checkpoint(ckpt, w)
+
         if fuse:
             # FP32 model
             model.append(
@@ -137,15 +139,8 @@ def export_onnx(model, im, file, opset, train, dynamic, simplify, prefix=colorst
             f'\n{prefix} starting export with onnx {onnx.__version__}...')
         f = file.with_suffix('.onnx')
 
-        torch.onnx.export(model, im, f, verbose=False, opset_version=opset,
-                          training=torch.onnx.TrainingMode.TRAINING if train else torch.onnx.TrainingMode.EVAL,
-                          do_constant_folding=not train,
-                          input_names=['images'],
-                          output_names=['output'],
-                          dynamic_axes={'images': {0: 'batch', 2: 'height', 3: 'width'},  # shape(1,3,640,640)
-                                        # shape(1,25200,85)
-                                        'output': {0: 'batch', 1: 'anchors'}
-                                        } if dynamic else None)
+        torch.onnx.export(model, im, f, verbose=False, opset_version=opset, input_names=['images'],
+                          output_names=['output'])
 
         # Checks
         model_onnx = onnx.load(f)  # load onnx model
@@ -181,13 +176,13 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         imgsz=(320, 320),  # image (height, width)
         batch_size=1,  # batch size
         device='cpu',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
-        include=('torchscript'),  # include formats
+        include=('torchscript', 'onnx'),  # include formats
         half=False,  # FP16 half-precision export
         inplace=False,  # set YOLOv5 Detect() inplace=True
         train=False,  # model.train() mode
         optimize=True,  # TorchScript: optimize for mobile
         simplify=False,  # ONNX: simplify model
-        opset=12,  # ONNX: opset version
+        opset=11,  # ONNX: opset version
         dynamic=False,  # ONNX/TF: dynamic axes
         ):
     t = time.time()
@@ -209,9 +204,8 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
     gs = int(max(model.stride))  # grid size (max stride)
     # verify img_size are gs-multiples
     imgsz = [check_img_size(x, gs) for x in imgsz]
-    print('Image size: ', imgsz)
+
     # image size(1,3,320,192) BCHW iDetection
-    print('Device: ', device)
     im = torch.zeros(batch_size, 3, *imgsz).to(device)
 
     # Update model
@@ -219,7 +213,6 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         im, model = im.half(), model.half()  # to FP16
 
     # training mode = no Detect() layer grid construction
-    print('Model: ', model)
     model.train() if train else model.eval()
     for k, m in model.named_modules():
         if isinstance(m, Conv):  # assign export-friendly activations
@@ -243,7 +236,8 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         # f = weights.replace('.pth', '.torchscript.pt')  # onnx filename
 
         # traced_script_module.save(f)
-    if 'onnx' in include:  # OpenVINO requires ONNX
+    if 'onnx' in include:
+        model.model[-1].export = True
         export_onnx(model, im, file, opset, train, dynamic, simplify)
 
     # Finish
@@ -259,7 +253,7 @@ def parse_opt():
     parser.add_argument('--include', nargs='+',
                         default=['torchscript'],
                         help='available formats are (torchscript)')
-    parser.add_argument('--opset', type=int, default=12,
+    parser.add_argument('--opset', type=int, default=11,
                         help='ONNX: opset version')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+',
                         type=int, default=[320, 320], help='image (h, w)')
