@@ -186,9 +186,9 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
         inplace=False,  # set YOLOv5 Detect() inplace=True
         train=False,  # model.train() mode
         optimize=True,  # TorchScript: optimize for mobile
-        simplify=True,  # ONNX: simplify model
+        simplify=False,  # ONNX: simplify model
         opset=12,  # ONNX: opset version
-        dynamic=True,  # ONNX/TF: dynamic axes
+        dynamic=False,  # ONNX/TF: dynamic axes
         ):
     t = time.time()
     include = [x.lower() for x in include]
@@ -263,6 +263,11 @@ def parse_opt():
                         help='ONNX: opset version')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+',
                         type=int, default=[320, 320], help='image (h, w)')
+    parser.add_argument('--dynamic', action='store_true',
+                        help='ONNX/TF: dynamic axes')
+    parser.add_argument('--simplify', action='store_true',
+                        help='ONNX: simplify model')
+
     opt = parser.parse_args()
     print_args(FILE.stem, opt)
     return opt
