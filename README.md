@@ -48,14 +48,7 @@ food-detection-yolov5
 │   └─── index.html           # upload files' page
 │   └─── url.html             # input URLs' page    
 ```
-</details> 
-
-## 🌟 **Support food app for android**
-- Visit [food-android](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch.
-- Modified code from [original repo](https://github.com/cmdbug/YOLOv5_NCNN).
-- First [apk](https://github.com/lannguyen0910/food-detection-yolov5/releases/tag/1.0) release.
-- Learning purpose only!
-
+</details>
 
 ## 🌟 **Run on local machine (require CUDA)**
 - Clone the repo.
@@ -96,6 +89,13 @@ scripts/run.bat
 - You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
 - Remember when we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [detection-template](https://github.com/kaylode/custom-template/tree/detection) & [classification-template](https://github.com/kaylode/custom-template/tree/classification)
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1gl_Y6nVKyfAhAgqxJdIIBeb02gu1BNYQ/view?usp=sharing)
+
+## 🌟 **Food app on android**
+- Visit [food-android](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch.
+- Modified code from [original repo](https://github.com/cmdbug/YOLOv5_NCNN).
+- First [apk](https://github.com/lannguyen0910/food-detection-yolov5/releases/tag/1.0) release.
+- Learning purpose only!
+
 
 ## 🌟 **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
 - Example usage:
@@ -245,5 +245,6 @@ We conclude that the learned models are quite good compared to such huge data wi
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5.
 - Awesome object detection's custom template: https://github.com/kaylode/custom-template/tree/detection.
 - Adapted code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
+- Inference on android app: https://github.com/Tencent/ncnn
 - Edamam API: https://developer.edamam.com/food-database-api-docs.
 - Chart.js: https://github.com/chartjs/Chart.js.
