@@ -1,4 +1,6 @@
 r"""
+Reference: https://zhuanlan.zhihu.com/p/266130778
+
 Usage:
     $ python path/to/export.py --weights yolov5s.pt --include torchscript
 """
@@ -10,7 +12,6 @@ from model.models.yolo.utils.activations import SiLU
 from model.models.yolo.yolo import Detect
 from model.models.yolo.common import Conv
 import argparse
-import json
 import os
 import sys
 import time
@@ -232,10 +233,6 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
 
         export_torchscript(model, im, file, optimize)
 
-        # traced_script_module = torch.jit.trace(model, im)
-        # f = weights.replace('.pth', '.torchscript.pt')  # onnx filename
-
-        # traced_script_module.save(f)
     if 'onnx' in include:
         model.model[-1].export = True
         export_onnx(model, im, file, opset, train, dynamic, simplify)
