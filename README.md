@@ -74,7 +74,7 @@ python app.py --host=localhost:3000
 
 Or run this command in your terminal to clear cache files after running.
 ```
-run.bat
+scripts/run.bat
 ```
 
 🚨 **UPDATE**: 
@@ -90,6 +90,18 @@ run.bat
 - You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
 - Remember when we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [detection-template](https://github.com/kaylode/custom-template/tree/detection) & [classification-template](https://github.com/kaylode/custom-template/tree/classification)
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1gl_Y6nVKyfAhAgqxJdIIBeb02gu1BNYQ/view?usp=sharing)
+
+## **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
+- Example usage:
+```
+python export.py --weights yolov5s_best.pth --imgsz 640 --include onnx
+```
+Or
+```
+python export.py --weights yolov5s_best.pth --imgsz 320 320 --include torchscript
+```
+
+- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)
 
 ## 🌟 **Datasets**
 <details>
