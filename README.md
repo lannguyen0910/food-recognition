@@ -49,9 +49,15 @@ food-detection-yolov5
 │   └─── url.html             # input URLs' page    
 ```
 </details> 
- 
 
-## 🌟 **How to run locally (require CUDA)**
+## 🌟 **Support food app for android**
+- Visit [food-android](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch.
+- Modified code from [original repo](https://github.com/cmdbug/YOLOv5_NCNN).
+- First [apk](https://github.com/lannguyen0910/food-detection-yolov5/releases/tag/1.0) release.
+- Learning purpose only!
+
+
+## 🌟 **Run on local machine (require CUDA)**
 - Clone the repo.
 ```
 git clone https://github.com/lannguyen0910/food-detection-yolov5
@@ -236,7 +242,8 @@ We conclude that the learned models are quite good compared to such huge data wi
 - Feel free to make a contribution to the project by pulling an request or making an issue.
 
 ## 📙 **References**
-- YOLOv5 official repo: https://github.com/ultralytics/yolov5
-- Awesome object detection's custom template: https://github.com/kaylode/custom-template/tree/detection
-- Edamam API: https://developer.edamam.com/food-database-api-docs
-- Chart.js: https://github.com/chartjs/Chart.js
+- YOLOv5 official repo: https://github.com/ultralytics/yolov5.
+- Awesome object detection's custom template: https://github.com/kaylode/custom-template/tree/detection.
+- Adapted code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
+- Edamam API: https://developer.edamam.com/food-database-api-docs.
+- Chart.js: https://github.com/chartjs/Chart.js.
