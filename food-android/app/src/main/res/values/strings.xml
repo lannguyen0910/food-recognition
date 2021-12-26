@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Food Detector YOLOv5</string>
+    <string name="app_title">Food Detector</string>
+    <string name="app_author"></string>
+</resources>
