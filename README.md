@@ -1,17 +1,15 @@
-# YOLOv5 NCNN Implementation
+# **Food detection on android with YOLOv5 and NCNN**
 
-This repo provides C++ implementation of [YOLOv5 model](https://github.com/ultralytics/yolov5) using
-Tencent's NCNN framework.
+Ncnn deployment on android, support YOLOv5s for food detection
 
-# Notes
+# **Notes**
+- I remove many models in original repo and remain only Yolov5s model.
+- Modified some code and add more assets to make it look like a **food detection app**.
+- If you use my pytorch weights from [here](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing) and export it using my [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing), then you can run the app on Android Studio.
+- First [apk](https://github.com/lannguyen0910/food-detection-yolov5/releases/tag/1.0) release.
+- The app is for learning purpose only!
 
-Currently NCNN does not support Slice operations with steps, therefore I removed the Slice operation
-and replaced the input with a downscaled image and stacked it to match the channel number. This
-may slightly reduce the accuracy.
-
-# Credits 
-
+# **Credits** 
+* [Original implementation](https://github.com/cmdbug/YOLOv5_NCNN)
 * [YOLOv5 by Ultralytics](https://github.com/ultralytics/yolov5) 
 * [NCNN by Tencent](https://github.com/tencent/ncnn)
-
-仅供学习。
