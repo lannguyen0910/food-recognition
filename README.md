@@ -242,10 +242,10 @@ We conclude that the learned models are quite good compared to such huge data wi
 
 - Feel free to make a contribution to the project by pulling an request or making an issue.
 
-## 📙 **References**
+## 📙 **Credits**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5.
-- Awesome object detection's custom template: https://github.com/kaylode/custom-template/tree/detection.
-- Adapted code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
-- Inference on android app: https://github.com/Tencent/ncnn
+- Object detection's custom template: https://github.com/kaylode/custom-template/tree/detection.
+- Base code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
+- Ncnn by Tencent: https://github.com/Tencent/ncnn
 - Edamam API: https://developer.edamam.com/food-database-api-docs.
 - Chart.js: https://github.com/chartjs/Chart.js.
