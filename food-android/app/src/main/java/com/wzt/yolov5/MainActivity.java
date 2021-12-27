@@ -585,7 +585,7 @@ public class MainActivity extends AppCompatActivity {
             if (cursor != null) {
                 cursor.moveToFirst();
                 // String imgNo = cursor.getString(0); // 编号
-                String v_path = cursor.getString(1); // 文件路径
+                String v_path = cursor.getString(4); // 文件路径
                 String v_size = cursor.getString(2); // 大小
                 String v_name = cursor.getString(3); // 文件名
                 detectOnVideo(v_path);
