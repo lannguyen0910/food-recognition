@@ -2,6 +2,12 @@
 
 Ncnn deployment on android, support YOLOv5s for food detection
 
+# **App usage**
+- After running the app, there's a ```YoloV5s``` button. Click the button to start.
+- By default we'll "livestream" based on our back camera. The model'll detect food objects and write bboxes + labels (Accuracy is still low) on our view display in the middle of the screen.
+- Click ```Photo``` button to choose the photo we want to detect. The result will display in our image view. Click that view to switch to default.
+- Click ```Video``` button to choose the video we want to detect. We can speed up the video result with the speed bar at the bottom. **Recommend dragging it to the maximum for easy monitoring**.
+
 # **Notes**
 - I remove many models in original repo and remain only YOLOv5 model.
 - Modified some code and add more assets to make it look like a **food detection app**.
