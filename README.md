@@ -94,7 +94,8 @@ scripts/run.bat
 - Visit [food-android](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch.
 - Modified code from [original repo](https://github.com/cmdbug/YOLOv5_NCNN).
 - First [apk](https://github.com/lannguyen0910/food-detection-yolov5/releases/tag/1.0) release.
-- Learning purpose only!
+- Because we have not trained enough so the accuracy of the model is still low. We'll update gradually.
+- The app is for learning purpose only!
 
 
 ## 🌟 **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
