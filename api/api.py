@@ -1,7 +1,7 @@
 import json
 import requests
 from tqdm import tqdm
-from secret import API, get_response
+from .secret import API, get_response
 
 DATABASE = "./api/db.json"
 
