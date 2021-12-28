@@ -73,7 +73,7 @@ python app.py --host=localhost:3000
 
 Or run this command in your terminal to clear cache files after running.
 ```
-scripts/run.bat
+run.bat
 ```
 
 🚨 **UPDATE**: 
@@ -101,6 +101,7 @@ scripts/run.bat
 ## 🌟 **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
 - Example usage:
 ```
+pip install onnx>=1.9.0 onnx-simplifier>=0.3.6
 python export.py --weights yolov5s_best.pth --imgsz 640 --include onnx
 ```
 Or
