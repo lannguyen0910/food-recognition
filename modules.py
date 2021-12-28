@@ -38,7 +38,7 @@ class Arguments:
             self.weight=tmp_path
 
 weight_urls = {
-    'yolov5s': "103KodPawOJW56EINgwyDc0uFiAHg7ps8",
+    'yolov5s': "1-ShcLWtQKYDhdz6OyKNtiIZJByp35P_g",
     "yolov5m": "10RTh_BMm-Ow_zxWeSFIUSXhyaAKlpy1u",
     "yolov5l": "1-me51mvmgWnOSlysLMdKRFWeRu-0ZWf_",
     "yolov5x": "1-mz9V9Y69k2isJLe-gn5OQcWzxaDMw3N",
