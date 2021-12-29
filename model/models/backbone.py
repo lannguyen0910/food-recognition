@@ -122,7 +122,7 @@ class YoloBackbone(BaseBackbone):
                 pass
             print("Loaded pretrained model")
 
-        self.model = nn.DataParallel(self.model).cuda()
+        self.model = nn.DataParallel(self.model)
         self.loss_fn = YoloLoss(
             num_classes=num_classes,
             model=self.model)

@@ -6,8 +6,6 @@ import numpy as np
 import tldextract
 import pytube
 import hashlib
-import tldextract
-import pytube
 import time
 import base64
 
@@ -214,7 +212,6 @@ def analyze():
 
             # save file to /static/uploads
             img = Image.open(f.stream)
-            # img.show()
             img.save(filepath)
 
         elif 'url-button' in request.form:
@@ -241,6 +238,7 @@ def analyze():
 
                 # Save file to /static/uploads
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
                 np_img = np.fromstring(data, np.uint8)
                 img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
                 cv2.imwrite(filepath, img)
@@ -386,7 +384,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     if args.ngrok:
         run_with_ngrok(app)

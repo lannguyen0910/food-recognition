@@ -55,7 +55,7 @@ def load_checkpoint(model, path):
     :param model: (nn.Module)
     :param path: (string) checkpoint path
     """
-    state = torch.load(path)
+    state = torch.load(path, map_location='cpu')
     current_lr = None
     if model.optimizer is not None:
         for param_group in model.optimizer.param_groups:
@@ -95,13 +95,13 @@ def get_epoch_iters(path):
     return epoch_idx, iter_idx, best_value
 
 def get_class_names(path):
-    state = torch.load(path)
+    state = torch.load(path, map_location='cpu')
     class_names = state['class_names'] if 'class_names' in state.keys() else None
     num_classes = len(class_names) if class_names is not None else 1
     return class_names, num_classes
 
 def get_config(path, ignore_keys=[]):
-    state = torch.load(path)
+    state = torch.load(path, map_location='cpu')
     config_dict = state['config'] if 'config' in state.keys() else None
     config = config_from_dict(config_dict, ignore_keys)
     return config

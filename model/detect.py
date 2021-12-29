@@ -2,25 +2,36 @@ from model.utils.getter import *
 import argparse
 
 parser = argparse.ArgumentParser(description='Perfom Objet Detection')
-parser.add_argument('--weight', type=str, default = None,help='version of EfficentDet')
-parser.add_argument('--input_path', type=str, help='path to an image to inference')
-parser.add_argument('--output_path', type=str, help='path to save inferenced image')
-parser.add_argument('--gpus', type=str, default='0', help='path to save inferenced image')
-parser.add_argument('--min_conf', type=float, default= 0.15, help='minimum confidence for an object to be detect')
-parser.add_argument('--min_iou', type=float, default=0.5, help='minimum iou threshold for non max suppression')
-parser.add_argument('--tta', action='store_true', help='whether to use test time augmentation')
-parser.add_argument('--tta_ensemble_mode', type=str, default='wbf', help='tta ensemble mode')
-parser.add_argument('--tta_conf_threshold', type=float, default=0.01, help='tta confidence score threshold')
-parser.add_argument('--tta_iou_threshold', type=float, default=0.9, help='tta iou threshold')
+parser.add_argument('--weight', type=str, default=None,
+                    help='version of EfficentDet')
+parser.add_argument('--input_path', type=str,
+                    help='path to an image to inference')
+parser.add_argument('--output_path', type=str,
+                    help='path to save inferenced image')
+parser.add_argument('--gpus', type=str, default=False,
+                    help='path to save inferenced image')
+parser.add_argument('--min_conf', type=float, default=0.15,
+                    help='minimum confidence for an object to be detect')
+parser.add_argument('--min_iou', type=float, default=0.5,
+                    help='minimum iou threshold for non max suppression')
+parser.add_argument('--tta', action='store_true',
+                    help='whether to use test time augmentation')
+parser.add_argument('--tta_ensemble_mode', type=str,
+                    default='wbf', help='tta ensemble mode')
+parser.add_argument('--tta_conf_threshold', type=float,
+                    default=0.01, help='tta confidence score threshold')
+parser.add_argument('--tta_iou_threshold', type=float,
+                    default=0.9, help='tta iou threshold')
 
-CACHE_DIR='./.cache'
+CACHE_DIR = './.cache'
 
 # Global model, only changes when model name changes
 DETECTOR = None
 
+
 class Testset():
     def __init__(self, config, input_path, transforms=None):
-        self.input_path = input_path # path to image folder or a single image
+        self.input_path = input_path  # path to image folder or a single image
         self.transforms = transforms
         self.image_size = config.image_size
         self.load_images()
@@ -32,12 +43,13 @@ class Testset():
         return 1
 
     def load_images(self):
-        self.all_image_paths = []   
+        self.all_image_paths = []
         if os.path.isdir(self.input_path):  # path to image folder
             paths = sorted(os.listdir(self.input_path))
             for path in paths:
-                self.all_image_paths.append(os.path.join(self.input_path, path))
-        elif os.path.isfile(self.input_path): # path to single image
+                self.all_image_paths.append(
+                    os.path.join(self.input_path, path))
+        elif os.path.isfile(self.input_path):  # path to single image
             self.all_image_paths.append(self.input_path)
 
     def __getitem__(self, idx):
@@ -62,7 +74,7 @@ class Testset():
         }
 
     def collate_fn(self, batch):
-        imgs = torch.stack([s['img'] for s in batch])   
+        imgs = torch.stack([s['img'] for s in batch])
         ori_imgs = [s['ori_img'] for s in batch]
         img_names = [s['img_name'] for s in batch]
         image_ori_ws = [s['image_ori_w'] for s in batch]
@@ -70,7 +82,8 @@ class Testset():
         image_ws = [s['image_w'] for s in batch]
         image_hs = [s['image_h'] for s in batch]
         img_scales = torch.tensor([1.0]*len(batch), dtype=torch.float)
-        img_sizes = torch.tensor([imgs[0].shape[-2:]]*len(batch), dtype=torch.float)
+        img_sizes = torch.tensor(
+            [imgs[0].shape[-2:]]*len(batch), dtype=torch.float)
         return {
             'imgs': imgs,
             'ori_imgs': ori_imgs,
@@ -79,7 +92,7 @@ class Testset():
             'image_ori_hs': image_ori_hs,
             'image_ws': image_ws,
             'image_hs': image_hs,
-            'img_sizes': img_sizes, 
+            'img_sizes': img_sizes,
             'img_scales': img_scales
         }
 
@@ -89,22 +102,21 @@ class Testset():
     def __str__(self):
         return f"Number of found images: {len(self.all_image_paths)}"
 
+
 def detect(args, config):
     global DETECTOR
-    
-    num_gpus = len(args.gpus.split(','))
-    devices_info = get_devices_info(args.gpus)
 
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
     test_transforms = A.Compose([
-        get_resize_augmentation(config.image_size, keep_ratio=config.keep_ratio),
+        get_resize_augmentation(
+            config.image_size, keep_ratio=config.keep_ratio),
         A.Normalize(mean=MEAN, std=STD, max_pixel_value=1.0, p=1.0),
         ToTensorV2(p=1.0)
     ])
 
     testset = Testset(
-        config, 
+        config,
         args.input_path,
         transforms=test_transforms)
     testloader = DataLoader(
@@ -117,18 +129,15 @@ def detect(args, config):
 
     class_names, num_classes = get_class_names(args.weight)
     class_names.insert(0, 'Background')
-    
+
     if DETECTOR is None or DETECTOR.model_name != config.model_name:
         net = get_model(args, config, num_classes=num_classes)
-        DETECTOR = Detector(model = net, freeze=True, device = device)
+        DETECTOR = Detector(model=net, freeze=True, device=device)
         load_checkpoint(DETECTOR, args.weight)
-        ## Print info
+        # Print info
         print(config)
-        
+
     DETECTOR.eval()
-
-
-    
 
     result_dict = {
         'boxes': [],
@@ -140,7 +149,7 @@ def detect(args, config):
     with tqdm(total=len(testloader)) as pbar:
         with torch.no_grad():
             for idx, batch in enumerate(testloader):
-              
+
                 preds = DETECTOR.inference_step(batch)
 
                 for idx, outputs in enumerate(preds):
@@ -148,9 +157,9 @@ def detect(args, config):
                     img_h = batch['image_hs'][idx]
                     img_ori_ws = batch['image_ori_ws'][idx]
                     img_ori_hs = batch['image_ori_hs'][idx]
-                    
+
                     outputs = postprocessing(
-                        outputs, 
+                        outputs,
                         current_img_size=[img_w, img_h],
                         ori_img_size=[img_ori_ws, img_ori_hs],
                         min_iou=args.min_iou,
@@ -160,11 +169,11 @@ def detect(args, config):
                         output_format='xywh',
                         mode=config.fusion_mode)
 
-                    boxes = outputs['bboxes'] 
-                    labels = outputs['classes']  
+                    boxes = outputs['bboxes']
+                    labels = outputs['classes']
                     scores = outputs['scores']
-                    
-                    for (box,label,score) in zip(boxes, labels, scores):
+
+                    for (box, label, score) in zip(boxes, labels, scores):
                         result_dict['boxes'].append(box)
                         result_dict['labels'].append(label)
                         result_dict['scores'].append(score)
