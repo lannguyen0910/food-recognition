@@ -35,11 +35,11 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 
-UPLOAD_FOLDER = './static/assets/uploads'
-CSV_FOLDER = './static/csv'
-VIDEO_FOLDER = './static/assets/videos'
-DETECTION_FOLDER = './static/assets/detections'
-METADATA_FOLDER = './static/metadata'
+UPLOAD_FOLDER = './static/assets/uploads/'
+CSV_FOLDER = './static/csv/'
+VIDEO_FOLDER = './static/assets/videos/'
+DETECTION_FOLDER = './static/assets/detections/'
+METADATA_FOLDER = './static/metadata/'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['CSV_FOLDER'] = CSV_FOLDER

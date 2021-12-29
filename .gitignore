@@ -27,3 +27,5 @@ weights
 classification.yaml
 detection.yaml
 food-android
+test.py
+.cache

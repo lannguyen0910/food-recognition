@@ -88,7 +88,7 @@ def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
             cache_dict[key] = result_dict[key]
     df = pd.DataFrame(cache_dict)
 
-    df.to_csv(f'./{cache_dir}/{cache_name}.csv', index=False)
+    df.to_csv(f'{cache_dir}/{cache_name}.csv', index=False)
 
 def check_cache(cache_name):
     return os.path.isfile(f'./{CACHE_DIR}/{cache_name}.csv')
@@ -397,6 +397,7 @@ def get_prediction(
         hashed_key = ori_hashed_key + f"_{model_tag}"
 
     ori_img = cv2.imread(input_path)
+
     ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
     img_h, img_w, _ = ori_img.shape
 
