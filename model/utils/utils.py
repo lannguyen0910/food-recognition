@@ -214,7 +214,7 @@ def download_weights(id_or_url, cached=None, md5=None, quiet=False):
 
 
 weight_url = {
-    "yolov5s": "103KodPawOJW56EINgwyDc0uFiAHg7ps8",
+    'yolov5s': "1-PCf80DuSrfnScODXFH4S3f0qP7sbT1a",
     "yolov5m": "10RTh_BMm-Ow_zxWeSFIUSXhyaAKlpy1u",
     "yolov5l": "1-me51mvmgWnOSlysLMdKRFWeRu-0ZWf_",
     "yolov5x": "1-mz9V9Y69k2isJLe-gn5OQcWzxaDMw3N",
