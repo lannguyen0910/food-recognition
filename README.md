@@ -1,16 +1,31 @@
 <h1 align="center">🍔🍟🍗 Food Analysis with YOLOv5 🍞🍖🍕</h1>
 
 <p align="center">
+   <a href="./LICENSE"><img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg" alt="MIT" /></a>
+
+ <a href="https://github.com/lannguyen0910/food-detection-yolov5/stargazers">
+ <img src="https://img.shields.io/github/stars/lannguyen0910/food-detection-yolov5?style=flat-square" alt="Stars"/>
+ </a>
+ <a href="https://github.com/lannguyen0910/food-detection-yolov5/fork">
+ <img src="https://img.shields.io/github/forks/lannguyen0910/food-detection-yolov5.svg?style=flat-square" alt="Forks"/>
+ </a>
+ <img src="https://visitor-badge.laobi.icu/badge?page_id=lannguyen0910.food-detection-yolov5" alt="visitors" />
+ 
  <a><img  src="./demo/pipeline.png"></a>
   <br>
-  <a style="font-size: 100px; text-color:red;"> <strong> Awesome Food Detector</strong> </a>
 </p>
 
 
 <p align="center">
   <a href="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/overview/master"><img src="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/badge/master?s=9716a4eb0076053fa36e0d967bba5161b85b8fb5" alt="CodeFactor" /></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="Python" /></a>
-  <a href="./LICENSE"><img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg" alt="MIT" /></a>
+ 
+ <a href="https://github.com/lannguyen0910/food-detection-yolov5/issues">
+<img src="https://img.shields.io/github/issues/lannguyen0910/food-detection-yolov5?style=flat-square" alt="Issues"/>
+</a>
+<a href="https://github.com/lannguyen0910/food-detection-yolov5/pulls">
+<img src="https://img.shields.io/github/issues-pr/lannguyen0910/food-detection-yolov5?style=flat-square" alt="Pull Requests"/>
+</a>
 </p>
 
 ## 🌳 **Folder Structure**
