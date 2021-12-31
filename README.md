@@ -95,6 +95,9 @@ run.bat
 - Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). Just for demo, the accuracy is still very low on our custom datasets, will update the weights gradually.
 - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights.
 
+![image](https://user-images.githubusercontent.com/47696901/147828887-3ac3b310-3205-43d6-b805-70694c872b57.png)
+
+
 ## 🌟 **Run on Google Colab**
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
 <!-- - (https://colab.research.google.com/drive/1SFDqNEQA9hrVA6zFn7wb0il-wV2Unou8?usp=sharing)-->
@@ -149,6 +152,9 @@ We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to
 <br>
 
 ## 🌟 **Server**
+<details>
+<summary>Implementation details</summary>
+   
 The two functions: ```get_prediction``` and ```get_video_prediction``` are two inference functions for images and videos. Implemented in ```modules.py```, where the image detection process (get_prediction) will call the Edamam API to get nutritional information in the food. We also save nutritional information in csv files in the folder ```/static/csv```.
 <br>
 
@@ -156,7 +162,8 @@ We provide the user with the ability to customize the threshold of confidence an
 <br>
 
 In addition, the team also saved the models as ```global variables```. When starting Flask Server, the model will be initialized only once. Only when there is a change in model selection, this variable will be reinitialized, otherwise the model will not be reinitialized when there are new image queries, this will somewhat reduce the processing time.
-
+</details>
+   
 ## 🌟 **Additional Methods**
 <details>
 <summary>To increase the variety of dishes, we apply a classification model:</summary>
@@ -256,7 +263,7 @@ We conclude that the learned models are quite good compared to such huge data wi
 ## 💡 **Further Improvements**
 - We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate. You can try to train on other food datasets for better experience!
 
-- Feel free to make a contribution to the project by pulling an request or making an issue.
+- Feel free to make a contribution to the project by pulling a request or making an issue.
 
 ## 📙 **Credits**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5.
