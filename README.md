@@ -91,8 +91,9 @@ Or run this command in your terminal to clear cache files after running.
 run.bat
 ```
 
-🚨 **UPDATE**: 
-- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). Just for demo, the accuracy is still very low on our custom datasets, will update the weights gradually.
+🚨 **UPDATE**:
+- We lost our pretrained weights and datasets so we have to collect new datasets and train again.
+- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). The accuracy is still very low on our custom datasets, will update the weights gradually.
 - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights.
 
 ![image](https://user-images.githubusercontent.com/47696901/147828887-3ac3b310-3205-43d6-b805-70694c872b57.png)
