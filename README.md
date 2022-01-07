@@ -74,6 +74,7 @@ cd food-detection-yolov5/
 - Install dependencies.
 ```
 pip install -r requirements.txt
+pip install opencv-python --upgrade
 ```
 
 - (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display MP4 video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the colab notebook bellow: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
