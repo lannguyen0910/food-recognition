@@ -13,5 +13,3 @@ may slightly reduce the accuracy.
 
 * [YOLOv5 by Ultralytics](https://github.com/ultralytics/yolov5) 
 * [NCNN by Tencent](https://github.com/tencent/ncnn)
-
-仅供学习。
