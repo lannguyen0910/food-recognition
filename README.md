@@ -28,6 +28,7 @@
 </a>
 </p>
 
+<!--
 ## 🌳 **Folder Structure**
 
 <details>
@@ -63,9 +64,34 @@ food-detection-yolov5
 │   └─── index.html           # upload files' page
 │   └─── url.html             # input URLs' page    
 ```
+</details> -->
+   
+
+<details open> <summary><strong>Dev logs</strong></summary>
+ <strong><i>[26/12/2021]</i></strong> Update app on Android 🤞 <br>
+ <strong><i>[12/09/2021]</i></strong> Update all features to the web app 🤞 <br>
+ <strong><i>[16/07/2021]</i></strong> All trained checkpoints on custom data have been lost. Now use pretrained models on COCO for inference. 
 </details>
 
-## 🌟 **Run on local machine (require CUDA)**
+🚨 **NOTE**:
+- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch.
+- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). The accuracy is still very low on our custom datasets, will update the weights gradually.
+- Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights.
+
+![image](https://user-images.githubusercontent.com/47696901/147828887-3ac3b310-3205-43d6-b805-70694c872b57.png)
+
+
+## 📔  **Notebook**
+- For inference, use this notebook [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
+
+
+## 🌟 **Train YOLOv5 using our object detection's template**
+- Update new datasets: [detection-dataset](https://drive.google.com/drive/folders/1qivPtnHk6OpvsTyRUGOF1c2a86CMwBY1?usp=sharing) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing)
+- You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
+- Remember when we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [detection-template](https://github.com/kaylode/custom-template/tree/detection) & [classification-template](https://github.com/kaylode/custom-template/tree/classification)
+- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1gl_Y6nVKyfAhAgqxJdIIBeb02gu1BNYQ/view?usp=sharing)
+ 
+ ## 🌟 **Run on local machine (require CUDA)**
 - Clone the repo.
 ```
 git clone https://github.com/lannguyen0910/food-detection-yolov5
@@ -91,33 +117,7 @@ Or run this command in your terminal to clear cache files after running.
 ```
 run.bat
 ```
-
-🚨 **UPDATE**:
-- We lost our pretrained weights and datasets so we have to collect new datasets and train again.
-- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). The accuracy is still very low on our custom datasets, will update the weights gradually.
-- Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights.
-
-![image](https://user-images.githubusercontent.com/47696901/147828887-3ac3b310-3205-43d6-b805-70694c872b57.png)
-
-
-## 🌟 **Run on Google Colab**
-- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
-<!-- - (https://colab.research.google.com/drive/1SFDqNEQA9hrVA6zFn7wb0il-wV2Unou8?usp=sharing)-->
-
-## 🌟 **Train YOLOv5 using our object detection's template** 
-- Update new datasets: [detection-dataset](https://drive.google.com/drive/folders/1qivPtnHk6OpvsTyRUGOF1c2a86CMwBY1?usp=sharing) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing)
-- You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
-- Remember when we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [detection-template](https://github.com/kaylode/custom-template/tree/detection) & [classification-template](https://github.com/kaylode/custom-template/tree/classification)
-- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1gl_Y6nVKyfAhAgqxJdIIBeb02gu1BNYQ/view?usp=sharing)
-
-## 🌟 **Food app on android**
-- Visit [food-android](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch.
-- Modified code from [original repo](https://github.com/cmdbug/YOLOv5_NCNN).
-- First [apk](https://github.com/lannguyen0910/food-detection-yolov5/releases/tag/1.0) release.
-- Because we have not trained enough so the accuracy of the model is still low. We'll update gradually.
-- The app is for learning purpose only!
-
-
+ 
 ## 🌟 **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
 - Example usage:
 ```
