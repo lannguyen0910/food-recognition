@@ -20,14 +20,17 @@ def get_model(args, config, num_classes):
     print('Number of classes: ', NUM_CLASSES)
     max_post_nms = config.max_post_nms if config.max_post_nms > 0 else None
     max_pre_nms = config.max_pre_nms if config.max_pre_nms > 0 else None
-    load_weights = True
 
     net = None
 
+    if args.weight is None:
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        args.weight = os.path.join(CACHE_DIR, f'{config.model_name}.pt')
+        download_pretrained_weights(f'{config.model_name}', args.weight)
+
     version_name = config.model_name.split('v')[1]
     net = YoloBackbone(
-        version_name=version_name,
-        load_weights=load_weights,
+        weight=args.weight,
         num_classes=NUM_CLASSES,
         max_pre_nms=max_pre_nms,
         max_post_nms=max_post_nms)
@@ -91,45 +94,29 @@ class BaseTimmModel(nn.Module):
 class YoloBackbone(BaseBackbone):
     def __init__(
             self,
-            version_name='5s',
+            weight,
             num_classes=80,
             max_pre_nms=None,
-            load_weights=True,
             max_post_nms=None,
             **kwargs):
 
         super(YoloBackbone, self).__init__(**kwargs)
 
         if max_pre_nms is None:
-            max_pre_nms = 30000
+            max_pre_nms = 20000
         self.max_pre_nms = max_pre_nms
 
         if max_post_nms is None:
-            max_post_nms = 1000
+            max_post_nms = 500
         self.max_post_nms = max_post_nms
 
-        version = version_name[0]
-        # if version == '4':
-        #     version_mode = version_name.split('-')[1]
-        #     self.name = f'yolov4-{version_mode}'
-        #     self.model = Yolov4(
-        #         cfg=f'./models/configs/yolov4-{version_mode}.yaml', ch=3, nc=num_classes
-        #     )
-        # elif version == '5':
-        #     version_mode = version_name[-1]
-        #     self.name = f'yolov5{version_mode}'
-        #     self.model = Model(
-        #         cfg=f'./models/configs/yolov5{version_mode}.yaml', ch=3, nc=num_classes
-        #     )
+        self.model = torch.hub.load(
+            'ultralytics/yolov5', 'custom', path=weight, force_reload=True)
 
-        if load_weights:
-            tmp_path = os.path.join(CACHE_DIR, f'yolov{version_name}.pt')
-            download_pretrained_weights(f'yolov{version_name}', tmp_path)
-            print('Temp path: ', tmp_path)
-            self.model = torch.hub.load(
-                'ultralytics/yolov5', 'custom', path=tmp_path, force_reload=True).autoshape()
-
-            self.class_names = self.model.names
+        self.class_names = self.model.names
+        self.model.multi_label = False  # NMS multiple labels per box
+        # maximum number of detections per image
+        self.model.max_det = self.max_post_nms
 
         self.loss_fn = YoloLoss(
             num_classes=num_classes,
