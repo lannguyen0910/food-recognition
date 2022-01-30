@@ -1,0 +1,141 @@
+settings:
+  nc: 90
+
+  # class names
+  names:
+    [
+      "hot-dog",
+      "Apple",
+      "Artichoke",
+      "Asparagus",
+      "Bagel",
+      "Baked-goods",
+      "Banana",
+      "Beer",
+      "Bell-pepper",
+      "Bread",
+      "Broccoli",
+      "Burrito",
+      "Cabbage",
+      "Cake",
+      "Candy",
+      "Cantaloupe",
+      "Carrot",
+      "Common-fig",
+      "Cookie",
+      "Dessert",
+      "French-fries",
+      "Grape",
+      "Guacamole",
+      "Hot-dog",
+      "Ice-cream",
+      "Muffin",
+      "Orange",
+      "Pancake",
+      "Pear",
+      "Popcorn",
+      "Pretzel",
+      "Strawberry",
+      "Tomato",
+      "Waffle",
+      "food-drinks",
+      "Cheese",
+      "Cocktail",
+      "Coffee",
+      "Cooking-spray",
+      "Crab",
+      "Croissant",
+      "Cucumber",
+      "Doughnut",
+      "Egg",
+      "Fruit",
+      "Grapefruit",
+      "Hamburger",
+      "Honeycomb",
+      "Juice",
+      "Lemon",
+      "Lobster",
+      "Mango",
+      "Milk",
+      "Mushroom",
+      "Oyster",
+      "Pasta",
+      "Pastry",
+      "Peach",
+      "Pineapple",
+      "Pizza",
+      "Pomegranate",
+      "Potato",
+      "Pumpkin",
+      "Radish",
+      "Salad",
+      "food",
+      "Sandwich",
+      "Shrimp",
+      "Squash",
+      "Squid",
+      "Submarine-sandwich",
+      "Sushi",
+      "Taco",
+      "Tart",
+      "Tea",
+      "Vegetable",
+      "Watermelon",
+      "Wine",
+      "Winter-melon",
+      "Zucchini",
+      "Banh_mi",
+      "Banh_trang_tron",
+      "Banh_xeo",
+      "Bun_bo_Hue",
+      "Bun_dau",
+      "Com_tam",
+      "Goi_cuon",
+      "Pho",
+      "Hu_tieu",
+      "Xoi",
+    ]
+  #################   TRAINING CONFIG   ###################
+
+  model_name: "yolov5m" #[efficientdet-d{i} (0-7) | fasterrcnn-{backbone} | yolov4-p{i} (5,7) | yolov5{i} (s,m,l,x)]
+
+  gpu_devices: "0" # supports multi-gpus
+  num_epochs: 300
+  batch_size: 32
+  num_workers: 2
+
+  fusion_mode: "nms" # Post-process method [nms | wbf | None]
+  min_iou_val: 0.7 # IOU threshold for validation
+  min_conf_val: 0.001 # Confidence score threshold for validation
+  max_images_val: 20000 # max number of images for validation
+  max_pre_nms: 20000 # max detections for post process, input to NMS, set <0 for default [effdet: 5000; frcnn: 1000; yolo: 30000]
+  max_post_nms: 500 # max detections per image limit, output of NMS, set <0 for default [effdet: 100; frcnn: 100; yolo: 1000]
+
+  image_size: [640, 640] # should be square and multiple of 32 to prevent bugs [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
+  keep_ratio: False # whether to use resize padding
+
+  cutmix: False
+  mixup: False
+  multiscale: False # multiscale training
+
+  # learning rate policy
+  lr_policy:
+    name: "adam" #[adam|sgd]
+    lr: 0.001 #[adam: 1e-3 | sgd: 1e-2]
+    momentum: 0.937
+    weight_decay: 0.0005
+
+  lr_scheduler:
+    name:
+      "1cycle-yolo" #[plateau | cosine | 1cycle-yolo | 1cycle]
+      # if need to specify more scheduler arguments, do it here
+
+  # gradient accumulation
+  mixed_precision: True # whether to use nvidia apex
+  total_accumulate_steps: 128 # step * batch_size, not use if equal 0
+
+  # Test time augmentation
+  tta: False # whether to use TTA while validation
+  tta_ensemble_mode: "wbf" # ensemble method when TTA
+  tta_conf_threshold: 0.01
+  tta_iou_threshold: 0.9

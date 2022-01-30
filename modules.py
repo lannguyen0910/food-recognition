@@ -4,10 +4,9 @@ from PIL import Image
 import numpy as np
 import os
 import pandas as pd
-from model import (
-    detect, get_config, Config,
-    download_weights, draw_boxes_v2,
-    get_class_names, postprocessing,
+from utilities import (
+    detect, Config, get_config, get_class_names,
+    download_weights, draw_boxes_v2, postprocessing,
     box_fusion, classify, change_box_order,
     VideoPipeline)
 from api import get_info_from_db
@@ -32,16 +31,17 @@ class Arguments:
         self.tta_iou_threshold = 0.9
 
         if self.model_name:
-            tmp_path = os.path.join(CACHE_DIR, self.model_name+'.pth')
+            tmp_path = os.path.join(CACHE_DIR, self.model_name+'.pt')
             download_pretrained_weights(
                 self.model_name,
                 cached=tmp_path)
             self.weight = tmp_path
 
 
+# https://drive.google.com/file/d/1B-lJUU0h96z_UVxCcpI5mKD8j0OX6yVR/view?usp=sharing
 weight_urls = {
-    'yolov5s': "1-PCf80DuSrfnScODXFH4S3f0qP7sbT1a",
-    "yolov5m": "10RTh_BMm-Ow_zxWeSFIUSXhyaAKlpy1u",
+    'yolov5s': "1jNSrQUdnf4Anmyn2AHd7bcxQbP38GNVn",
+    "yolov5m": "1B-lJUU0h96z_UVxCcpI5mKD8j0OX6yVR",
     "yolov5l": "1-me51mvmgWnOSlysLMdKRFWeRu-0ZWf_",
     "yolov5x": "1-mz9V9Y69k2isJLe-gn5OQcWzxaDMw3N",
     "effnetb4": "1-K_iDfuhxQFHIF9HTy8SvfnIFwjqxtaX",
@@ -204,11 +204,18 @@ def ensemble_models(input_path, image_size):
     args3.input_path = input_path
     args4.input_path = input_path
 
-    class_names, num_classes = get_class_names(args1.weight)
-    config1 = get_config(args1.weight, ignore_keys)
-    config2 = get_config(args2.weight, ignore_keys)
-    config3 = get_config(args3.weight, ignore_keys)
-    config4 = get_config(args4.weight, ignore_keys)
+    # class_names, num_classes = get_class_names(args1.weight)
+    config1 = get_config(model_name='yolov5s')
+    config2 = get_config(model_name='yolov5m')
+    config3 = get_config(model_name='yolov5l')
+    config4 = get_config(model_name='yolov5x')
+
+    # config1 = Config(os.path.join('utilities', 'configs', 'yolov5s.yaml'))
+    # config2 = Config(os.path.join('utilities', 'configs', 'yolov5m.yaml'))
+    # config3 = Config(os.path.join('utilities', 'configs', 'yolov5l.yaml'))
+    # config4 = Config(os.path.join('utilities', 'configs', 'yolov5x.yaml'))
+
+    class_names, num_classes = get_class_names('yolov5s')
 
     result_dict1 = detect(args1, config1)
     result_dict2 = detect(args2, config2)
@@ -350,24 +357,26 @@ def get_video_prediction(
         min_conf=0.1,
         enhance_labels=False):
 
-    ignore_keys = [
-        'min_iou_val',
-        'min_conf_val',
-        'tta',
-        'gpu_devices',
-        'tta_ensemble_mode',
-        'tta_conf_threshold',
-        'tta_iou_threshold',
-    ]
+    # ignore_keys = [
+    #     'min_iou_val',
+    #     'min_conf_val',
+    #     'tta',
+    #     'gpu_devices',
+    #     'tta_ensemble_mode',
+    #     'tta_conf_threshold',
+    #     'tta_iou_threshold',
+    # ]
 
     args = Arguments(model_name=model_name)
 
-    config = get_config(args.weight, ignore_keys)
+    config = get_config(model_name)
+
     if config is None:
         print("Config not found. Load configs from configs/configs.yaml")
-        config = Config(os.path.join('model/configs', 'configs.yaml'))
+        config = Config(os.path.join(
+            'utilities/configs', 'train_detection.yaml'))
     else:
-        print("Load configs from weight")
+        print("Load configs from yaml file!")
 
     args.input_path = input_path
     args.output_path = output_path
@@ -386,15 +395,15 @@ def get_prediction(
         min_conf=0.1,
         enhance_labels=False):
 
-    ignore_keys = [
-        'min_iou_val',
-        'min_conf_val',
-        'tta',
-        'gpu_devices',
-        'tta_ensemble_mode',
-        'tta_conf_threshold',
-        'tta_iou_threshold',
-    ]
+    # ignore_keys = [
+    #     'min_iou_val',
+    #     'min_conf_val',
+    #     'tta',
+    #     'gpu_devices',
+    #     'tta_ensemble_mode',
+    #     'tta_conf_threshold',
+    #     'tta_iou_threshold',
+    # ]
 
     # get hashed key from image path
     ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
@@ -416,14 +425,14 @@ def get_prediction(
     # check whether cache exists
     if check_cache(hashed_key):
         print(f"Load cache from {hashed_key}")
-        class_names, _ = get_class_names(f'./{CACHE_DIR}/{model_name}.pth')
+        class_names, _ = get_class_names(model_name)
         result_dict = load_cache(hashed_key)
     else:
         if not ensemble:
             args = Arguments(model_name=model_name)
-            class_names, _ = get_class_names(args.weight)
+            class_names, _ = get_class_names(model_name)
 
-            config = get_config(args.weight, ignore_keys)
+            config = get_config(model_name)
             if config is None:
                 print("Config not found. Load configs from configs/configs.yaml")
                 config = Config(os.path.join('model/configs', 'configs.yaml'))
@@ -439,7 +448,9 @@ def get_prediction(
         save_cache(result_dict, hashed_key)
         print(f"Save cache to {hashed_key}")
 
+    print('Class names: ', class_names)
     class_names.insert(0, "Background")
+    print('After insert: ', class_names)
 
     # post process
     result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)

@@ -123,11 +123,11 @@ run.bat
 - Example usage:
 ```
 pip install onnx>=1.9.0 onnx-simplifier>=0.3.6
-python tools/export.py --weights yolov5s_best.pth --imgsz 640 --include onnx
+python tools/export.py --weights yolov5s_best.pt --imgsz 640 --include onnx
 ```
-Or
+
 ```
-python tools/export.py --weights yolov5s_best.pth --imgsz 320 320 --include torchscript
+python tools/export.py --weights yolov5s_best.pt --imgsz 320 320 --include torchscript
 ```
 
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)

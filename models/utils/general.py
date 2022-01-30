@@ -283,6 +283,16 @@ def xywh2xyxy(x):
     return y
 
 
+def check_suffix(file='yolov5s.pt', suffix=('.pt',), msg=''):
+    # Check file(s) for acceptable suffix
+    if file and suffix:
+        if isinstance(suffix, str):
+            suffix = [suffix]
+        for f in file if isinstance(file, (list, tuple)) else [file]:
+            s = Path(f).suffix.lower()  # file suffix
+            if len(s):
+                assert s in suffix, f"{msg}{f} acceptable suffix is {suffix}"
+
 def scale_coords(img1_shape, coords, img0_shape, ratio_pad=None):
     # Rescale coords (xyxy) from img1_shape to img0_shape
     if ratio_pad is None:  # calculate from img0_shape
@@ -855,6 +865,21 @@ def kmean_anchors(path='./data/coco128.yaml', n=9, img_size=640, thr=4.0, gen=10
 
     return print_results(k)
 
+
+def increment_path(path, exist_ok=False, sep='', mkdir=False):
+    # Increment file or directory path, i.e. runs/exp --> runs/exp{sep}2, runs/exp{sep}3, ... etc.
+    path = Path(path)  # os-agnostic
+    if path.exists() and not exist_ok:
+        path, suffix = (path.with_suffix(
+            ''), path.suffix) if path.is_file() else (path, '')
+        dirs = glob.glob(f"{path}{sep}*")  # similar paths
+        matches = [re.search(rf"%s{sep}(\d+)" % path.stem, d) for d in dirs]
+        i = [int(m.groups()[0]) for m in matches if m]  # indices
+        n = max(i) + 1 if i else 2  # increment number
+        path = Path(f"{path}{sep}{n}{suffix}")  # increment path
+    if mkdir:
+        path.mkdir(parents=True, exist_ok=True)  # make directory
+    return path
 
 def print_mutation(hyp, results, yaml_file='hyp_evolved.yaml', bucket=''):
     # Print mutation results to evolve.txt (for use with train.py --evolve)

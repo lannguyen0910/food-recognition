@@ -23,7 +23,7 @@ VAL_PATH = args.annotations[:-5]+'_val.json'
 def save_coco(file, images, annotations, categories):
     with open(file, 'wt', encoding='UTF-8') as coco:
         json.dump({ 'images': images, 
-            'annotations': annotations, 'categories': categories}, coco, indent=2, sort_keys=True)
+            'annotations': annotations, 'categories': categories}, coco)
 
 def filter_annotations(annotations, images):
     image_ids = funcy.lmap(lambda i: int(i['id']), images)

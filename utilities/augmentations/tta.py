@@ -2,10 +2,10 @@ import numpy as np
 import torch
 from itertools import product
 # from models import EfficientDetBackbone, Detector
-from model.configs import Config
-from model.utils.utils import draw_pred_gt_boxes
-from model.utils.postprocess import box_fusion, change_box_order
-from model.utils.getter import *
+from utilities.configs import Config
+from utilities.utils.utils import draw_pred_gt_boxes
+from utilities.utils.postprocess import box_fusion, change_box_order
+from utilities.utils.getter import *
 
 class BaseTTA:
     """ author: @shonenkov """
@@ -215,7 +215,7 @@ if __name__=='__main__':
                     optim_params = {'lr': 0.1},     
                     device = device)
 
-    state = torch.load('./weights/best.pth')
+    state = torch.load('./weights/best.pt')
     model.model.load_state_dict(state['model'])
 
     val_transforms = get_augmentation(_type = 'val')

@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from ensemble_boxes import weighted_boxes_fusion, nms
 
+
 def change_box_order(boxes, order):
     """
     Change box order between (xmin, ymin, xmax, ymax) and (xcenter, ycenter, width, height).
@@ -17,7 +18,8 @@ def change_box_order(boxes, order):
     :return: (tensor) converted bounding boxes, size [N, 4]
     """
 
-    assert order in ['xyxy2xywh', 'xywh2xyxy', 'xyxy2cxcy', 'cxcy2xyxy', 'yxyx2xyxy', 'xyxy2yxyx']
+    assert order in ['xyxy2xywh', 'xywh2xyxy',
+                     'xyxy2cxcy', 'cxcy2xyxy', 'yxyx2xyxy', 'xyxy2yxyx']
 
     # Convert 1-d to a 2-d tensor of boxes, which first dim is 1
     if isinstance(boxes, torch.Tensor):
@@ -26,28 +28,29 @@ def change_box_order(boxes, order):
 
         if order == 'xyxy2xywh':
             return torch.cat([boxes[:, :2], boxes[:, 2:] - boxes[:, :2]], 1)
-        elif order ==  'xywh2xyxy':
+        elif order == 'xywh2xyxy':
             return torch.cat([boxes[:, :2], boxes[:, :2] + boxes[:, 2:]], 1)
         elif order == 'xyxy2cxcy':
             return torch.cat([(boxes[:, 2:] + boxes[:, :2]) / 2,  # c_x, c_y
-                            boxes[:, 2:] - boxes[:, :2]], 1)  # w, h
+                              boxes[:, 2:] - boxes[:, :2]], 1)  # w, h
         elif order == 'cxcy2xyxy':
-            return torch.cat([boxes[:, :2] - (boxes[:, 2:] *1.0 / 2),  # x_min, y_min
-                            boxes[:, :2] + (boxes[:, 2:] *1.0 / 2)], 1)  # x_max, y_max
+            return torch.cat([boxes[:, :2] - (boxes[:, 2:] * 1.0 / 2),  # x_min, y_min
+                              boxes[:, :2] + (boxes[:, 2:] * 1.0 / 2)], 1)  # x_max, y_max
         elif order == 'xyxy2yxyx' or order == 'yxyx2xyxy':
-            return boxes[:,[1,0,3,2]]
-        
+            return boxes[:, [1, 0, 3, 2]]
+
     else:
         # Numpy
         new_boxes = boxes.copy()
         if order == 'xywh2xyxy':
-            new_boxes[:,2] = boxes[:,0] + boxes[:,2]
-            new_boxes[:,3] = boxes[:,1] + boxes[:,3]
+            new_boxes[:, 2] = boxes[:, 0] + boxes[:, 2]
+            new_boxes[:, 3] = boxes[:, 1] + boxes[:, 3]
             return new_boxes
         elif order == 'xyxy2xywh':
-            new_boxes[:,2] = boxes[:,2] - boxes[:,0]
-            new_boxes[:,3] = boxes[:,3] - boxes[:,1]
+            new_boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
+            new_boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
             return new_boxes
+
 
 def filter_area(boxes, labels, confidence_score=None, min_wh=10, max_wh=4096):
     """
@@ -71,11 +74,12 @@ def filter_area(boxes, labels, confidence_score=None, min_wh=10, max_wh=4096):
     picked_classes = labels[picked_index]
     if confidence_score is not None:
         picked_score = confidence_score[picked_index]
-    
+
     if confidence_score is not None:
         return np.array(picked_boxes), np.array(picked_score), np.array(picked_classes)
     else:
         return np.array(picked_boxes), np.array(picked_classes)
+
 
 def resize_postprocessing(boxes, current_img_size, ori_img_size, keep_ratio=False):
     """
@@ -87,34 +91,39 @@ def resize_postprocessing(boxes, current_img_size, ori_img_size, keep_ratio=Fals
     if keep_ratio:
         ori_w, ori_h = ori_img_size
         ratio = float(ori_w*1.0/ori_h)
-        
+
         # If ratio equals 1.0, skip to scaling
-        if ratio != 1.0: 
-            if ratio > 1.0: # width > height, width = current_img_size, meaning padding along height
+        if ratio != 1.0:
+            if ratio > 1.0:  # width > height, width = current_img_size, meaning padding along height
                 true_width = current_img_size[0]
-                true_height = current_img_size[0] / ratio # true height without padding equals (current width / ratio)
-                pad_size = int((true_width-true_height)/2) # Albumentation padding
-                
+                # true height without padding equals (current width / ratio)
+                true_height = current_img_size[0] / ratio
+                # Albumentation padding
+                pad_size = int((true_width-true_height)/2)
+
                 # Subtract padding size from heights
-                new_boxes[:,1] -= pad_size
-                new_boxes[:,3] -= pad_size
-            else: # height > width, height = current_img_size, meaning padding along width
+                new_boxes[:, 1] -= pad_size
+                new_boxes[:, 3] -= pad_size
+            else:  # height > width, height = current_img_size, meaning padding along width
                 true_height = current_img_size[1]
-                true_width = current_img_size[1] * ratio # true width without padding equals (current height * ratio)
-                pad_size = int((true_height-true_width)/2) # Albumentation padding
+                # true width without padding equals (current height * ratio)
+                true_width = current_img_size[1] * ratio
+                # Albumentation padding
+                pad_size = int((true_height-true_width)/2)
 
                 # Subtract padding size from widths
-                new_boxes[:,0] -= pad_size
-                new_boxes[:,2] -= pad_size
+                new_boxes[:, 0] -= pad_size
+                new_boxes[:, 2] -= pad_size
             # Assign new width, new height
             current_img_size = [true_width, true_height]
-    
-    # Scaling boxes to match original image shape 
-    new_boxes[:,0] = (new_boxes[:,0] * ori_img_size[0])/ current_img_size[0]
-    new_boxes[:,2] = (new_boxes[:,2] * ori_img_size[0])/ current_img_size[0]
-    new_boxes[:,1] = (new_boxes[:,1] * ori_img_size[1])/ current_img_size[1]
-    new_boxes[:,3] = (new_boxes[:,3] * ori_img_size[1])/ current_img_size[1]
+
+    # Scaling boxes to match original image shape
+    new_boxes[:, 0] = (new_boxes[:, 0] * ori_img_size[0]) / current_img_size[0]
+    new_boxes[:, 2] = (new_boxes[:, 2] * ori_img_size[0]) / current_img_size[0]
+    new_boxes[:, 1] = (new_boxes[:, 1] * ori_img_size[1]) / current_img_size[1]
+    new_boxes[:, 3] = (new_boxes[:, 3] * ori_img_size[1]) / current_img_size[1]
     return new_boxes
+
 
 def clip_coords(boxes, img_shape):
     # Clip bounding xyxy bounding boxes to image shape (width, height)
@@ -133,11 +142,12 @@ def clip_coords(boxes, img_shape):
 
     return _boxes
 
+
 def postprocessing(
-        preds, 
+        preds,
         current_img_size=None,  # Need to be square
         ori_img_size=None,
-        min_iou=0.5, 
+        min_iou=0.5,
         min_conf=0.1,
         mode=None,
         max_dets=None,
@@ -151,8 +161,8 @@ def postprocessing(
 
     if len(boxes) == 0 or boxes is None:
         return {
-            'bboxes': boxes, 
-            'scores': scores, 
+            'bboxes': boxes,
+            'scores': scores,
             'classes': labels}
 
     # Clip boxes in image size
@@ -175,7 +185,7 @@ def postprocessing(
                 iou_threshold=min_iou)
 
         indexes = np.where(scores > min_conf)[0]
-        
+
         boxes = boxes[indexes]
         scores = scores[indexes]
         labels = labels[indexes]
@@ -185,35 +195,35 @@ def postprocessing(
             boxes = boxes[sorted_index]
             scores = scores[sorted_index]
             labels = labels[sorted_index]
-            
+
             boxes = boxes[:max_dets]
             scores = scores[:max_dets]
             labels = labels[:max_dets]
 
         if ori_img_size is not None and current_img_size is not None:
             boxes = resize_postprocessing(
-                boxes, 
-                current_img_size=current_img_size, 
-                ori_img_size=ori_img_size, 
+                boxes,
+                current_img_size=current_img_size,
+                ori_img_size=ori_img_size,
                 keep_ratio=keep_ratio)
 
         if output_format == 'xywh':
             boxes = change_box_order(boxes, order='xyxy2xywh')
 
-
     return {
-        'bboxes': boxes, 
-        'scores': scores, 
+        'bboxes': boxes,
+        'scores': scores,
         'classes': labels}
 
+
 def box_fusion(
-    bounding_boxes, 
-    confidence_score, 
-    labels, 
-    mode='wbf', 
-    image_size=None,
-    weights=None, 
-    iou_threshold=0.5):
+        bounding_boxes,
+        confidence_score,
+        labels,
+        mode='wbf',
+        image_size=None,
+        weights=None,
+        iou_threshold=0.5):
     """
     bounding boxes: 
         list of boxes of same image [[box1, box2,...],[...]] if ensemble many models
@@ -228,10 +238,10 @@ def box_fusion(
         for ens_boxes in bounding_boxes:
             if isinstance(ens_boxes, list):
                 ens_boxes = np.array(ens_boxes)
-            ens_boxes[:,0] = ens_boxes[:,0]*1.0/image_size[0]
-            ens_boxes[:,1] = ens_boxes[:,1]*1.0/image_size[1]
-            ens_boxes[:,2] = ens_boxes[:,2]*1.0/image_size[0]
-            ens_boxes[:,3] = ens_boxes[:,3]*1.0/image_size[1]
+            ens_boxes[:, 0] = ens_boxes[:, 0]*1.0/image_size[0]
+            ens_boxes[:, 1] = ens_boxes[:, 1]*1.0/image_size[1]
+            ens_boxes[:, 2] = ens_boxes[:, 2]*1.0/image_size[0]
+            ens_boxes[:, 3] = ens_boxes[:, 3]*1.0/image_size[1]
             normalized_boxes.append(ens_boxes)
         normalized_boxes = np.array(normalized_boxes)
     else:
@@ -239,17 +249,17 @@ def box_fusion(
 
     if mode == 'wbf':
         picked_boxes, picked_score, picked_classes = weighted_boxes_fusion(
-            normalized_boxes, 
-            confidence_score, 
-            labels, 
-            weights=weights, 
-            iou_thr=iou_threshold, 
-            conf_type='avg', #[nms|avf]
+            normalized_boxes,
+            confidence_score,
+            labels,
+            weights=weights,
+            iou_thr=iou_threshold,
+            conf_type='avg',  # [nms|avf]
             skip_box_thr=0.0001)
     elif mode == 'nms':
         picked_boxes, picked_score, picked_classes = nms(
-            normalized_boxes, 
-            confidence_score, 
+            normalized_boxes,
+            confidence_score,
             labels,
             weights=weights,
             iou_thr=iou_threshold)

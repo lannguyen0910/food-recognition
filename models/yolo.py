@@ -24,8 +24,10 @@ class Detect(nn.Module):
         self.grid = [torch.zeros(1)] * self.nl  # init grid
         a = torch.tensor(anchors).float().view(self.nl, -1, 2)
         self.register_buffer('anchors', a)  # shape(nl,na,2)
-        self.register_buffer('anchor_grid', a.clone().view(self.nl, 1, -1, 1, 1, 2))  # shape(nl,1,na,1,1,2)
-        self.m = nn.ModuleList(nn.Conv2d(x, self.no * self.na, 1) for x in ch)  # output conv
+        self.register_buffer('anchor_grid', a.clone().view(
+            self.nl, 1, -1, 1, 1, 2))  # shape(nl,1,na,1,1,2)
+        self.m = nn.ModuleList(nn.Conv2d(x, self.no * self.na, 1)
+                               for x in ch)  # output conv
         self.export = False  # onnx export
 
     def forward(self, x):
@@ -35,15 +37,18 @@ class Detect(nn.Module):
         for i in range(self.nl):
             x[i] = self.m[i](x[i])  # conv
             bs, _, ny, nx = x[i].shape  # x(bs,255,20,20) to x(bs,3,20,20,85)
-            x[i] = x[i].view(bs, self.na, self.no, ny, nx).permute(0, 1, 3, 4, 2).contiguous()
+            x[i] = x[i].view(bs, self.na, self.no, ny, nx).permute(
+                0, 1, 3, 4, 2).contiguous()
 
             if not self.training:  # inference
                 if self.grid[i].shape[2:4] != x[i].shape[2:4]:
                     self.grid[i] = self._make_grid(nx, ny).to(x[i].device)
 
                 y = x[i].sigmoid()
-                y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i].to(x[i].device)) * self.stride[i]  # xy
-                y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * self.anchor_grid[i]  # wh
+                y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 +
+                               self.grid[i].to(x[i].device)) * self.stride[i]  # xy
+                y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * \
+                    self.anchor_grid[i]  # wh
                 z.append(y.view(bs, -1, self.no))
 
         return x if self.training else (torch.cat(z, 1), x)
@@ -55,7 +60,8 @@ class Detect(nn.Module):
 
 
 class Yolov4(nn.Module):
-    def __init__(self, cfg='yolov4-p5.yaml', ch=3, nc=None):  # model, input channels, number of classes
+    # model, input channels, number of classes
+    def __init__(self, cfg='yolov4-p5.yaml', ch=3, nc=None):
         super(Yolov4, self).__init__()
         if isinstance(cfg, dict):
             self.yaml = cfg  # model dict
@@ -69,14 +75,16 @@ class Yolov4(nn.Module):
         if nc and nc != self.yaml['nc']:
             # print('Overriding %s nc=%g with nc=%g' % (cfg, self.yaml['nc'], nc))
             self.yaml['nc'] = nc  # override yaml value
-        self.model, self.save = parse_model(deepcopy(self.yaml), ch=[ch])  # model, savelist, ch_out
+        self.model, self.save = parse_model(
+            deepcopy(self.yaml), ch=[ch])  # model, savelist, ch_out
         # print([x.shape for x in self.forward(torch.zeros(1, ch, 64, 64))])
 
         # Build strides, anchors
         m = self.model[-1]  # Detect()
         if isinstance(m, Detect):
             s = 256  # 2x min stride
-            m.stride = torch.tensor([s / x.shape[-2] for x in self.forward(torch.zeros(1, ch, s, s))])  # forward
+            m.stride = torch.tensor(
+                [s / x.shape[-2] for x in self.forward(torch.zeros(1, ch, s, s))])  # forward
             m.anchors /= m.stride.view(-1, 1, 1)
             check_anchor_order(m)
             self.stride = m.stride
@@ -95,18 +103,22 @@ class Yolov4(nn.Module):
         y, dt = [], []  # outputs
         for m in self.model:
             if m.f != -1:  # if not from previous layer
-                x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
+                x = y[m.f] if isinstance(m.f, int) else [
+                    x if j == -1 else y[j] for j in m.f]  # from earlier layers
             x = m(x)  # run
             y.append(x if m.i in self.save else None)  # save output
         return x
 
-    def _initialize_biases(self, cf=None):  # initialize biases into Detect(), cf is class frequency
+    # initialize biases into Detect(), cf is class frequency
+    def _initialize_biases(self, cf=None):
         # cf = torch.bincount(torch.tensor(np.concatenate(dataset.labels, 0)[:, 0]).long(), minlength=nc) + 1.
         m = self.model[-1]  # Detect() module
         for mi, s in zip(m.m, m.stride):  # from
             b = mi.bias.view(m.na, -1)  # conv.bias(255) to (3,85)
-            b[:, 4].data += math.log(8 / (640 / s) ** 2)  # obj (8 objects per 640 image)
-            b[:, 5:].data += math.log(0.6 / (m.nc - 0.99)) if cf is None else torch.log(cf / cf.sum())  # cls
+            # obj (8 objects per 640 image)
+            b[:, 4].data += math.log(8 / (640 / s) ** 2)
+            b[:, 5:].data += math.log(0.6 / (m.nc - 0.99)
+                                      ) if cf is None else torch.log(cf / cf.sum())  # cls
             mi.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
 
     # def _print_biases(self):
@@ -138,11 +150,13 @@ class Yolov4(nn.Module):
 def parse_model(d, ch):  # model_dict, input_channels(3)
     # print('\n%3s%18s%3s%10s  %-40s%-30s' % ('', 'from', 'n', 'params', 'module', 'arguments'))
     anchors, nc, gd, gw = d['anchors'], d['nc'], d['depth_multiple'], d['width_multiple']
-    na = (len(anchors[0]) // 2) if isinstance(anchors, list) else anchors  # number of anchors
+    na = (len(anchors[0]) // 2) if isinstance(anchors,
+                                              list) else anchors  # number of anchors
     no = na * (nc + 5)  # number of outputs = anchors * (classes + 5)
 
     layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
-    for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args
+    # from, number, module, args
+    for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):
         m = eval(m) if isinstance(m, str) else m  # eval strings
         for j, a in enumerate(args):
             try:
@@ -190,12 +204,15 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         else:
             c2 = ch[f]
 
-        m_ = nn.Sequential(*[m(*args) for _ in range(n)]) if n > 1 else m(*args)  # module
+        m_ = nn.Sequential(*[m(*args) for _ in range(n)]
+                           ) if n > 1 else m(*args)  # module
         t = str(m)[8:-2].replace('__main__.', '')  # module type
         np = sum([x.numel() for x in m_.parameters()])  # number params
-        m_.i, m_.f, m_.type, m_.np = i, f, t, np  # attach index, 'from' index, type, number params
+        # attach index, 'from' index, type, number params
+        m_.i, m_.f, m_.type, m_.np = i, f, t, np
         # print('%3s%18s%3s%10.0f  %-40s%-30s' % (i, f, n, np, t, args))  # print
-        save.extend(x % i for x in ([f] if isinstance(f, int) else f) if x != -1)  # append to savelist
+        save.extend(x % i for x in ([f] if isinstance(
+            f, int) else f) if x != -1)  # append to savelist
         layers.append(m_)
         if m in [HarDBlock, HarDBlock2]:
             c2 = m_.get_out_ch()
@@ -204,12 +221,16 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             ch.append(c2)
     return nn.Sequential(*layers), sorted(save)
 
+
 """
 YOLO-V5
 """
-class Yolov5(nn.Module):
-    def __init__(self, cfg='yolov5s.yaml', ch=3, nc=None, anchors=None):  # model, input channels, number of classes
-        super(Yolov5, self).__init__()
+
+
+class Model(nn.Module):
+    # model, input channels, number of classes
+    def __init__(self, cfg='yolov5s.yaml', ch=3, nc=None, anchors=None):
+        super(Model, self).__init__()
         if isinstance(cfg, dict):
             self.yaml = cfg  # model dict
         else:  # is *.yaml
@@ -224,7 +245,8 @@ class Yolov5(nn.Module):
             self.yaml['nc'] = nc  # override yaml value
         if anchors:
             self.yaml['anchors'] = round(anchors)  # override yaml value
-        self.model, self.save = parse_model_v5(deepcopy(self.yaml), ch=[ch])  # model, savelist
+        self.model, self.save = parse_model_v5(
+            deepcopy(self.yaml), ch=[ch])  # model, savelist
         self.names = [str(i) for i in range(self.yaml['nc'])]  # default names
         self.inplace = self.yaml.get('inplace', True)
 
@@ -233,7 +255,8 @@ class Yolov5(nn.Module):
         if isinstance(m, Detect):
             s = 256  # 2x min stride
             m.inplace = self.inplace
-            m.stride = torch.tensor([s / x.shape[-2] for x in self.forward(torch.zeros(1, ch, s, s))])  # forward
+            m.stride = torch.tensor(
+                [s / x.shape[-2] for x in self.forward(torch.zeros(1, ch, s, s))])  # forward
             m.anchors /= m.stride.view(-1, 1, 1)
             check_anchor_order(m)
             self.stride = m.stride
@@ -246,7 +269,8 @@ class Yolov5(nn.Module):
         if augment:
             return self.forward_augment(x)  # augmented inference, None
         else:
-            return self.forward_once(x, profile)  # single-scale inference, train
+            # single-scale inference, train
+            return self.forward_once(x, profile)
 
     def forward_augment(self, x):
         img_size = x.shape[-2:]  # height, width
@@ -254,7 +278,8 @@ class Yolov5(nn.Module):
         f = [None, 3, None]  # flips (2-ud, 3-lr)
         y = []  # outputs
         for si, fi in zip(s, f):
-            xi = scale_img(x.flip(fi) if fi else x, si, gs=int(self.stride.max()))
+            xi = scale_img(x.flip(fi) if fi else x, si,
+                           gs=int(self.stride.max()))
             yi = self.forward_once(xi)[0]  # forward
             # cv2.imwrite(f'img_{si}.jpg', 255 * xi[0].cpu().numpy().transpose((1, 2, 0))[:, :, ::-1])  # save
             yi = self._descale_pred(yi, fi, si, img_size)
@@ -265,7 +290,8 @@ class Yolov5(nn.Module):
         y, dt = [], []  # outputs
         for m in self.model:
             if m.f != -1:  # if not from previous layer
-                x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
+                x = y[m.f] if isinstance(m.f, int) else [
+                    x if j == -1 else y[j] for j in m.f]  # from earlier layers
 
             if profile:
                 # o = thop.profile(m, inputs=(x,), verbose=False)[0] / 1E9 * 2 if thop else 0  # FLOPs
@@ -287,7 +313,8 @@ class Yolov5(nn.Module):
             elif flips == 3:
                 p[..., 0] = img_size[1] - p[..., 0]  # de-flip lr
         else:
-            x, y, wh = p[..., 0:1] / scale, p[..., 1:2] / scale, p[..., 2:4] / scale  # de-scale
+            x, y, wh = p[..., 0:1] / scale, p[..., 1:2] / \
+                scale, p[..., 2:4] / scale  # de-scale
             if flips == 2:
                 y = img_size[0] - y  # de-flip ud
             elif flips == 3:
@@ -295,21 +322,24 @@ class Yolov5(nn.Module):
             p = torch.cat((x, y, wh, p[..., 4:]), -1)
         return p
 
-    def _initialize_biases(self, cf=None):  # initialize biases into Detect(), cf is class frequency
+    # initialize biases into Detect(), cf is class frequency
+    def _initialize_biases(self, cf=None):
         # https://arxiv.org/abs/1708.02002 section 3.3
         # cf = torch.bincount(torch.tensor(np.concatenate(dataset.labels, 0)[:, 0]).long(), minlength=nc) + 1.
         m = self.model[-1]  # Detect() module
         for mi, s in zip(m.m, m.stride):  # from
             b = mi.bias.view(m.na, -1)  # conv.bias(255) to (3,85)
-            b.data[:, 4] += math.log(8 / (640 / s) ** 2)  # obj (8 objects per 640 image)
-            b.data[:, 5:] += math.log(0.6 / (m.nc - 0.99)) if cf is None else torch.log(cf / cf.sum())  # cls
+            # obj (8 objects per 640 image)
+            b.data[:, 4] += math.log(8 / (640 / s) ** 2)
+            b.data[:, 5:] += math.log(0.6 / (m.nc - 0.99)
+                                      ) if cf is None else torch.log(cf / cf.sum())  # cls
             mi.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
 
     def _print_biases(self):
         m = self.model[-1]  # Detect() module
         for mi in m.m:  # from
             b = mi.bias.detach().view(m.na, -1).T  # conv.bias(255) to (3,85)
-    
+
     def fuse(self):  # fuse model Conv2d() + BatchNorm2d() layers
         for m in self.model.modules():
             if type(m) is Conv and hasattr(m, 'bn'):
@@ -322,14 +352,17 @@ class Yolov5(nn.Module):
     def info(self, verbose=False, img_size=640):  # print model information
         model_info(self, verbose, img_size)
 
+
 def parse_model_v5(d, ch):  # model_dict, input_channels(3)
     # logger.info('\n%3s%18s%3s%10s  %-40s%-30s' % ('', 'from', 'n', 'params', 'module', 'arguments'))
     anchors, nc, gd, gw = d['anchors'], d['nc'], d['depth_multiple'], d['width_multiple']
-    na = (len(anchors[0]) // 2) if isinstance(anchors, list) else anchors  # number of anchors
+    na = (len(anchors[0]) // 2) if isinstance(anchors,
+                                              list) else anchors  # number of anchors
     no = na * (nc + 5)  # number of outputs = anchors * (classes + 5)
 
     layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
-    for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args
+    # from, number, module, args
+    for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):
         m = eval(m) if isinstance(m, str) else m  # eval strings
         for j, a in enumerate(args):
             try:
@@ -338,7 +371,7 @@ def parse_model_v5(d, ch):  # model_dict, input_channels(3)
                 pass
 
         n = max(round(n * gd), 1) if n > 1 else n  # depth gain
-        if m in [Conv, GhostConv, Bottleneck, GhostBottleneck, SPP, DWConv, MixConv2d, Focus, CrossConv, BottleneckCSP,
+        if m in [Conv, GhostConv, Bottleneck, GhostBottleneck, SPP, SPPF, DWConv, MixConv2d, Focus, CrossConv, BottleneckCSP,
                  C3, C3TR]:
             c1, c2 = ch[f], args[0]
             if c2 != no:  # if not output
@@ -363,11 +396,14 @@ def parse_model_v5(d, ch):  # model_dict, input_channels(3)
         else:
             c2 = ch[f]
 
-        m_ = nn.Sequential(*[m(*args) for _ in range(n)]) if n > 1 else m(*args)  # module
+        m_ = nn.Sequential(*[m(*args) for _ in range(n)]
+                           ) if n > 1 else m(*args)  # module
         t = str(m)[8:-2].replace('__main__.', '')  # module type
         np = sum([x.numel() for x in m_.parameters()])  # number params
-        m_.i, m_.f, m_.type, m_.np = i, f, t, np  # attach index, 'from' index, type, number params
-        save.extend(x % i for x in ([f] if isinstance(f, int) else f) if x != -1)  # append to savelist
+        # attach index, 'from' index, type, number params
+        m_.i, m_.f, m_.type, m_.np = i, f, t, np
+        save.extend(x % i for x in ([f] if isinstance(
+            f, int) else f) if x != -1)  # append to savelist
         layers.append(m_)
         if i == 0:
             ch = []
@@ -375,11 +411,12 @@ def parse_model_v5(d, ch):  # model_dict, input_channels(3)
     return nn.Sequential(*layers), sorted(save)
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', type=str, default='yolov4-p5.yaml', help='model.yaml')
-    parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    parser.add_argument('--cfg', type=str,
+                        default='yolov4-p5.yaml', help='model.yaml')
+    parser.add_argument('--device', default='',
+                        help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     opt = parser.parse_args()
     opt.cfg = check_file(opt.cfg)  # check file
     device = select_device(opt.device)
@@ -402,4 +439,3 @@ if __name__ == '__main__':
     # print("Run 'tensorboard --logdir=models/runs' to view tensorboard at http://localhost:6006/")
     # tb_writer.add_graph(model.model, img)  # add model to tensorboard
     # tb_writer.add_image('test', img[0], dataformats='CWH')  # add model to tensorboard
-    

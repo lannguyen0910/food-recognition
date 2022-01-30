@@ -1,4 +1,4 @@
-from model.utils.getter import *
+from utilities.utils.getter import *
 import argparse
 
 parser = argparse.ArgumentParser(description='Perfom Objet Detection')
@@ -127,15 +127,13 @@ def detect(args, config):
         collate_fn=testset.collate_fn
     )
 
-    class_names, num_classes = get_class_names(args.weight)
+    class_names, num_classes = config.names, config.nc
     class_names.insert(0, 'Background')
 
     if DETECTOR is None or DETECTOR.model_name != config.model_name:
         net = get_model(args, config, num_classes=num_classes)
         DETECTOR = Detector(model=net, freeze=True, device=device)
-        load_checkpoint(DETECTOR, args.weight)
-        # Print info
-        print(config)
+        # load_checkpoint(DETECTOR, args.weight)
 
     DETECTOR.eval()
 
@@ -157,7 +155,6 @@ def detect(args, config):
                     img_h = batch['image_hs'][idx]
                     img_ori_ws = batch['image_ori_ws'][idx]
                     img_ori_hs = batch['image_ori_hs'][idx]
-
                     outputs = postprocessing(
                         outputs,
                         current_img_size=[img_w, img_h],
@@ -172,6 +169,9 @@ def detect(args, config):
                     boxes = outputs['bboxes']
                     labels = outputs['classes']
                     scores = outputs['scores']
+                    print('Boxes: ', boxes)
+                    print('labels: ', labels)
+                    print('scores: ', scores)
 
                     for (box, label, score) in zip(boxes, labels, scores):
                         result_dict['boxes'].append(box)
@@ -184,5 +184,5 @@ def detect(args, config):
 
                 pbar.update(1)
                 pbar.set_description(f'Empty images: {empty_imgs}')
-
+    print('Result dict: ', result_dict)
     return result_dict
