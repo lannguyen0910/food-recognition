@@ -84,7 +84,8 @@ food-detection-yolov5
 
 ## 📔  **Notebook**
 - For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
-- For training, refer to this notebook i use for training [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
+- For training, refer to this notebook for your own training [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
+- For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)
  ## 🌟 **Inference on local machine (GPU or CPU)**
 - Clone the repo.
 ```
@@ -112,20 +113,8 @@ run.bat
 ```
 gpu: True
 ```
-## 🌟 **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
-- Example usage:
-```
-pip install onnx>=1.9.0 onnx-simplifier>=0.3.6
-python tools/export.py --weights yolov5s_best.pt --imgsz 640 --include onnx
-```
 
-```
-python tools/export.py --weights yolov5s_best.pt --imgsz 320 320 --include torchscript
-```
-
-- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)
-
-## 🌟 **Datasets**
+## 🌟 **Dataset**
 - Datasets: [detection-dataset](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged 2 datasets) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing) (MAFood121)
 
 ## 🌟 **Dataset details**
@@ -201,12 +190,12 @@ When a dish is predicted, we provide more information about the nutritional leve
  
 - Valset: 
 
-| Models  | Image Size | Epochs    | mAP@0.5  | mAP@0.5:0.95 |
-| ------- | :--------: | :------: | :------: | :----------: | 
-| YOLOv5s |  640x640   |  172        | 94.36 |   72.08      |  
-| YOLOv5m |  640x640   |    112      | 93.01  |   71.88      |  
-| YOLOv5l |  640x640   |      118    |  96.55  |   78.75      | 
-| YOLOv5x |  640x640   |    62     |  83.56  |    60.11     |
+| Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
+| ------- | :--------: | :----: | :-----: | :----------: |
+| YOLOv5s |  640x640   |  172   |  94.36  |    72.08     |
+| YOLOv5m |  640x640   |  112   |  93.01  |    71.88     |
+| YOLOv5l |  640x640   |  118   |  96.55  |    78.75     |
+| YOLOv5x |  640x640   |   62   |  83.56  |    60.11     |
 
 ---
 
@@ -217,7 +206,7 @@ When a dish is predicted, we provide more information about the nutritional leve
 | YOLOv5s |  640x640   |   6.3    |   28.4    |   30.3   |     30.5     |
 | YOLOv5m |  640x640   |   7.5    |   28.7    |   30.6   |     30.9     |
 | YOLOv5l |  640x640   |   38.4   |   46.8    |   57.9   |     57.5     |
-| YOLOv5x |  640x640   |   55.0   |   48.9    |   59.8   |     55.1     | -->
+| YOLOv5x |  640x640   |   55.0   |   48.9    |   59.8   |     55.1     | --> |
 </details>
 
 We conclude that the learned models are quite good compared to such huge data with such a variety of dishes, and their complexity is also guaranteed to be suitable for practical applications. We show that the system is scalable and has high practical significance for the people of Vietnam in particular and the world in general.

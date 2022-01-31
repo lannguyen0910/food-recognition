@@ -27,14 +27,16 @@ def select_device(device='', batch_size=None):
     cpu_request = device.lower() == 'cpu'
     if device and not cpu_request:  # if device requested other than 'cpu'
         os.environ['CUDA_VISIBLE_DEVICES'] = device  # set environment variable
-        assert torch.cuda.is_available(), 'CUDA unavailable, invalid device %s requested' % device  # check availablity
+        assert torch.cuda.is_available(
+        ), 'CUDA unavailable, invalid device %s requested' % device  # check availablity
 
     cuda = False if cpu_request else torch.cuda.is_available()
     if cuda:
         c = 1024 ** 2  # bytes to MB
         ng = torch.cuda.device_count()
         if ng > 1 and batch_size:  # check that batch_size is compatible with device_count
-            assert batch_size % ng == 0, 'batch-size %g not multiple of GPU count %g' % (batch_size, ng)
+            assert batch_size % ng == 0, 'batch-size %g not multiple of GPU count %g' % (
+                batch_size, ng)
         x = [torch.cuda.get_device_properties(i) for i in range(ng)]
         s = 'Using CUDA '
         for i in range(0, ng):
@@ -67,7 +69,8 @@ def initialize_weights(model):
     for m in model.modules():
         t = type(m)
         if t is nn.Conv2d:
-            pass  # nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            # nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            pass
         elif t is nn.BatchNorm2d:
             m.eps = 1e-3
             m.momentum = 0.03
@@ -114,35 +117,47 @@ def fuse_conv_and_bn(conv, bn):
         # prepare filters
         w_conv = conv.weight.clone().view(conv.out_channels, -1)
         w_bn = torch.diag(bn.weight.div(torch.sqrt(bn.eps + bn.running_var)))
-        fusedconv.weight.copy_(torch.mm(w_bn, w_conv).view(fusedconv.weight.size()))
+        fusedconv.weight.copy_(
+            torch.mm(w_bn, w_conv).view(fusedconv.weight.size()))
 
         # prepare spatial bias
-        b_conv = torch.zeros(conv.weight.size(0), device=conv.weight.device) if conv.bias is None else conv.bias
-        b_bn = bn.bias - bn.weight.mul(bn.running_mean).div(torch.sqrt(bn.running_var + bn.eps))
-        fusedconv.bias.copy_(torch.mm(w_bn, b_conv.reshape(-1, 1)).reshape(-1) + b_bn)
+        b_conv = torch.zeros(conv.weight.size(
+            0), device=conv.weight.device) if conv.bias is None else conv.bias
+        b_bn = bn.bias - \
+            bn.weight.mul(bn.running_mean).div(
+                torch.sqrt(bn.running_var + bn.eps))
+        fusedconv.bias.copy_(
+            torch.mm(w_bn, b_conv.reshape(-1, 1)).reshape(-1) + b_bn)
 
         return fusedconv
 
 
-def model_info(model, verbose=False):
-    # Plots a line-by-line description of a PyTorch model
+def model_info(model, verbose=False, img_size=640):
+    # Model information. img_size may be int or list, i.e. img_size=640 or img_size=[640, 320]
     n_p = sum(x.numel() for x in model.parameters())  # number parameters
-    n_g = sum(x.numel() for x in model.parameters() if x.requires_grad)  # number gradients
+    n_g = sum(x.numel() for x in model.parameters()
+              if x.requires_grad)  # number gradients
     if verbose:
-        print('%5s %40s %9s %12s %20s %10s %10s' % ('layer', 'name', 'gradient', 'parameters', 'shape', 'mu', 'sigma'))
+        print(f"{'layer':>5} {'name':>40} {'gradient':>9} {'parameters':>12} {'shape':>20} {'mu':>10} {'sigma':>10}")
         for i, (name, p) in enumerate(model.named_parameters()):
             name = name.replace('module_list.', '')
             print('%5g %40s %9s %12g %20s %10.3g %10.3g' %
                   (i, name, p.requires_grad, p.numel(), list(p.shape), p.mean(), p.std()))
 
-    try:  # FLOPS
+    try:  # FLOPs
         from thop import profile
-        flops = profile(deepcopy(model), inputs=(torch.zeros(1, 3, 64, 64),), verbose=False)[0] / 1E9 * 2
-        fs = ', %.1f GFLOPS' % (flops * 100)  # 640x640 FLOPS
-    except:
+        stride = max(int(model.stride.max()), 32) if hasattr(
+            model, 'stride') else 32
+        img = torch.zeros((1, model.yaml.get('ch', 3), stride, stride), device=next(
+            model.parameters()).device)  # input
+        flops = profile(deepcopy(model), inputs=(img,), verbose=False)[
+            0] / 1E9 * 2  # stride GFLOPs
+        img_size = img_size if isinstance(img_size, list) else [
+            img_size, img_size]  # expand if int/float
+        fs = ', %.1f GFLOPs' % (
+            flops * img_size[0] / stride * img_size[1] / stride)  # 640x640 GFLOPs
+    except (ImportError, Exception):
         fs = ''
-
-    print('Model Summary: %g layers, %g parameters, %g gradients%s' % (len(list(model.parameters())), n_p, n_g, fs))
 
 
 def load_classifier(name='resnet101', n=2):
@@ -173,11 +188,13 @@ def scale_img(img, ratio=1.0, same_shape=False):  # img(16,3,256,416), r=ratio
     else:
         h, w = img.shape[2:]
         s = (int(h * ratio), int(w * ratio))  # new size
-        img = F.interpolate(img, size=s, mode='bilinear', align_corners=False)  # resize
+        img = F.interpolate(img, size=s, mode='bilinear',
+                            align_corners=False)  # resize
         if not same_shape:  # pad/crop img
-            gs = 128#64#32  # (pixels) grid size
+            gs = 128  # 64#32  # (pixels) grid size
             h, w = [math.ceil(x * ratio / gs) * gs for x in (h, w)]
-        return F.pad(img, [0, w - s[1], 0, h - s[0]], value=0.447)  # value = imagenet mean
+        # value = imagenet mean
+        return F.pad(img, [0, w - s[1], 0, h - s[0]], value=0.447)
 
 
 def copy_attr(a, b, include=(), exclude=()):
@@ -201,11 +218,13 @@ class ModelEMA:
 
     def __init__(self, model, decay=0.9999, updates=0):
         # Create EMA
-        self.ema = deepcopy(model.module if is_parallel(model) else model).eval()  # FP32 EMA
+        self.ema = deepcopy(model.module if is_parallel(
+            model) else model).eval()  # FP32 EMA
         # if next(model.parameters()).device.type != 'cpu':
         #     self.ema.half()  # FP16 EMA
         self.updates = updates  # number of EMA updates
-        self.decay = lambda x: decay * (1 - math.exp(-x / 2000))  # decay exponential ramp (to help early epochs)
+        # decay exponential ramp (to help early epochs)
+        self.decay = lambda x: decay * (1 - math.exp(-x / 2000))
         for p in self.ema.parameters():
             p.requires_grad_(False)
 
@@ -215,7 +234,8 @@ class ModelEMA:
             self.updates += 1
             d = self.decay(self.updates)
 
-            msd = model.module.state_dict() if is_parallel(model) else model.state_dict()  # model state_dict
+            msd = model.module.state_dict() if is_parallel(
+                model) else model.state_dict()  # model state_dict
             for k, v in self.ema.state_dict().items():
                 if v.dtype.is_floating_point:
                     v *= d
