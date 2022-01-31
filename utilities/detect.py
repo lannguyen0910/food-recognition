@@ -169,9 +169,6 @@ def detect(args, config):
                     boxes = outputs['bboxes']
                     labels = outputs['classes']
                     scores = outputs['scores']
-                    print('Boxes: ', boxes)
-                    print('labels: ', labels)
-                    print('scores: ', scores)
 
                     for (box, label, score) in zip(boxes, labels, scores):
                         result_dict['boxes'].append(box)

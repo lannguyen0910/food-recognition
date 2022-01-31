@@ -11,7 +11,7 @@ from utilities import (
     VideoPipeline)
 from api import get_info_from_db
 
-CACHE_DIR = '.cache'
+CACHE_DIR = './.cache'
 CSV_FOLDER = './static/csv'
 METADATA_FOLDER = './static/metadata'
 

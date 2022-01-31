@@ -214,10 +214,10 @@ def download_weights(id_or_url, cached=None, md5=None, quiet=False):
 
 # https://drive.google.com/file/d/1uIp1Kl1xWsVqiE2tDPChEnTo1ZOwC0Jv/view?usp=sharing
 weight_url = {
-    'yolov5s': "1uIp1Kl1xWsVqiE2tDPChEnTo1ZOwC0Jv",
-    "yolov5m": "1B-lJUU0h96z_UVxCcpI5mKD8j0OX6yVR",
-    "yolov5l": "1-me51mvmgWnOSlysLMdKRFWeRu-0ZWf_",
-    "yolov5x": "1-mz9V9Y69k2isJLe-gn5OQcWzxaDMw3N",
+    'yolov5s': "1rISMag8OCM5v99TYuavAobm3LkwjtAi9",
+    "yolov5m": "1I649VGqkam_IcCCW8WUA965vPrW_pqDX",
+    "yolov5l": "1sBciFcRav2ZE6jzhWnca9uegjQ4860om",
+    "yolov5x": "1CRD6T9QtH9XEa-h985_Ho6jgLWu58zn0",
     "se_resnet": "1SjWV-tZ980n7t0K68Lfpu5j9sw5-E2Gs"
 }
 

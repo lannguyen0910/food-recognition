@@ -27,8 +27,10 @@ def get_model(args, config, num_classes):
         os.makedirs(CACHE_DIR, exist_ok=True)
         args.weight = os.path.join(CACHE_DIR, f'{config.model_name}.pt')
         download_pretrained_weights(f'{config.model_name}', args.weight)
+    version_name = config.model_name.split('v')[1]
 
     net = YoloBackbone(
+        version_name=version_name,
         weight=args.weight,
         num_classes=NUM_CLASSES,
         max_pre_nms=max_pre_nms,
@@ -93,6 +95,7 @@ class BaseTimmModel(nn.Module):
 class YoloBackbone(BaseBackbone):
     def __init__(
             self,
+            version_name,
             weight,
             num_classes=80,
             max_pre_nms=None,
@@ -109,13 +112,23 @@ class YoloBackbone(BaseBackbone):
             max_post_nms = 500
         self.max_post_nms = max_post_nms
 
-        self.model = torch.hub.load(
-            'ultralytics/yolov5', 'custom', path=weight, force_reload=True)
+        version = version_name[0]
+        if version == '4':
+            version_mode = version_name.split('-')[1]
+            self.name = f'yolov4-{version_mode}'
+            self.model = Yolov4(
+                cfg=f'./models/configs/yolov4-{version_mode}.yaml', ch=3, nc=num_classes
+            )
+        elif version == '5':
+            version_mode = version_name[-1]
+            self.name = f'yolov5{version_mode}'
+            self.model = Model(
+                cfg=f'./models/configs/yolov5{version_mode}.yaml', ch=3, nc=num_classes
+            )
 
-        self.class_names = self.model.names
-        self.model.multi_label = False  # NMS multiple labels per box
-        # maximum number of detections per image
-        self.model.max_det = self.max_post_nms
+        ckpt = torch.load(weight, map_location='cpu')
+        self.model.load_state_dict(
+            ckpt['model'].state_dict(), strict=False)  # load state_dict
 
         self.loss_fn = YoloLoss(
             num_classes=num_classes,
