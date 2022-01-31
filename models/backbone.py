@@ -28,8 +28,10 @@ def get_model(args, config, num_classes):
         args.weight = os.path.join(CACHE_DIR, f'{config.model_name}.pt')
         download_pretrained_weights(f'{config.model_name}', args.weight)
     version_name = config.model_name.split('v')[1]
+    use_gpu = config.gpu  # False is use CPU
 
     net = YoloBackbone(
+        use_gpu=use_gpu,
         version_name=version_name,
         weight=args.weight,
         num_classes=NUM_CLASSES,
@@ -95,6 +97,7 @@ class BaseTimmModel(nn.Module):
 class YoloBackbone(BaseBackbone):
     def __init__(
             self,
+            use_gpu,
             version_name,
             weight,
             num_classes=80,
@@ -125,8 +128,11 @@ class YoloBackbone(BaseBackbone):
             self.model = Model(
                 cfg=f'./models/configs/yolov5{version_mode}.yaml', ch=3, nc=num_classes
             )
-
-        ckpt = torch.load(weight, map_location='cpu')
+        if not use_gpu:
+            map_loc = 'cpu'
+        else:
+            map_loc = None
+        ckpt = torch.load(weight, map_location=map_loc)
         self.model.load_state_dict(
             ckpt['model'].state_dict(), strict=False)  # load state_dict
 

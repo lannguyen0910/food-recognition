@@ -373,9 +373,9 @@ def get_video_prediction(
     if config is None:
         print("Config not found. Load configs from configs/configs.yaml")
         config = Config(os.path.join(
-            'utilities/configs', 'train_detection.yaml'))
+            'utilities/configs', 'configs.yaml'))
     else:
-        print("Load configs from yaml file!")
+        print("Load configs!")
 
     args.input_path = input_path
     args.output_path = output_path
@@ -447,9 +447,7 @@ def get_prediction(
         save_cache(result_dict, hashed_key)
         print(f"Save cache to {hashed_key}")
 
-    print('Class names: ', class_names)
     class_names.insert(0, "Background")
-    print('After insert: ', class_names)
 
     # post process
     result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)

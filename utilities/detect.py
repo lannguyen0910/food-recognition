@@ -181,5 +181,4 @@ def detect(args, config):
 
                 pbar.update(1)
                 pbar.set_description(f'Empty images: {empty_imgs}')
-    print('Result dict: ', result_dict)
     return result_dict

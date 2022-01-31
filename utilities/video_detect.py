@@ -183,7 +183,7 @@ class VideoDetect:
                 num_classes=num_classes)
             self.num_classes = num_classes
             DETECTOR = Detector(model=net, device=self.device)
-            load_checkpoint(DETECTOR, args.weight)
+            # load_checkpoint(DETECTOR, args.weight)
         DETECTOR.eval()
 
     def run(self, batch):
