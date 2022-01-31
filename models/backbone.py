@@ -28,7 +28,6 @@ def get_model(args, config, num_classes):
         args.weight = os.path.join(CACHE_DIR, f'{config.model_name}.pt')
         download_pretrained_weights(f'{config.model_name}', args.weight)
 
-    version_name = config.model_name.split('v')[1]
     net = YoloBackbone(
         weight=args.weight,
         num_classes=NUM_CLASSES,
