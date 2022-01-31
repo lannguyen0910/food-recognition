@@ -9,8 +9,8 @@
  <a href="https://github.com/lannguyen0910/food-detection-yolov5/fork">
  <img src="https://img.shields.io/github/forks/lannguyen0910/food-detection-yolov5.svg?style=flat-square" alt="Forks"/>
  </a>
- <img src="https://visitor-badge.laobi.icu/badge?page_id=lannguyen0910.food-detection-yolov5" alt="visitors" />
- 
+<!--  <img src="https://visitor-badge.laobi.icu/badge?page_id=lannguyen0910.food-detection-yolov5" alt="visitors" />
+  -->
  <a><img  src="./demo/pipeline.png"></a>
   <br>
 </p>
