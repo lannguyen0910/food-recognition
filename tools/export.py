@@ -5,12 +5,12 @@ Usage:
     $ python path/to/export.py --weights yolov5s.pt --include torchscript
 """
 
-from model.models.yolo.utils.torch_utils import select_device
-from model.models.yolo.utils.general import (LOGGER, check_img_size, check_requirements, colorstr, file_size, print_args,
-                                             url2file)
-from model.models.yolo.utils.activations import SiLU
-from model.models.yolo.yolo import Detect
-from model.models.yolo.common import Conv
+from models.utils.torch_utils import select_device
+from models.utils.general import (LOGGER, check_img_size, check_requirements, colorstr, file_size, print_args,
+                                  url2file)
+from models.utils.activations import SiLU
+from models.yolo import Detect
+from models.common import Conv
 import argparse
 import os
 import sys
@@ -21,10 +21,10 @@ import torch
 import torch.nn as nn
 from torch.utils.mobile_optimizer import optimize_for_mobile
 import os
-from model.configs.configs import Config
-from model.models.detector import Detector
-from model.utils.getter import *
-from model.trainer.checkpoint import get_config, get_class_names
+from utilities.configs.configs import Config
+from models.detector import Detector
+from utilities.utils.getter import *
+from utilities.trainer.checkpoint import get_config, get_class_names
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -49,7 +49,7 @@ class Ensemble(nn.ModuleList):
 
 
 def attempt_load(weights, map_location=None, inplace=True, fuse=True):
-    from model.models.yolo.yolo import Detect, Yolov5
+    from models.yolo import Detect, Model
 
     # Loads an ensemble of models weights=[a,b,c] or a single model weights=[a] or weights=a
     model = Ensemble()
@@ -93,7 +93,7 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
 
     # Compatibility updates
     for m in model.modules():
-        if type(m) in [nn.Hardswish, nn.LeakyReLU, nn.ReLU, nn.ReLU6, nn.SiLU, Detect, Yolov5]:
+        if type(m) in [nn.Hardswish, nn.LeakyReLU, nn.ReLU, nn.ReLU6, nn.SiLU, Detect, Model]:
             m.inplace = inplace  # pytorch 1.7.0 compatibility
             if type(m) is Detect:
                 if not isinstance(m.anchor_grid, list):  # new Detect Layer compatibility
@@ -246,7 +246,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str,
-                        default=ROOT / 'yolov5s.pth', help='model.pth path(s)')
+                        default=ROOT / 'yolov5s.pt', help='model.pt path(s)')
     parser.add_argument('--include', nargs='+',
                         default=['torchscript'],
                         help='available formats are (torchscript)')

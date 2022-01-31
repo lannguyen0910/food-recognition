@@ -72,6 +72,9 @@ def get_info_from_db(food_list):
     for food_name in food_list:
         has_info = False
         for item in data['food']:
+            if '_' in str(food_name):
+                food_name = ' '.join(food_name.split('_'))
+
             if str.lower(food_name) == str.lower(item['name']):
                 for key in result_list.keys():
                     result_list[key].append(item['nutrients'][key])
