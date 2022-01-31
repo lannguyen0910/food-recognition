@@ -329,7 +329,7 @@ def label_enhancement(image, result_dict):
     new_id_list = []
 
     for box_id, (box, label) in enumerate(zip(boxes, labels)):
-        if label == 21:  # other food 31
+        if label == 34 or label == 65:  # perform classification on "food" label and "food-drinks" label
             cropped = crop_box(image, box)  # rgb
             img_list.append(cropped.copy())
             new_id_list.append(box_id)
