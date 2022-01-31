@@ -68,30 +68,23 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
+<strong><i>[31/01/2022]</i></strong> Update to new YOLOv5 version 5, 6. Can load checkpoints from original repo now 🤞.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android 🤞 <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app 🤞 <br>
  <strong><i>[16/07/2021]</i></strong> All trained checkpoints on custom data have been lost. Now use pretrained models on COCO for inference. 
 </details>
 
-🚨 **NOTE**:
-- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch.
-- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). The accuracy is still very low on our custom datasets, will update the weights gradually.
-- Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights.
-
-![image](https://user-images.githubusercontent.com/47696901/147828887-3ac3b310-3205-43d6-b805-70694c872b57.png)
-
+🚨 **UPDATE**:
+- WandB yolov5 training visualization (4 versions): <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a> 
+- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch (Not update yet).
+- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). 
+- The accuracy is very high on our custom datasets now (90 classes), will update new datasets in the future (for diversity).
+<!-- - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights. -->
 
 ## 📔  **Notebook**
-- For inference, use this notebook [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
-
-
-## 🌟 **Train YOLOv5 using our object detection's template**
-- Update new datasets: [detection-dataset](https://drive.google.com/drive/folders/1qivPtnHk6OpvsTyRUGOF1c2a86CMwBY1?usp=sharing) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing)
-- You can try merging all the train/val annatation.json files of all the datasets using this [module](https://github.com/lannguyen0910/food-detection-yolov5/blob/master/model/datasets/merge.py)
-- Remember when we train YOLOv5 in COCO format, not in YOLO format because the template supports for EfficientDet too: [detection-template](https://github.com/kaylode/custom-template/tree/detection) & [classification-template](https://github.com/kaylode/custom-template/tree/classification)
-- Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1gl_Y6nVKyfAhAgqxJdIIBeb02gu1BNYQ/view?usp=sharing)
- 
- ## 🌟 **Run on local machine (require CUDA)**
+- For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
+- For training, refer to this notebook i use for training [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
+ ## 🌟 **Inference on local machine (GPU or CPU)**
 - Clone the repo.
 ```
 git clone https://github.com/lannguyen0910/food-detection-yolov5
@@ -111,14 +104,13 @@ sudo apt-get install ffmpeg
 
 - Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
 ```
-python app.py --host=localhost:3000
-```
-
-Or run this command in your terminal to clear cache files after running.
-```
 run.bat
 ```
- 
+
+- Switch from ```CPU``` to ```GPU``` for faster inference, change 4 yolov5 config files in ```utilities/configs``` 
+```
+use_gpu: True
+```
 ## 🌟 **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
 - Example usage:
 ```
@@ -132,7 +124,7 @@ python tools/export.py --weights yolov5s_best.pt --imgsz 320 320 --include torch
 
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)
 
-## 🌟 **Datasets**
+## 🌟 **Dataset details**
 <details>
 <summary>To train the food detection model, we survey the following datasets:</summary>
   
