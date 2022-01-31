@@ -68,7 +68,7 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
-<strong><i>[31/01/2022]</i></strong> Update to new YOLOv5 version 5, 6. Can load checkpoints from original repo now 🤞.<br>
+<strong><i>[31/01/2022]</i></strong> Big refactor - Update to new YOLOv5 version 5, 6. Can load checkpoints from original repo now 🤞.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android 🤞 <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app 🤞 <br>
  <strong><i>[16/07/2021]</i></strong> All trained checkpoints on custom data have been lost. Now use pretrained models on COCO for inference. 
@@ -76,9 +76,10 @@ food-detection-yolov5
 
 🚨 **UPDATE**:
 - WandB yolov5 training visualization (4 versions): <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a> 
-- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch (Not update yet).
-- Best current [weights](https://drive.google.com/drive/folders/1gL16SVnLeI7cUnBMeK54JwKKOWiOybrc?usp=sharing). 
 - The accuracy is very high on our custom datasets now (90 classes), will update new datasets in the future (for diversity).
+- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch (Not update yet).
+- Best current [weights](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing). 
+
 <!-- - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights. -->
 
 ## 📔  **Notebook**
@@ -109,7 +110,7 @@ run.bat
 
 - Switch from ```CPU``` to ```GPU``` for faster inference, change 4 yolov5 config files in ```utilities/configs``` 
 ```
-use_gpu: True
+gpu: True
 ```
 ## 🌟 **Export Torchscript / Onnx / Bin-Param for [ncnn](https://github.com/Tencent/ncnn) usage**
 - Example usage:
@@ -123,6 +124,9 @@ python tools/export.py --weights yolov5s_best.pt --imgsz 320 320 --include torch
 ```
 
 - Open notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)
+
+## 🌟 **Datasets**
+- Datasets: [detection-dataset](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged 2 datasets) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing) (MAFood121)
 
 ## 🌟 **Dataset details**
 <details>
