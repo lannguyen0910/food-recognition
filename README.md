@@ -196,65 +196,29 @@ When a dish is predicted, we provide more information about the nutritional leve
 
 ## 📝 **Appendix**
 <details open>
-<summary>mAP of each model:</summary>
+<summary>mAP of each model. Visualization details at: <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a></summary>
   <br>
-  
-Due to hardware limitations, only two models YOLOv5s and YOLOv5m were trained on the entire dataset, the other two models, YOLOv5l and YOLOv5x, were trained on only a small set of data.
-  <br>
-  
-- Valset:
+ 
+- Valset: 
 
-| Models  | Image Size | mAPsmall | mAPmedium | mAPlarge | mAP@0.5:0.95 |
-| ------- | :--------: | :------: | :-------: | :------: | :----------: |
-| YOLOv5s |  640x640   |    5     |   29.7    |   31.1   |     31.5     |
-| YOLOv5m |  640x640   |   8.6    |   30.1    |   30.9   |     32.3     |
-| YOLOv5l |  640x640   |   16.7   |   51.9    |   52.0   |     56.0     |
-| YOLOv5x |  640x640   |   18.4   |    50     |   50.9   |     55.1     |
+| Models  | Image Size | Epochs    | mAP@0.5  | mAP@0.5:0.95 |
+| ------- | :--------: | :------: | :------: | :----------: | 
+| YOLOv5s |  640x640   |  172        | 94.36 |   72.08      |  
+| YOLOv5m |  640x640   |    112      | 93.01  |   71.88      |  
+| YOLOv5l |  640x640   |      118    |  96.55  |   78.75      | 
+| YOLOv5x |  640x640   |    62     |  83.56  |    60.11     |
 
 ---
 
-- Testset:
+<!-- - Testset (old version):
 
 | Models  | Image Size | mAPsmall | mAPmedium | mAPlarge | mAP@0.5:0.95 |
 | ------- | :--------: | :------: | :-------: | :------: | :----------: |
 | YOLOv5s |  640x640   |   6.3    |   28.4    |   30.3   |     30.5     |
 | YOLOv5m |  640x640   |   7.5    |   28.7    |   30.6   |     30.9     |
 | YOLOv5l |  640x640   |   38.4   |   46.8    |   57.9   |     57.5     |
-| YOLOv5x |  640x640   |   55.0   |   48.9    |   59.8   |     55.1     |
+| YOLOv5x |  640x640   |   55.0   |   48.9    |   59.8   |     55.1     | -->
 </details>
-<br>
-
-<details>
-  <summary>The loss and the learning rate through the loops of the 2 models YOLOv5l and YOLOv5x , have different values due to different image sizes:</summary>
-  <br>
-  
-  <img src="demo/yolov5l,x.PNG" width="100%" /> 
-</details>
-
-<details>
-  <summary>Losses and mAP of 2 models YOLOv5l and YOLOv5x:</summary>
-  <br>
-  
-  <img src="demo/yolov5l,x_val.PNG" width="100%" /> 
-  <br>
-  
-The results on valset are quite similar between the two models, the highest mAPsmall value belongs to YOLOv5x, because it was trained on a larger image. However, due to the limitation of Google Colab, and the number of parameters of these two models is quite high, the training has not been completed, the model has not really converged. We found that if the training was longer, there would be better results.
-  
-</details>
-
-<details>
-  <summary>The YOLOv5s and YOLOv5m models were trained on the entire large dataset and converged after 100 epochs, both trained with the same configuration. The result of the training process of YOLOv5s and YOLOv5m models are as follows:</summary>
-  <br>
-  
-
-  <img float="left" src="demo/yolov5s,m.png" width="50%"/>
-  <img float="right" src="demo/yolov5s,m_val.png" width="50%"/>
-  <br>
-  
-It was observed that the YOLOv5m model converged faster than the YOLOv5s, and also overfitted the data more quickly. The highest mAPmedium and mAPlarge values of the two models are also quite close, however YOLOv5m outperforms the other model in detecting small objects.
-
-</details>
-<br>
 
 We conclude that the learned models are quite good compared to such huge data with such a variety of dishes, and their complexity is also guaranteed to be suitable for practical applications. We show that the system is scalable and has high practical significance for the people of Vietnam in particular and the world in general.
 <br>
