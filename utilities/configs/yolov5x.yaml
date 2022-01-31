@@ -1,5 +1,6 @@
 settings:
-  nc: 90
+  nc: 90 # Number of classes
+  gpu: False # Use gpu for inference
 
   # class names
   names:

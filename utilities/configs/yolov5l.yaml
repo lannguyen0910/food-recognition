@@ -1,7 +1,7 @@
 settings:
-  nc: 90
-
-  # class names
+  nc: 90 # Number of classes
+  gpu: False # Use gpu for inference
+  # Class names
   names:
     [
       "hot-dog",
