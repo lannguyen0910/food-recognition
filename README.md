@@ -68,7 +68,7 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
-<strong><i>[31/01/2022]</i></strong> Big refactor - Update to new YOLOv5 version 5, 6. Can load checkpoints from original repo now 🤞.<br>
+<strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 version 5, 6. Can load checkpoints from original repo now 🤞.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android 🤞 <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app 🤞 <br>
  <strong><i>[16/07/2021]</i></strong> All trained checkpoints on custom data have been lost. Now use pretrained models on COCO for inference. 
@@ -192,10 +192,10 @@ When a dish is predicted, we provide more information about the nutritional leve
 
 | Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
 | ------- | :--------: | :----: | :-----: | :----------: |
-| YOLOv5s |  640x640   |  172   |  94.36  |    72.08     |
-| YOLOv5m |  640x640   |  112   |  93.01  |    71.88     |
-| YOLOv5l |  640x640   |  118   |  96.55  |    78.75     |
-| YOLOv5x |  640x640   |   62   |  83.56  |    60.11     |
+| YOLOv5s |  640x640   |  172   |  90.7   |    67.1     |
+| YOLOv5m |  640x640   |  112   |  89.7   |    66.6     |
+| YOLOv5l |  640x640   |  118   |  94     |      73     |
+| YOLOv5x |  640x640   |   62   |  0.219  |   0.164     |
 
 ---
 
