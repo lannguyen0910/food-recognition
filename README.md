@@ -195,9 +195,8 @@ When a dish is predicted, we provide more information about the nutritional leve
 | YOLOv5s |  640x640   |  172   |  90.7   |    67.1     |
 | YOLOv5m |  640x640   |  112   |  89.7   |    66.6     |
 | YOLOv5l |  640x640   |  118   |  94     |      73     |
-| YOLOv5x |  640x640   |   62   |  0.219  |   0.164     |
+| YOLOv5x |  640x640   |   62   |  77.9  |    53.3    |
 
----
 
 <!-- - Testset (old version):
 
@@ -206,7 +205,7 @@ When a dish is predicted, we provide more information about the nutritional leve
 | YOLOv5s |  640x640   |   6.3    |   28.4    |   30.3   |     30.5     |
 | YOLOv5m |  640x640   |   7.5    |   28.7    |   30.6   |     30.9     |
 | YOLOv5l |  640x640   |   38.4   |   46.8    |   57.9   |     57.5     |
-| YOLOv5x |  640x640   |   55.0   |   48.9    |   59.8   |     55.1     | --> |
+| YOLOv5x |  640x640   |   55.0   |   48.9    |   59.8   |     55.1     | -->
 </details>
 
 We conclude that the learned models are quite good compared to such huge data with such a variety of dishes, and their complexity is also guaranteed to be suitable for practical applications. We show that the system is scalable and has high practical significance for the people of Vietnam in particular and the world in general.
