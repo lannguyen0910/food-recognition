@@ -10,7 +10,7 @@ omegaconf
 pycocotools
 gdown==3.13.0
 tldextract
-pytube
+git+https://github.com/baxterisme/pytube
 flask-cors
 flask_ngrok
 cryptography
