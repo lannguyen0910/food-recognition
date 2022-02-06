@@ -146,7 +146,7 @@ class VideoWriter:
 
         self.outvid = cv2.VideoWriter(
             outpath,
-            cv2.VideoWriter_fourcc(*'H264'),
+            cv2.VideoWriter_fourcc(*'MP4V'),
             self.FPS,
             (self.WIDTH, self.HEIGHT))
 
