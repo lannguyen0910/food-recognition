@@ -23,7 +23,7 @@ parser.add_argument('--tta_conf_threshold', type=float,
 parser.add_argument('--tta_iou_threshold', type=float,
                     default=0.9, help='tta iou threshold')
 
-CACHE_DIR = './.cache'
+CACHE_DIR = '/content/main'
 
 # Global model, only changes when model name changes
 DETECTOR = None
