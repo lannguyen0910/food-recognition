@@ -76,16 +76,30 @@ food-detection-yolov5
 
 🚨 **UPDATE**:
 - WandB yolov5 training visualization (4 versions): <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a> 
-- The accuracy is very high on our custom datasets now (90 classes), will update new datasets in the future (for diversity).
-- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch (Not update yet).
-- Best current [weights](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing). 
+- The accuracy is very high on our custom datasets now (90 classes), more datasets will be added in the future.
+- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch (not update yet).
+- Current [weights](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing).
+- Code was refactored and cleaned, easy for understanding and scaling.
 
 <!-- - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights. -->
+## Table of Contents
+1. [Notebook](#--notebook)
+2. [Inference](#-inference-on-local-machine-gpu-or-cpu)
+3. [Datasets](#dataset)
+   * [Drive](#-dataset)
+   * [Details](#-dataset-details)
+5. [Implementation](#experiments)
+   * [Models](#-yolov5-models)
+   * [Server](#-server)
+6. [Demo](#-sample-results)
+7. [Appendix](#-appendix)
+8. [Credits](#-credits)
 
 ## 📔  **Notebook**
 - For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
 - For training, refer to this notebook for your own training [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
 - For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)
+
  ## 🌟 **Inference on local machine (GPU or CPU)**
 - Clone the repo.
 ```
@@ -99,7 +113,7 @@ pip uninstall opencv-python-headless==4.5.5.62
 pip install opencv-python-headless==4.5.2.52
 ```
 
-- (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display MP4 video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the colab notebook bellow: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1JMH9vwvxmWy72yXxV2-niRUTW_J3PlQM?usp=sharing)
+- (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display ```MP4``` video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the inference notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
 ```
 sudo apt-get install ffmpeg
 ```
@@ -136,8 +150,9 @@ We also perform the aggregation of the two data sets above into one. The new set
 </details>
 
 ## 🌟 **YOLOv5 models**
-We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, and the training and data processing steps are reinstalled by us using Pytorch. When training, data augmentation methods are applied to minimize the model's easy overfit.
-<br>
+We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. We have 2 implementation versions:
+1. Old: The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. When training, data augmentation methods are applied to minimize the model's easy overfit. Test-time-augmentation can also be used 
+2. New: We update our training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy.
 
 ## 🌟 **Server**
 <details>
