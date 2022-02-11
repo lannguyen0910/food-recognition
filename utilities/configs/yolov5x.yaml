@@ -109,11 +109,11 @@ settings:
   min_iou_val: 0.7 # IOU threshold for validation
   min_conf_val: 0.001 # Confidence score threshold for validation
   max_images_val: 20000 # max number of images for validation
-  max_pre_nms: 20000 # max detections for post process, input to NMS, set <0 for default [effdet: 5000; frcnn: 1000; yolo: 30000]
-  max_post_nms: 500 # max detections per image limit, output of NMS, set <0 for default [effdet: 100; frcnn: 100; yolo: 1000]
+  max_pre_nms: 30000 # max detections for post process, input to NMS, set <0 for default [effdet: 5000; frcnn: 1000; yolo: 30000]
+  max_post_nms: 1000 # max detections per image limit, output of NMS, set <0 for default [effdet: 100; frcnn: 100; yolo: 1000]
 
   image_size: [640, 640] # should be square and multiple of 32 to prevent bugs [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
-  keep_ratio: False # whether to use resize padding
+  keep_ratio: True # whether to use resize padding
 
   cutmix: False
   mixup: False
