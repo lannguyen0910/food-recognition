@@ -70,13 +70,11 @@ def load_checkpoint(model, path):
                 break
 
     try:
-        model.model.model._modules['module'].load_state_dict(
-            state['ema' if state.get('ema')
-                  else 'model'].float().fuse().eval())
-        # if model.optimizer is not None:
-        #     model.optimizer.load_state_dict(state["optimizer"])
-        # if model.scaler is not None:
-        #     model.scaler.load_state_dict(state[model.scaler.state_dict_key])
+        model.model.load_state_dict(state["model"])
+        if model.optimizer is not None:
+            model.optimizer.load_state_dict(state["optimizer"])
+        if model.scaler is not None:
+            model.scaler.load_state_dict(state[model.scaler.state_dict_key])
     except KeyError:
         try:
             ret = model.model.load_state_dict(state, strict=False)
