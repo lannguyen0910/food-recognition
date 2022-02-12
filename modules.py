@@ -181,7 +181,7 @@ def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
     }
 
 
-def ensemble_models(input_path, image_size):
+def ensemble_models(input_path, image_size, tta=False):
 
     # ignore_keys = [
     #     'min_iou_val',
@@ -203,16 +203,16 @@ def ensemble_models(input_path, image_size):
     args3.input_path = input_path
     args4.input_path = input_path
 
+    args1.tta = tta
+    args2.tta = tta
+    args3.tta = tta
+    args4.tta = tta
+
     # class_names, num_classes = get_class_names(args1.weight)
     config1 = get_config(model_name='yolov5s')
     config2 = get_config(model_name='yolov5m')
     config3 = get_config(model_name='yolov5l')
     config4 = get_config(model_name='yolov5x')
-
-    # config1 = Config(os.path.join('utilities', 'configs', 'yolov5s.yaml'))
-    # config2 = Config(os.path.join('utilities', 'configs', 'yolov5m.yaml'))
-    # config3 = Config(os.path.join('utilities', 'configs', 'yolov5l.yaml'))
-    # config4 = Config(os.path.join('utilities', 'configs', 'yolov5x.yaml'))
 
     class_names, num_classes = get_class_names('yolov5s')
 
@@ -389,6 +389,7 @@ def get_prediction(
         input_path,
         output_path,
         model_name,
+        tta=False,
         ensemble=False,
         min_iou=0.5,
         min_conf=0.1,
@@ -439,11 +440,12 @@ def get_prediction(
                 print("Load configs from weight")
 
             args.input_path = input_path
+            args.tta = tta
             result_dict = detect(args, config)
 
         else:
             result_dict, class_names = ensemble_models(
-                input_path, [img_w, img_h])
+                input_path, [img_w, img_h], tta=tta)
         save_cache(result_dict, hashed_key)
         print(f"Save cache to {hashed_key}")
 
