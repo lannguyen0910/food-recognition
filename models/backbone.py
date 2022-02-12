@@ -11,7 +11,7 @@ from .loss import YoloLoss
 from .utils import non_max_suppression
 from utilities.utils.utils import download_pretrained_weights
 
-CACHE_DIR = './.cache'
+CACHE_DIR = '/content/main/static'
 
 
 def get_model(args, config, num_classes):
