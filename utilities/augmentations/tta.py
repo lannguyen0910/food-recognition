@@ -159,8 +159,6 @@ class TTA():
                     if len(boxes) != 0:
                         if tta_transform is not None:
                             boxes = tta_transform.deaugment_boxes(boxes.copy())
-                            
-
                     
                     predictions['bboxes'][i].append(boxes)
                     predictions['classes'][i].append(classes)

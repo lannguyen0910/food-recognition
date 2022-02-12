@@ -183,15 +183,15 @@ def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
 
 def ensemble_models(input_path, image_size):
 
-    ignore_keys = [
-        'min_iou_val',
-        'min_conf_val',
-        'tta',
-        'gpu_devices',
-        'tta_ensemble_mode',
-        'tta_conf_threshold',
-        'tta_iou_threshold',
-    ]
+    # ignore_keys = [
+    #     'min_iou_val',
+    #     'min_conf_val',
+    #     'tta',
+    #     'gpu_devices',
+    #     'tta_ensemble_mode',
+    #     'tta_conf_threshold',
+    #     'tta_iou_threshold',
+    # ]
 
     args1 = Arguments(model_name='yolov5s')
     args2 = Arguments(model_name='yolov5m')

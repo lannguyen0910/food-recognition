@@ -111,7 +111,6 @@ def get_class_names(model_name):
 
 
 def get_config(model_name):
-    print('Model name: ', model_name)
     config = Config(os.path.join(
         'utilities', 'configs', model_name + '.yaml'))
     return config
