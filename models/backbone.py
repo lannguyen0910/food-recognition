@@ -108,11 +108,11 @@ class YoloBackbone(BaseBackbone):
         super(YoloBackbone, self).__init__(**kwargs)
 
         if max_pre_nms is None:
-            max_pre_nms = 20000
+            max_pre_nms = 30000
         self.max_pre_nms = max_pre_nms
 
         if max_post_nms is None:
-            max_post_nms = 500
+            max_post_nms = 1000
         self.max_post_nms = max_post_nms
 
         version = version_name[0]
@@ -170,7 +170,7 @@ class YoloBackbone(BaseBackbone):
         outputs, _ = self.model(inputs)
         outputs = non_max_suppression(
             outputs,
-            conf_thres=0.0001,
+            conf_thres=0.001,
             iou_thres=0.8,
             max_nms=self.max_pre_nms,
             max_det=self.max_post_nms)  # [bs, max_det, 6]

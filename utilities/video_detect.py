@@ -262,10 +262,14 @@ class VideoPipeline:
 
                 ori_img = ori_imgs[i]
 
+                if len(boxes) == 0:
+                    continue
+
                 videowriter.write(
                     ori_img,
                     boxes=boxes,
                     labels=labels,
                     scores=scores)
+                    
         videowriter.release()
         return self.saved_path

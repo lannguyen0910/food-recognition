@@ -53,7 +53,12 @@ class ClassificationTestset():
   
 def classify(weight, img_list):
     global CLASSIFIER
-    config = get_config(weight)
+
+    # Extract name from weight
+    weight_name = os.path.basename(weight)
+    cfg_name, ext = os.path.splitext(weight_name)
+
+    config = get_config(cfg_name)
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
     testset = ClassificationTestset(config, img_list)
@@ -64,8 +69,8 @@ def classify(weight, img_list):
         pin_memory=True,
         collate_fn=testset.collate_fn
     )
-
-    class_names, num_classes = get_class_names(weight)
+    
+    class_names, num_classes = get_class_names(cfg_name)
 
     if CLASSIFIER is None or CLASSIFIER.model_name != config.model_name:
         net = BaseTimmModel(
