@@ -177,14 +177,27 @@ class VideoDetect:
         self.class_names, num_classes = config.names, config.nc
         self.class_names.insert(0, 'Background')
 
+        if args.tta:
+            self.tta = TTA(
+                min_conf=args.tta_conf_threshold,
+                min_iou=args.tta_iou_threshold,
+                postprocess_mode=args.tta_ensemble_mode)
+        else:
+            self.tta = None
+
         if DETECTOR is None or DETECTOR.model_name != config.model_name:
             net = get_model(
                 args, config,
                 num_classes=num_classes)
             self.num_classes = num_classes
             DETECTOR = Detector(model=net, device=self.device)
-            # load_checkpoint(DETECTOR, args.weight)
+
+            # Print info
+            print(config)
+
         DETECTOR.eval()
+        for param in DETECTOR.parameters():
+            param.requires_grad = False
 
     def run(self, batch):
         with torch.no_grad():
@@ -192,7 +205,10 @@ class VideoDetect:
             labels_result = []
             scores_result = []
 
-            preds = DETECTOR.inference_step(batch)
+            if self.tta is not None:
+                    preds = self.tta.make_tta_predictions(DETECTOR, batch)
+            else:
+                preds = DETECTOR.inference_step(batch)
 
             for idx, outputs in enumerate(preds):
                 img_w = batch['image_ws'][idx]
@@ -270,6 +286,6 @@ class VideoPipeline:
                     boxes=boxes,
                     labels=labels,
                     scores=scores)
-                    
+
         videowriter.release()
         return self.saved_path

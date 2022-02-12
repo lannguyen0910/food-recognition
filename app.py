@@ -256,7 +256,10 @@ def analyze():
         model_types = request.form.get('model-types')
         enhanced = request.form.get('enhanced')
         ensemble = request.form.get('ensemble')
+        tta = request.form.get('tta')
+
         ensemble = True if ensemble == 'on' else False
+        tta = True if tta == 'on' else False
         enhanced = True if enhanced == 'on' else False
         model_types = str.lower(model_types)
         min_conf = float(confidence)/100
@@ -273,6 +276,7 @@ def analyze():
                 filepath,
                 output_path,
                 model_name=model_types,
+                tta=tta,
                 ensemble=ensemble,
                 min_conf=min_conf,
                 min_iou=min_iou,
@@ -289,6 +293,7 @@ def analyze():
                 filepath,
                 output_path,
                 model_name=model_types,
+                tta=tta,
                 min_conf=min_conf,
                 min_iou=min_iou,
                 enhance_labels=enhanced)

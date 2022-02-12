@@ -26,10 +26,6 @@
       <h1 style="font-weight: bold; color: #000">Food Detector</h1>
       <p style="padding-top:5px">
         <h4><b>Web App for Food Detection using YOLOv5</b></h4>
-        <p>5 datasets are aggregated for use: <b>Open Images V6 - Food, School Lunch Dataset, Vietnamese Food, MAFood-121, Food-101</b></p>
-        <p>93,748 training images, 26,825 evaluating images, up to 180 classes</p>
-        <p>4 versions of YOLOv5: (s, m, l, x)</p>
-        <p>Integrated with Edamam API for nutrition analysis based on food names</p>
       </p>
     </div>
     <div class="about-section2">
@@ -41,7 +37,8 @@
           <p>Confidence scores and IOU threshold are adjustable</p>
           <p>Choose 1 of 4 YOLOv5 versions to use</p>
           <p>Label enhancement to further predict "<b>Other Food</b>" class using <b>EfficientNet-B4</b></p>
-          <p>Ensemble 4 YOLOv5 models and aggregated by "<b>weighted box fusion</b>" method</p>
+          <p>Ensemble 4 YOLOv5 models and aggregated by "<b>weighted box fusion</b>" method, only apply to images</p>
+          <p>Test-time augmentation technique for detection, with fixed tta</p>
           <p>Provide 2 types of <b>Nutrition Statistics Chart</b> below an <b>image result</b> (by food and by nutrition)</p>
         </p>
         

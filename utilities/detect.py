@@ -115,6 +115,14 @@ def detect(args, config):
         ToTensorV2(p=1.0)
     ])
 
+    if args.tta:
+        args.tta = TTA(
+            min_conf=args.tta_conf_threshold,
+            min_iou=args.tta_iou_threshold,
+            postprocess_mode=args.tta_ensemble_mode)
+    else:
+        args.tta = None
+
     testset = Testset(
         config,
         args.input_path,
@@ -133,9 +141,14 @@ def detect(args, config):
     if DETECTOR is None or DETECTOR.model_name != config.model_name:
         net = get_model(args, config, num_classes=num_classes)
         DETECTOR = Detector(model=net, freeze=True, device=device)
-        # load_checkpoint(DETECTOR, args.weight)
+
+        # Print info
+        print(config)
 
     DETECTOR.eval()
+
+    for param in DETECTOR.parameters():
+        param.requires_grad = False
 
     result_dict = {
         'boxes': [],
@@ -147,8 +160,10 @@ def detect(args, config):
     with tqdm(total=len(testloader)) as pbar:
         with torch.no_grad():
             for idx, batch in enumerate(testloader):
-
-                preds = DETECTOR.inference_step(batch)
+                if args.tta is not None:
+                    preds = args.tta.make_tta_predictions(DETECTOR, batch)
+                else:
+                    preds = DETECTOR.inference_step(batch)
 
                 for idx, outputs in enumerate(preds):
                     img_w = batch['image_ws'][idx]

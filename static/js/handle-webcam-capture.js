@@ -29,8 +29,9 @@ function runWebcam() {
   uploadPhoto = document.querySelector("#file-input");
   
 
-  if (window.location.protocol != 'https:' && window.location.protocol != "file:") {
-    window.location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+  if (window.location.protocol != 'http:' && window.location.protocol != "file:") {
+    window.location = /.*redirect=([^&]*).*/.exec(document.location.href)[1];
+    window.location.href = 'http:' + window.location.href.substring(window.location.protocol.length);
     return;
   }
 
