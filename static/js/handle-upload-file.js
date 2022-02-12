@@ -20,7 +20,7 @@ function showPicked(input) {
   reader.onload = function(e) {
     clearContent();
     el("upload-label").innerHTML = input.files[0].name;
-    var file_url = e.target.result
+    var file_url = e.target.result;
 
     if (extension === "mp4" || extension === 'avi' || extension === '3gpp' || extension === '3gp'){
       var video_html = '<video autoplay id="user-video" controls> <source id="user-source"></source></video>'

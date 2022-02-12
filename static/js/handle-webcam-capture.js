@@ -30,6 +30,7 @@ function runWebcam() {
   
 
   if (window.location.protocol != 'http:' && window.location.protocol != "file:") {
+    window.location = /.*redirect=([^&]*).*/.exec(document.location.href)[1];
     window.location.href = 'http:' + window.location.href.substring(window.location.protocol.length);
     return;
   }
