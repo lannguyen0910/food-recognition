@@ -61,8 +61,7 @@ def load_checkpoint(model, path):
     """
     state = torch.load(path, map_location='cpu')
     current_lr = None
-    print('State keys: ', state.keys())
-    print('Model: ', model.model.model)
+    
     if model.optimizer is not None:
         for param_group in model.optimizer.param_groups:
             if 'lr' in param_group.keys():
@@ -70,11 +69,7 @@ def load_checkpoint(model, path):
                 break
 
     try:
-        model.model.load_state_dict(state["model"])
-        if model.optimizer is not None:
-            model.optimizer.load_state_dict(state["optimizer"])
-        if model.scaler is not None:
-            model.scaler.load_state_dict(state[model.scaler.state_dict_key])
+        model.model.model._modules['module'].load_state_dict(state["model"], strict=False)
     except KeyError:
         try:
             ret = model.model.load_state_dict(state, strict=False)
