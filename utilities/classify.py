@@ -81,7 +81,8 @@ def classify(weight, img_list):
     if CLASSIFIER is None or CLASSIFIER.model_name != config.model_name:
         net = BaseTimmModel(
             name=config.model_name,
-            num_classes=num_classes)
+            num_classes=num_classes,
+            from_pretrained=False)
         CLASSIFIER = Classifier(model=net,  device=device, freeze=True)
         load_checkpoint(CLASSIFIER, weight)
 
