@@ -63,8 +63,8 @@ def classify(weight, img_list):
     # Extract name from weight
     weight_name = os.path.basename(weight)
     cfg_name, ext = os.path.splitext(weight_name)
-
-    config = get_config(cfg_name)
+    cfg_target = 'classification'
+    config = get_config(os.path.join(cfg_target, cfg_name))
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
     testset = ClassificationTestset(config, img_list)
