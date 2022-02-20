@@ -66,7 +66,8 @@ class BaseTimmModel(nn.Module):
         super().__init__()
         self.name = name
         if num_classes != 1000:
-            self.model = timm.create_model(name, pretrained=from_pretrained, num_classes=num_classes)
+            self.model = timm.create_model(
+                name, pretrained=from_pretrained, num_classes=num_classes)
         else:
             self.model = timm.create_model(name, pretrained=from_pretrained)
 
@@ -105,13 +106,13 @@ class YoloBackbone(BaseBackbone):
             version_mode = version_name.split('-')[1]
             self.name = f'yolov4-{version_mode}'
             self.model = Yolov4(
-                cfg=f'./models/configs/yolov4-{version_mode}.yaml', ch=3, nc=num_classes
+                cfg=f'./models/configs/detection/yolov4-{version_mode}.yaml', ch=3, nc=num_classes
             )
         elif version == '5':
             version_mode = version_name[-1]
             self.name = f'yolov5{version_mode}'
             self.model = Model(
-                cfg=f'./models/configs/yolov5{version_mode}.yaml', ch=3, nc=num_classes
+                cfg=f'./models/configs/detection/yolov5{version_mode}.yaml', ch=3, nc=num_classes
             )
         if not use_gpu:
             map_loc = 'cpu'

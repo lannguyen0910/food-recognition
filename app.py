@@ -295,8 +295,7 @@ def analyze():
                 model_name=model_types,
                 tta=tta,
                 min_conf=min_conf,
-                min_iou=min_iou,
-                enhance_labels=enhanced)
+                min_iou=min_iou)
         else:
             error_msg = "Invalid input url!!!"
             return render_template('detect-input-url.html', error_msg=error_msg)

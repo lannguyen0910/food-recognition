@@ -1,14 +1,7 @@
-<h1 align="center">🍔🍟🍗 Food Analysis with YOLOv5 🍞🍖🍕</h1>
+<h1 align="center">🍔🍟🍗 Meal analysis using yolov5 🍞🍖🍕</h1>
 
 <p align="center">
-   <a href="./LICENSE"><img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg" alt="MIT" /></a>
 
- <a href="https://github.com/lannguyen0910/food-detection-yolov5/stargazers">
- <img src="https://img.shields.io/github/stars/lannguyen0910/food-detection-yolov5?style=flat-square" alt="Stars"/>
- </a>
- <a href="https://github.com/lannguyen0910/food-detection-yolov5/fork">
- <img src="https://img.shields.io/github/forks/lannguyen0910/food-detection-yolov5.svg?style=flat-square" alt="Forks"/>
- </a>
 <!--  <img src="https://visitor-badge.laobi.icu/badge?page_id=lannguyen0910.food-detection-yolov5" alt="visitors" />
   -->
  <a><img  src="./demo/pipeline.png"></a>
@@ -17,9 +10,15 @@
 
 
 <p align="center">
+    <a href="./LICENSE"><img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg" alt="MIT" /></a>
   <a href="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/overview/master"><img src="https://www.codefactor.io/repository/github/lannguyen0910/food-detection-yolov5/badge/master?s=9716a4eb0076053fa36e0d967bba5161b85b8fb5" alt="CodeFactor" /></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="Python" /></a>
- 
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="Python" /></a> 
+   <a href="https://github.com/lannguyen0910/food-detection-yolov5/stargazers">
+    <img src="https://img.shields.io/github/stars/lannguyen0910/food-detection-yolov5?style=flat-square" alt="Stars"/>
+    </a>
+ <a href="https://github.com/lannguyen0910/food-detection-yolov5/fork">
+ <img src="https://img.shields.io/github/forks/lannguyen0910/food-detection-yolov5.svg?style=flat-square" alt="Forks"/>
+ </a>
  <a href="https://github.com/lannguyen0910/food-detection-yolov5/issues">
 <img src="https://img.shields.io/github/issues/lannguyen0910/food-detection-yolov5?style=flat-square" alt="Issues"/>
 </a>
@@ -68,9 +67,9 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
-<strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 version 5, 6. Can load checkpoints from original repo now 🤞.<br>
- <strong><i>[26/12/2021]</i></strong> Update app on Android 🤞 <br>
- <strong><i>[12/09/2021]</i></strong> Update all features to the web app 🤞 <br>
+<strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 latest versions P5-P6. Can load checkpoints from original repo.<br>
+ <strong><i>[26/12/2021]</i></strong> Update app on Android. <br>
+ <strong><i>[12/09/2021]</i></strong> Update all features to the web app. <br>
  <strong><i>[16/07/2021]</i></strong> All trained checkpoints on custom data have been lost. Now use pretrained models on COCO for inference. 
 </details>
 
@@ -151,8 +150,8 @@ We also perform the aggregation of the two data sets above into one. The new set
 
 ## 🌟 **YOLOv5 models**
 We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. We have 2 implementation versions:
-1. Old: The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. When training, data augmentation methods are applied to minimize the model's easy overfit. Test-time-augmentation can also be used 
-2. New: We update our training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy.
+1. Old: Use our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
+2. New: Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
 
 ## 🌟 **Server**
 <details>
@@ -233,7 +232,7 @@ We conclude that the learned models are quite good compared to such huge data wi
 
 ## 📙 **Credits**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5.
-- Object detection's custom template: https://github.com/kaylode/custom-template/tree/detection.
+- Custom template: https://github.com/kaylode/theseus.
 - Base code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
 - Ncnn by Tencent: https://github.com/Tencent/ncnn
 - Edamam API: https://developer.edamam.com/food-database-api-docs.

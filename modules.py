@@ -44,6 +44,7 @@ weight_urls = {
     "yolov5l": "1sBciFcRav2ZE6jzhWnca9uegjQ4860om",
     "yolov5x": "1CRD6T9QtH9XEa-h985_Ho6jgLWu58zn0",
     "effnetb4": "1-K_iDfuhxQFHIF9HTy8SvfnIFwjqxtaX",
+    "htc_seg": "1wPVkCE5GPzNCU2pSkq02JnzmQ_A7YV6C",
 }
 
 
@@ -352,9 +353,9 @@ def get_video_prediction(
         input_path,
         output_path,
         model_name,
+        tta,
         min_iou=0.5,
-        min_conf=0.1,
-        enhance_labels=False):
+        min_conf=0.1):
 
     # ignore_keys = [
     #     'min_iou_val',
@@ -381,6 +382,7 @@ def get_video_prediction(
     args.output_path = output_path
     args.min_conf = min_conf
     args.min_iou = min_iou
+    args.tta = tta
     video_detect = VideoPipeline(args, config)
     return video_detect.run()
 
