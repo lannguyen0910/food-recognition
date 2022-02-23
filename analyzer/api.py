@@ -3,7 +3,7 @@ import requests
 from tqdm import tqdm
 from .secret import API, get_response
 
-DATABASE = "./api/db.json"
+DATABASE = "./analyzer/db.json"
 
 
 def make_request(api_name, params, headers):

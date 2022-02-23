@@ -9,7 +9,7 @@ from utilities import (
     download_weights, draw_boxes_v2, postprocessing,
     box_fusion, classify, change_box_order,
     VideoPipeline)
-from api import get_info_from_db
+from analyzer import get_info_from_db
 
 CACHE_DIR = './.cache'
 CSV_FOLDER = './static/csv'
