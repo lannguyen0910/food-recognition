@@ -56,7 +56,7 @@ color_list = standard_to_bgr(STANDARD_COLORS)
 def draw_boxes_v2(img_name, img, boxes, label_ids, scores, label_names=None, obj_list=None, figsize=(15, 15)):
     """
     Visualize an image with its bouding boxes
-    rgn image + xywh box
+    rgb image + xywh box
     """
     def plot_one_box(img, box, key=None, value=None, color=None, line_thickness=None):
         tl = line_thickness or int(
@@ -211,6 +211,7 @@ def download_weights(id_or_url, cached=None, md5=None, quiet=False):
         url = 'https://drive.google.com/uc?id={}'.format(id_or_url)
 
     return gdown.cached_download(url=url, path=cached, md5=md5, quiet=quiet)
+
 
 # https://drive.google.com/file/d/1uIp1Kl1xWsVqiE2tDPChEnTo1ZOwC0Jv/view?usp=sharing
 weight_url = {

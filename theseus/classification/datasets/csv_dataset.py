@@ -1,14 +1,11 @@
 import os
-import numpy as np
 import pandas as pd
 from typing import List, Optional
 
 from torchvision.transforms import transforms as tf
 from theseus.classification.augmentations.custom import RandomMixup, RandomCutmix
-from theseus.utilities.loggers.observer import LoggerObserver
-from .dataset import ClassificationDataset
 
-LOGGER = LoggerObserver.getLogger('main')
+from .dataset import ClassificationDataset
 
 class CSVDataset(ClassificationDataset):
     r"""CSVDataset multi-labels classification dataset
@@ -74,17 +71,4 @@ class CSVDataset(ClassificationDataset):
             image_name, label = row
             image_path = os.path.join(self.image_dir, image_name)
             self.fns.append([image_path, label])
-
-    def _calculate_classes_dist(self):
-        """
-        Calculate distribution of classes
-        """
-        LOGGER.text("Calculating class distribution...", LoggerObserver.DEBUG)
-        self.classes_dist = []
-
-        # Load csv
-        df = pd.read_csv(self.csv_path)
-        for _, row in df.iterrows():
-            _, label = row
             self.classes_dist.append(self.classes_idx[label])
-        return self.classes_dist
