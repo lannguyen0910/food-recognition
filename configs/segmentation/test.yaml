@@ -1,0 +1,25 @@
+global:
+  debug: True
+  cfg_transform: configs/sample/transform.yaml
+  save_dir: runs
+  device: cpu # cuda:0
+  weights: null
+model:
+  name: BaseSegModel
+  args:
+    name: unetplusplus
+    encoder_name: efficientnet-b4
+
+data:
+  dataset:
+    name: TestDataset
+    args:
+      image_dir: data/images
+      txt_classnames: configs/segmentation/classes.txt
+
+  dataloader:
+    name: DataLoaderWithCollator
+    args:
+      batch_size: 1
+      drop_last: False
+      shuffle: False

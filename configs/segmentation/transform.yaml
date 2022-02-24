@@ -1,0 +1,45 @@
+train:
+  name: AlbCompose
+  args:
+    transforms:
+      - name: AlbResize
+        args:
+          width: 640
+          height: 640
+      - name: AlbHorizontalFlip
+        args:
+      - name: AlbGaussianBlur
+        args:
+      - name: AlbHueSaturationValue
+        args:
+          hue_shift_limit:       0.2
+          sat_shift_limit:       0.2
+          val_shift_limit:       0.2
+      - name: AlbRandomBrightnessContrast
+        args:
+          brightness_limit:     0.3
+          contrast_limit:       0.3
+      # - name: AlbRandomRotate90
+      #   args:
+      # - name: AlbShiftScaleRotate
+      #   args:
+      #     border_mode: 0
+      #     value: 0
+      - name: AlbNormalize
+        args:
+          mean: [0.229, 0.224, 0.225]
+          std: [0.485, 0.456, 0.406]
+      - name: AlbToTensorV2
+val:
+  name: AlbCompose
+  args:
+    transforms:
+      - name: AlbResize
+        args:
+          width: 640
+          height: 640
+      - name: AlbNormalize
+        args:
+          mean: [0.229, 0.224, 0.225]
+          std: [0.485, 0.456, 0.406]
+      - name: AlbToTensorV2

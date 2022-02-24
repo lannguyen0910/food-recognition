@@ -1,0 +1,27 @@
+global:
+  debug: True
+  cfg_transform: configs/sample/transform.yaml
+  save_dir: runs
+  device: cpu # cuda:0
+  weights: null
+
+model:
+  name: BaseTimmModel
+  args:
+    name: convnext_small
+    from_pretrained: False
+    num_classes: 180
+
+data:
+  dataset:
+    name: ImageDataset
+    args:
+      image_dir: data/images
+      txt_classnames: configs/classification/classes.txt
+
+  dataloader:
+    name: DataLoader
+    args:
+      batch_size: 1
+      drop_last: False
+      shuffle: False
