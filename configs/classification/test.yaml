@@ -1,23 +1,23 @@
 global:
   debug: True
   cfg_transform: configs/sample/transform.yaml
-  save_dir: runs
+  save_dir: static/assets/classification
   device: cpu # cuda:0
-  weights: null
+  weights: weights/effnet_b0.pth
 
 model:
   name: BaseTimmModel
   args:
-    name: convnext_small
+    name: efficientnet_b0
     from_pretrained: False
     num_classes: 180
 
 data:
   dataset:
     name: ImageDataset
-    args:
-      image_dir: data/images
-      txt_classnames: configs/classification/classes.txt
+    # args:
+    #   image_dir: data/images
+    #   txt_classnames: configs/classification/classes.txt
 
   dataloader:
     name: DataLoader

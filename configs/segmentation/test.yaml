@@ -1,7 +1,7 @@
 global:
   debug: True
   cfg_transform: configs/sample/transform.yaml
-  save_dir: runs
+  save_dir: static/assets/segmentation
   device: cpu # cuda:0
   weights: null
 model:
@@ -13,9 +13,9 @@ model:
 data:
   dataset:
     name: TestDataset
-    args:
-      image_dir: data/images
-      txt_classnames: configs/segmentation/classes.txt
+    # args:
+    #   image_dir: data/images
+    #   txt_classnames: configs/segmentation/classes.txt
 
   dataloader:
     name: DataLoaderWithCollator
