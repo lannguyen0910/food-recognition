@@ -15,15 +15,15 @@ import cv2
 import os
 import pandas as pd
 from theseus.opt import Opts
-from typing import List, Optional, Tuple
+from typing import List
 
 import matplotlib as mpl
 mpl.use("Agg")
 
 
-@DATASET_REGISTRY.register()
-class TestDataset(torch.utils.data.Dataset):
-    def __init__(self, image_dir, txt_classnames, transform=None):
+# @DATASET_REGISTRY.register()
+class SegmentationTestset(torch.utils.data.Dataset):
+    def __init__(self, image_dir: str, txt_classnames:str, transform: List = None, **kwargs):
         self.image_dir = image_dir
         self.txt_classnames = txt_classnames
         self.transform = transform
@@ -34,11 +34,7 @@ class TestDataset(torch.utils.data.Dataset):
         self.classnames = df[1].tolist()
 
         self.fns = []
-        image_names = os.listdir(self.image_dir)
-
-        for image_name in image_names:
-            image_path = os.path.join(self.image_dir, image_name)
-            self.fns.append(image_path)
+        self.fns.append(self.image_dir)
 
     def __getitem__(self, index):
 
@@ -73,13 +69,14 @@ class TestDataset(torch.utils.data.Dataset):
         }
 
 
-class TestPipeline(object):
+class SegmentationPipeline(object):
     def __init__(
         self,
-        opt: Config
+        opt: Config,
+        image_dir: str
     ):
 
-        super(TestPipeline, self).__init__()
+        super(SegmentationPipeline, self).__init__()
         self.opt = opt
 
         self.debug = opt['global']['debug']
@@ -102,11 +99,17 @@ class TestPipeline(object):
             self.transform_cfg, registry=TRANSFORM_REGISTRY
         )
 
-        self.dataset = get_instance(
-            opt['data']["dataset"],
-            registry=DATASET_REGISTRY,
-            transform=self.transform['val'],
-        )
+        # self.dataset = get_instance(
+        #     opt['data']["dataset"],
+        #     registry=DATASET_REGISTRY,
+        #     transform=self.transform['val'],
+        # )
+
+        self.dataset = SegmentationTestset(
+            image_dir=image_dir,
+            txt_classnames='./configs/segmentation/classes.txt',
+            transform=self.transform['val'])
+
         CLASSNAMES = self.dataset.classnames
 
         self.dataloader = get_instance(
@@ -177,5 +180,5 @@ class TestPipeline(object):
 
 if __name__ == '__main__':
     opts = Opts().parse_args()
-    val_pipeline = TestPipeline(opts)
+    val_pipeline = SegmentationPipeline(opts)
     val_pipeline.inference()
