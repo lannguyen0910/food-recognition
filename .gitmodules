@@ -1,3 +1,0 @@
-[submodule "utilities/mmdetection"]
-	path = utilities/mmdetection
-	url = https://github.com/lannguyen0910/mmdetection
