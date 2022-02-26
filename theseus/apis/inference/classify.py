@@ -9,7 +9,6 @@ from theseus.utilities.loading import load_state_dict
 from theseus.classification.datasets import DATASET_REGISTRY, DATALOADER_REGISTRY
 from theseus.classification.augmentations import TRANSFORM_REGISTRY
 from theseus.classification.models import MODEL_REGISTRY
-from theseus.base.datasets import ImageDataset
 from theseus.opt import Config
 from tqdm import tqdm
 from datetime import datetime
@@ -158,12 +157,15 @@ class ClassificationPipeline(object):
 
         savepath = os.path.join(self.savedir, 'prediction.csv')
 
-        if not os.path.exists(savepath):
-            df.to_csv(savepath, index=False)
-        else:
-            df.to_csv(savepath, mode='a', index=False, header=False)
+        df.to_csv(savepath, index=False)
+
+        # if not os.path.exists(savepath):
+        #     df.to_csv(savepath, index=False)
+        # else:
+        #     df.to_csv(savepath, mode='a', index=False, header=False)
 
         return df_dict
+
 
 if __name__ == '__main__':
     opts = Opts().parse_args()
