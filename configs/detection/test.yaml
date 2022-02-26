@@ -1,0 +1,14 @@
+global:
+  debug: True
+  cfg_transform: configs/detection/transform.yaml
+  save_dir: static/assets/detection
+  device: cpu # cuda:0
+  weights: null
+
+data:
+  dataloader:
+    name: DataLoaderWithCollator
+    args:
+      batch_size: 1
+      drop_last: False
+      shuffle: False
