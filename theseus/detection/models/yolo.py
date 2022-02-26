@@ -49,8 +49,6 @@ class YoloBackbone(BaseBackbone):
     """
     Some yolov5 models with various pretrained backbones from hub
 
-    name: `str`
-        model name [unet, deeplabv3, ...]
     weight : `str` 
         weight path to load custom yolov5 weight
     min_conf: `float` 

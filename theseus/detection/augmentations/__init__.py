@@ -1,4 +1,7 @@
-from .tta import TTA
+from .tta import *
 from theseus.base.augmentations import TRANSFORM_REGISTRY
 
-TRANSFORM_REGISTRY.register(TTA, prefix='Base')
+TRANSFORM_REGISTRY.register(TTAHorizontalFlip)
+TRANSFORM_REGISTRY.register(TTARotate90)
+TRANSFORM_REGISTRY.register(TTAVerticalFlip)
+TRANSFORM_REGISTRY.register(TTACompose)
