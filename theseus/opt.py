@@ -41,22 +41,18 @@ class Config(dict):
         return str(json.dumps(dict(self), sort_keys=False, indent=4))
 
 
-class Opts(ArgumentParser):
-    def __init__(self):
-        super(Opts, self).__init__(
-            formatter_class=RawDescriptionHelpFormatter)
-        self.add_argument("-c", "--config", help="configuration file to use")
-        self.add_argument(
-            "-o", "--opt", nargs='+', help="override configuration options")
+class Opts():
+    def __init__(self, args):
+        super(Opts, self).__init__()
+        self.args = args
 
-    def parse_args(self, argv=None):
-        args = super(Opts, self).parse_args(argv)
-        assert args.config is not None, \
+    def parse_args(self):
+        assert self.args.config is not None, \
             "Please specify --config=configure_file_path."
-        args.opt = self._parse_opt(args.opt)
+        self.args.opt = self._parse_opt(self.args.opt)
 
-        config = Config(args.config)
-        config = self.override(config, args.opt)
+        config = Config(self.args.config)
+        # config = self.override(config, args.opt)
         return config
 
     def _parse_opt(self, opts):
