@@ -19,6 +19,18 @@ from typing import List
 import matplotlib as mpl
 mpl.use("Agg")
 
+CACHE_DIR = "./weights/"  # Path to the directory that saves weights
+CLASSIFIER = None  # Global model, only changes when model name changes
+
+
+class ClassificationArguments:
+    def __init__(self, config: str = None) -> None:
+        self.config = None
+
+        if config:
+            cfg_path = os.path.join('./configs/classification', config)
+            self.config = cfg_path
+
 
 class ClassificationTestset():
     def __init__(self, image_dir: list, txt_classnames: str, transform: List = None, **kwargs):
@@ -89,16 +101,13 @@ class ClassificationPipeline(object):
         self.device = torch.device(self.device_name)
 
         self.weights = opt['global']['weights']
+        if self.weights:
+            tmp_path = os.path.join(CACHE_DIR, self.weights+'.pth')
+            self.weights = tmp_path
 
         self.transform = get_instance_recursively(
             self.transform_cfg, registry=TRANSFORM_REGISTRY
         )
-
-        # self.dataset = get_instance(
-        #     opt['data']["dataset"],
-        #     registry=DATASET_REGISTRY,
-        #     transform=self.transform['val'],
-        # )
 
         self.dataset = ClassificationTestset(
             image_dir=image_dir,
@@ -114,16 +123,20 @@ class ClassificationPipeline(object):
             dataset=self.dataset,
             collate_fn=self.dataset.collate_fn
         )
-        global CLASSIFIER
 
         self.model = get_instance(
             opt["model"],
             registry=MODEL_REGISTRY,
             classnames=CLASSNAMES).to(self.device)
 
-        if self.weights:
-            state_dict = torch.load(self.weights)
-            self.model = load_state_dict(self.model, state_dict, 'model')
+        global CLASSIFIER
+        # Not to load the same classification model again
+        if CLASSIFIER is None or CLASSIFIER.name != self.model.name:
+            CLASSIFIER = self.model
+
+            if self.weights:
+                state_dict = torch.load(self.weights)
+                CLASSIFIER = load_state_dict(self.model, state_dict, 'model')
 
     def infocheck(self):
         device_info = get_devices_info(self.device_name)
@@ -144,9 +157,10 @@ class ClassificationPipeline(object):
             'score': []
         }
 
+        global CLASSIFIER
         for idx, batch in enumerate(tqdm(self.dataloader)):
             img_names = batch['img_names']
-            outputs = self.model.get_prediction(batch, self.device)
+            outputs = CLASSIFIER.get_prediction(batch, self.device)
             preds = outputs['names']
             probs = outputs['confidences']
 
@@ -170,6 +184,8 @@ class ClassificationPipeline(object):
 
 
 if __name__ == '__main__':
-    opts = Opts().parse_args()
-    val_pipeline = ClassificationPipeline(opts)
+    cls_args = ClassificationArguments(config="test.yaml")
+    opts = Opts(cls_args.config).parse_args()
+    img_dir = [] # contain list of cropped boxes of the detected image 
+    val_pipeline = ClassificationPipeline(opts, img_dir)
     val_pipeline.inference()
