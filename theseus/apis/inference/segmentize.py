@@ -21,7 +21,6 @@ import matplotlib as mpl
 mpl.use("Agg")
 
 
-# @DATASET_REGISTRY.register()
 class SegmentationTestset(torch.utils.data.Dataset):
     def __init__(self, image_dir: str, txt_classnames:str, transform: List = None, **kwargs):
         self.image_dir = image_dir

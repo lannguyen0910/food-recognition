@@ -38,7 +38,7 @@ class ClassificationTestset():
         """
         Get an item from memory
         """
-        image_path = self.fns[index]
+        image_path = self.img_list[index]
         im = Image.open(image_path).convert('RGB')
         width, height = im.width, im.height
 
@@ -114,6 +114,7 @@ class ClassificationPipeline(object):
             dataset=self.dataset,
             collate_fn=self.dataset.collate_fn
         )
+        global CLASSIFIER
 
         self.model = get_instance(
             opt["model"],
@@ -132,6 +133,7 @@ class ClassificationPipeline(object):
         self.logger.text(
             f"Everything will be saved to {self.savedir}", level=LoggerObserver.INFO)
 
+    @torch.no_grad()
     def inference(self):
         self.infocheck()
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
