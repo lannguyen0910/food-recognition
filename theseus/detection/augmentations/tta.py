@@ -114,8 +114,8 @@ class TTA():
     def make_tta_predictions(self, model, batch, weights=None):
 
         # Set image size for all transforms
-        batch_size = batch['imgs'].shape[0]
-        image_size = batch['imgs'].shape[-1]
+        batch_size = batch['inputs'].shape[0]
+        image_size = batch['inputs'].shape[-1]
         for tta_transform in self.tta_transforms:
             if tta_transform is not None:
                 for single_transform in tta_transform.transforms:
@@ -129,19 +129,18 @@ class TTA():
                 'scores': {}
             }
             for aug_idx, tta_transform in enumerate(self.tta_transforms):
-                imgs = batch['imgs']
+                imgs = batch['inputs']
                 if tta_transform is not None:
                     tta_imgs = tta_transform.batch_augment(imgs)
                 else:
                     tta_imgs = imgs
 
                 tta_batch = {
-                    'imgs': tta_imgs,
-                    'img_sizes': batch['img_sizes'],
-                    'img_scales': batch['img_scales']}
+                    'inputs': tta_imgs
+                }
 
                 #  Feed imgs through model
-                outputs = model.inference_step(tta_batch)
+                outputs = model.get_prediction(tta_batch)
 
                 for i, output in enumerate(outputs):
 
