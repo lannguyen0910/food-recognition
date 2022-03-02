@@ -6,16 +6,17 @@ from theseus.utilities.loading import load_state_dict
 from theseus.segmentation.datasets import DATASET_REGISTRY, DATALOADER_REGISTRY
 from theseus.segmentation.augmentations import TRANSFORM_REGISTRY
 from theseus.segmentation.models import MODEL_REGISTRY
-from theseus.opt import Config
+from theseus.opt import Config, Opts, InferenceArguments
+from typing import List
 from PIL import Image
 from datetime import datetime
+
 import numpy as np
 import torch
 import cv2
 import os
 import pandas as pd
-from theseus.opt import Opts, InferenceArguments
-from typing import List
+
 
 import matplotlib as mpl
 mpl.use("Agg")
@@ -117,6 +118,7 @@ class SegmentationPipeline(object):
             opt['data']["dataloader"],
             registry=DATALOADER_REGISTRY,
             dataset=self.dataset,
+            collate_fn=self.dataset.collate_fn
         )
 
         self.model = get_instance(
@@ -161,7 +163,7 @@ class SegmentationPipeline(object):
             img_names = batch['img_names']
             ori_sizes = batch['ori_sizes']
 
-            outputs = self.model.get_prediction(batch, self.device)
+            outputs = SEGMENTIZER.get_prediction(batch, self.device)
             preds = outputs['masks']
 
             for (input, pred, filename, ori_size) in zip(inputs, preds, img_names, ori_sizes):
