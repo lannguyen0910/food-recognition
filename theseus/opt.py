@@ -5,10 +5,25 @@ Modified from https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.4/tools/p
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import yaml
 import json
+import os
 from theseus.utilities.loading import load_yaml
 
 from theseus.utilities.loggers.observer import LoggerObserver
 LOGGER = LoggerObserver.getLogger("main")
+
+
+class InferenceArguments:
+    """
+    Arguments for Opts
+    """
+
+    def __init__(self, key: str = None, config_file: str = 'test.yaml') -> None:
+        self.config = None
+        assert key is not None, \
+            "Please choose a task: ['detection', 'segmentation', 'classification']."
+
+        cfg_path = os.path.join('./configs', key, config_file)
+        self.config = cfg_path
 
 
 class Config(dict):
@@ -49,7 +64,7 @@ class Opts():
     def parse_args(self):
         assert self.args.config is not None, \
             "Please specify --config=configure_file_path."
-        self.args.opt = self._parse_opt(self.args.opt)
+        # self.args.opt = self._parse_opt(self.args.opt)
 
         config = Config(self.args.config)
         # config = self.override(config, args.opt)

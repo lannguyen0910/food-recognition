@@ -14,15 +14,17 @@ import torch
 import cv2
 import os
 import pandas as pd
-from theseus.opt import Opts
+from theseus.opt import Opts, InferenceArguments
 from typing import List
 
 import matplotlib as mpl
 mpl.use("Agg")
 
+SEGMENTIZER = None  # Global model, only changes when model name changes
+
 
 class SegmentationTestset(torch.utils.data.Dataset):
-    def __init__(self, image_dir: str, txt_classnames:str, transform: List = None, **kwargs):
+    def __init__(self, image_dir: str, txt_classnames: str, transform: List = None, **kwargs):
         self.image_dir = image_dir
         self.txt_classnames = txt_classnames
         self.transform = transform
@@ -123,9 +125,14 @@ class SegmentationPipeline(object):
             classnames=CLASSNAMES,
             num_classes=len(CLASSNAMES)).to(self.device)
 
-        if self.weights:
-            state_dict = torch.load(self.weights)
-            self.model = load_state_dict(self.model, state_dict, 'model')
+        global SEGMENTIZER
+        # Not to load the same classification model again
+        if SEGMENTIZER is None or SEGMENTIZER.name != self.model.name:
+            SEGMENTIZER = self.model
+
+            if self.weights:
+                state_dict = torch.load(self.weights)
+                SEGMENTIZER = load_state_dict(self.model, state_dict, 'model')
 
     def infocheck(self):
         device_info = get_devices_info(self.device_name)
@@ -178,6 +185,8 @@ class SegmentationPipeline(object):
 
 
 if __name__ == '__main__':
-    opts = Opts().parse_args()
-    val_pipeline = SegmentationPipeline(opts)
+    seg_args = InferenceArguments(key="segmentation")
+    opts = Opts(seg_args.config).parse_args()
+    img_dir = ""
+    val_pipeline = SegmentationPipeline(opts, img_dir)
     val_pipeline.inference()
