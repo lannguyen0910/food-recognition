@@ -2,7 +2,7 @@ global:
   debug: True
   cfg_transform: configs/segmentation/transform.yaml
   save_dir: static/assets/segmentation
-  device: cuda:0
+  device: cuda:0 # [cpu, cuda:0]
   weights: weights/seg_net.pth
 model:
   name: BaseSegModel

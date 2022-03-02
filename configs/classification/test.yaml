@@ -2,7 +2,7 @@ global:
   debug: True
   cfg_transform: configs/classification/transform.yaml
   save_dir: static/assets/classification
-  device: cuda:0
+  device: cuda:0 # [cpu, cuda:0]
   weights: weights/effnet_b4.pth
 
 model:

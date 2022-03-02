@@ -2,8 +2,8 @@ global:
   debug: True
   cfg_transform: configs/detection/transform.yaml
   save_dir: static/assets/detection
-  device: cuda:0
-  weights: null
+  device: cuda:0 # [cpu, cuda:0]
+  weights: ["yolov5s", "yolov5m", "yolov5l", "yolov5x"]
 
 data:
   dataloader:
