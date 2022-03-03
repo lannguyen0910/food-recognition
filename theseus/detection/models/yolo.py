@@ -1,5 +1,4 @@
 # Author: Zylo117
-import os
 import json
 import numpy as np
 
@@ -7,30 +6,6 @@ import torch
 from torch import nn
 
 from typing import Any, Dict
-from utilities.utils.utils import download_pretrained_weights
-
-CACHE_DIR = './.cache'
-
-
-def get_model(args, config, num_classes):
-
-    NUM_CLASSES = num_classes
-    print('Number of classes: ', NUM_CLASSES)
-
-    net = None
-
-    if args.weight is None:
-        os.makedirs(CACHE_DIR, exist_ok=True)
-        args.weight = os.path.join(CACHE_DIR, f'{config.model_name}.pt')
-        download_pretrained_weights(f'{config.model_name}', args.weight)
-
-    net = YoloBackbone(
-        weight=args.weight,
-        min_iou=args.min_iou,
-        min_conf=args.min_conf,
-        max_det=args.max_det)
-
-    return net
 
 
 class BaseBackbone(nn.Module):
