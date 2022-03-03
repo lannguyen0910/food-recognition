@@ -210,12 +210,12 @@ def ensemble_models(input_path, image_size, tta=False):
     args4.tta = tta
 
     # class_names, num_classes = get_class_names(args1.weight)
-    config1 = get_config(model_name='yolov5s')
-    config2 = get_config(model_name='yolov5m')
-    config3 = get_config(model_name='yolov5l')
-    config4 = get_config(model_name='yolov5x')
+    config1 = get_config(model_name=os.path.join('detection', 'yolov5s'))
+    config2 = get_config(model_name=os.path.join('detection', 'yolov5m'))
+    config3 = get_config(model_name=os.path.join('detection', 'yolov5l'))
+    config4 = get_config(model_name=os.path.join('detection', 'yolov5x'))
 
-    class_names, num_classes = get_class_names('yolov5s')
+    class_names, num_classes = get_class_names(model_name=os.path.join('detection','yolov5s'))
 
     result_dict1 = detect(args1, config1)
     result_dict2 = detect(args2, config2)
@@ -369,7 +369,7 @@ def get_video_prediction(
 
     args = Arguments(model_name=model_name)
 
-    config = get_config(model_name)
+    config = get_config(model_name=os.path.join('detection', model_name))
 
     if config is None:
         print("Config not found. Load configs from configs/configs.yaml")
@@ -427,14 +427,14 @@ def get_prediction(
     # check whether cache exists
     if check_cache(hashed_key):
         print(f"Load cache from {hashed_key}")
-        class_names, _ = get_class_names(model_name)
+        class_names, _ = get_class_names(model_name=os.path.join('detection', model_name))
         result_dict = load_cache(hashed_key)
     else:
         if not ensemble:
             args = Arguments(model_name=model_name)
-            class_names, _ = get_class_names(model_name)
+            class_names, _ = get_class_names(model_name=os.path.join('detection', model_name))
 
-            config = get_config(model_name)
+            config = get_config(model_name=os.path.join('detection', model_name))
             if config is None:
                 print("Config not found. Load configs from configs/configs.yaml")
                 config = Config(os.path.join('model/configs', 'configs.yaml'))
