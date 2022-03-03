@@ -76,7 +76,7 @@ def classify(weight, img_list):
         collate_fn=testset.collate_fn
     )
 
-    class_names, num_classes = get_class_names(cfg_name)
+    class_names, num_classes = get_class_names(os.path.join(cfg_target, cfg_name))
 
     if CLASSIFIER is None or CLASSIFIER.model_name != config.model_name:
         net = BaseTimmModel(
