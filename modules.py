@@ -4,6 +4,8 @@ from PIL import Image
 import numpy as np
 import os
 import pandas as pd
+from theseus.utilities.visualization.visualizer import Visualizer
+
 from utilities import (
     detect, Config, get_config, get_class_names,
     download_weights, draw_boxes_v2, postprocessing,
@@ -22,7 +24,6 @@ class Arguments:
         self.weight = None
         self.input_path = ""
         self.output_path = ""
-        self.gpus = "0"
         self.min_conf = 0.001
         self.min_iou = 0.99
         self.tta = False
@@ -52,22 +53,20 @@ def download_pretrained_weights(name, cached=None):
     return download_weights(weight_urls[name], cached)
 
 
-def draw_image(out_path, ori_img, result_dict, class_names):
+def draw_image(out_path, visualizer, result_dict, class_names):
     if os.path.isfile(out_path):
         os.remove(out_path)
 
     if "names" in result_dict.keys():
-        draw_boxes_v2(
+        visualizer.draw_bboxes_v2(
             out_path,
-            ori_img,
             result_dict["boxes"],
             result_dict["labels"],
             result_dict["scores"],
             label_names=result_dict["names"])
     else:
-        draw_boxes_v2(
+        visualizer.draw_bboxes_v2(
             out_path,
-            ori_img,
             result_dict["boxes"],
             result_dict["labels"],
             result_dict["scores"],
@@ -148,51 +147,7 @@ def drop_duplicate_fill0(result_dict):
     return new_result_dict
 
 
-def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
-
-    boxes = np.array(result_dict['boxes'])
-    scores = np.array(result_dict['scores'])
-    labels = np.array(result_dict['labels'])
-    if len(boxes) != 0:
-        boxes[:, 2] += boxes[:, 0]
-        boxes[:, 3] += boxes[:, 1]
-
-        outputs = {
-            'bboxes': boxes,
-            'scores': scores,
-            'classes': labels
-        }
-
-        outputs = postprocessing(
-            outputs,
-            current_img_size=[img_w, img_h],
-            min_iou=min_iou,
-            min_conf=min_conf,
-            output_format='xywh',
-            mode='nms')
-
-        boxes = outputs['bboxes']
-        labels = outputs['classes']
-        scores = outputs['scores']
-
-    return {
-        'boxes': boxes,
-        'labels': labels,
-        'scores': scores
-    }
-
-
 def ensemble_models(input_path, image_size, tta=False):
-
-    # ignore_keys = [
-    #     'min_iou_val',
-    #     'min_conf_val',
-    #     'tta',
-    #     'gpu_devices',
-    #     'tta_ensemble_mode',
-    #     'tta_conf_threshold',
-    #     'tta_iou_threshold',
-    # ]
 
     args1 = Arguments(model_name='yolov5s')
     args2 = Arguments(model_name='yolov5m')
@@ -341,10 +296,18 @@ def label_enhancement(image, result_dict):
             'effnetb4',
             cached=tmp_path)
 
-    new_names, new_probs = classify(tmp_path, img_list)
+    new_dict = classify(tmp_path, img_list)
+
+    """
+    new_dict = {
+        'filename': [],
+        'label': [],
+        'score': []
+    }
+    """
 
     for idx, id in enumerate(new_id_list):
-        result_dict['names'][id] = new_names[idx]
+        result_dict['names'][id] = new_dict['label'][idx]
 
     return result_dict
 
@@ -387,7 +350,7 @@ def get_video_prediction(
     return video_detect.run()
 
 
-def get_prediction(
+def get_detection_prediction(
         input_path,
         output_path,
         model_name,
@@ -396,16 +359,6 @@ def get_prediction(
         min_iou=0.5,
         min_conf=0.1,
         enhance_labels=False):
-
-    # ignore_keys = [
-    #     'min_iou_val',
-    #     'min_conf_val',
-    #     'tta',
-    #     'gpu_devices',
-    #     'tta_ensemble_mode',
-    #     'tta_conf_threshold',
-    #     'tta_iou_threshold',
-    # ]
 
     # get hashed key from image path
     ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
@@ -451,10 +404,10 @@ def get_prediction(
         save_cache(result_dict, hashed_key)
         print(f"Save cache to {hashed_key}")
 
-    class_names.insert(0, "Background")
+    # class_names.insert(0, "Background")
 
     # post process
-    result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+    # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)
@@ -469,8 +422,11 @@ def get_prediction(
     # Save metadata food info as CSV
     save_cache(result_dict, ori_hashed_key+'_metadata', METADATA_FOLDER)
 
+    visualizer = Visualizer()
+    visualizer.set_image(ori_img)
+
     # draw result
-    draw_image(output_path, ori_img, result_dict, class_names)
+    draw_image(output_path, visualizer, result_dict, class_names)
 
     result_list = convert_dict_to_list(result_dict)
 
