@@ -175,7 +175,7 @@ class VideoDetect:
         self.fusion_mode = config.fusion_mode
 
         self.class_names, num_classes = config.names, config.nc
-        self.class_names.insert(0, 'Background')
+        # self.class_names.insert(0, 'Background')
 
         if args.tta:
             self.tta = TTA(

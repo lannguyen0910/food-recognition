@@ -137,12 +137,14 @@ class ClassificationPipeline(object):
     def inference(self):
         self.infocheck()
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
-
+    
         df_dict = {
             'filename': [],
             'label': [],
             'score': []
         }
+
+        CLASSIFIER.eval()
 
         for idx, batch in enumerate(tqdm(self.dataloader)):
             img_names = batch['img_names']

@@ -10,6 +10,7 @@ from theseus.opt import Config, Opts, InferenceArguments
 from typing import List
 from PIL import Image
 from datetime import datetime
+from tqdm import tqdm
 
 import numpy as np
 import torch
@@ -150,7 +151,7 @@ class SegmentationPipeline(object):
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
 
         visualizer = Visualizer()
-        self.model.eval()
+        SEGMENTIZER.eval()
 
         saved_mask_dir = os.path.join(self.savedir, 'masks')
         saved_overlay_dir = os.path.join(self.savedir, 'overlays')
@@ -158,7 +159,7 @@ class SegmentationPipeline(object):
         os.makedirs(saved_mask_dir, exist_ok=True)
         os.makedirs(saved_overlay_dir, exist_ok=True)
 
-        for idx, batch in enumerate(self.dataloader):
+        for idx, batch in enumerate(tqdm(self.dataloader)):
             inputs = batch['inputs']
             img_names = batch['img_names']
             ori_sizes = batch['ori_sizes']
