@@ -67,6 +67,7 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
+<strong><i>[../03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>. <br>
 <strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 latest versions P5-P6. Can load checkpoints from original repo.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android. <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app. <br>
@@ -106,6 +107,12 @@ food-detection-yolov5
 | --------------- | :--------: | :----: | :----: | :----------: | :------: |
 | EfficientNet-b4 |  640x640   |   7    | 84.069 |    86.033    |  84.116  |
 
+## 🌟 **Logs detail**
+In total, there are 3 implementation versions:
+1. Training using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
+2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
+3. Update Theseus template. Add semantic segmentation to webapp. Techniques adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
+
  ## 🌟 **Inference**
 - File structure
 ```
@@ -123,8 +130,6 @@ this repo
 - Install dependencies.
 ```
 pip install -r requirements.txt
-pip uninstall opencv-python-headless==4.5.5.62
-pip install opencv-python-headless==4.5.2.52
 ```
 
 <!-- - (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display ```MP4``` video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the inference notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
@@ -166,11 +171,7 @@ In addition, we find that if we expand the problem to include classification, th
 We also perform the aggregation of the two data sets above into one. The new set includes <b>93,748 training images</b> and <b>26,825 evaluation images</b> with a total of <b>180 different dishes</b>. It can be seen that the number of dishes has increased significantly, if the model detects a dish labeled "Other Foods", the classification model will be applied to this dish and classified again.
 </details>
 
-## 🌟 **YOLOv5 models**
-We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. We have 2 implementation versions:
-1. Use our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
-2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
-3. 
+
 ## 🌟 **Server**
 <details>
 <summary>Implementation details</summary>
