@@ -73,49 +73,35 @@ food-detection-yolov5
  <strong><i>[16/07/2021]</i></strong> All trained checkpoints on custom data have been lost. Now use pretrained models on COCO for inference. 
 </details>
 
-🚨 **UPDATE**:
-- WandB yolov5 training visualization (4 versions): <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a> 
-- The accuracy is very high on our custom datasets now (90 classes), more datasets will be added in the future.
-- [Food app](https://github.com/lannguyen0910/food-detection-yolov5/tree/food-android) branch (not update yet).
-- Current [weights](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing).
-- Code was refactored and cleaned, easy for understanding and scaling.
-
-<!-- - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights. -->
-## Table of Contents
-1. [Notebook](#--notebook)
-2. [Inference](#-inference-on-local-machine-gpu-or-cpu)
-3. [Datasets](#dataset)
-   * [Drive](#-dataset)
-   * [Details](#-dataset-details)
-5. [Implementation](#experiments)
-   * [Models](#-yolov5-models)
-   * [Server](#-server)
-6. [Demo](#-sample-results)
-7. [Appendix](#-appendix)
-8. [Credits](#-credits)
-
 ## 📔  **Notebook**
 - For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
-- For training, refer to this notebook for your own training [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
-- For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing)
+- For training, refer to this notebook for your own training:
+  - Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
+<!-- - For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing) -->
 
- ## 🌟 **Inference on local machine (GPU or CPU)**
-- Clone the repo.
-```
-git clone https://github.com/lannguyen0910/food-detection-yolov5
-cd food-detection-yolov5/
-```
+
+## 📝 **Pretrained-weights**
+- Link: [weights](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing)
+- Detection: <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a>
+
+| Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
+| ------- | :--------: | :----: | :-----: | :----------: |
+| YOLOv5s |  640x640   |  172   |  90.7   |     67.1     |
+| YOLOv5m |  640x640   |  112   |  89.7   |     66.6     |
+| YOLOv5l |  640x640   |  118   |   94    |      73      |
+| YOLOv5x |  640x640   |   62   |  77.9   |     53.3     |
+
+
+ ## 🌟 **Inference**
 - Install dependencies.
 ```
 pip install -r requirements.txt
-pip uninstall opencv-python-headless==4.5.5.62
-pip install opencv-python-headless==4.5.2.52
 ```
 
-- (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display ```MP4``` video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the inference notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
+<!-- - (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display ```MP4``` video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the inference notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
 ```
 sudo apt-get install ffmpeg
-```
+``` -->
 
 - Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
 ```
@@ -127,8 +113,14 @@ run.bat
 gpu: True
 ```
 
+## 🌟 **Logs detail**
+We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. We have 2 implementation versions:
+1. Train using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
+2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
+
 ## 🌟 **Dataset**
-- Datasets: [detection-dataset](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged 2 datasets) & [classification-dataset](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing) (MAFood121)
+- Detection: [link](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged 2 datasets).
+- Classification: [link](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing) (MAFood121)
 
 ## 🌟 **Dataset details**
 <details>
@@ -147,11 +139,6 @@ In addition, we find that if we expand the problem to include classification, th
   
 We also perform the aggregation of the two data sets above into one. The new set includes <b>93,748 training images</b> and <b>26,825 evaluation images</b> with a total of <b>180 different dishes</b>. It can be seen that the number of dishes has increased significantly, if the model detects a dish labeled "Other Foods", the classification model will be applied to this dish and classified again.
 </details>
-
-## 🌟 **YOLOv5 models**
-We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. We have 2 implementation versions:
-1. Old: Use our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
-2. New: Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
 
 ## 🌟 **Server**
 <details>
@@ -197,38 +184,6 @@ When a dish is predicted, we provide more information about the nutritional leve
   <img src="demo/6.jpg" width="100%" />
 </p>
 
-## 📝 **Appendix**
-<details open>
-<summary>mAP of each model. Visualization details at: <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a></summary>
-  <br>
- 
-- Valset: 
-
-| Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
-| ------- | :--------: | :----: | :-----: | :----------: |
-| YOLOv5s |  640x640   |  172   |  90.7   |    67.1     |
-| YOLOv5m |  640x640   |  112   |  89.7   |    66.6     |
-| YOLOv5l |  640x640   |  118   |  94     |      73     |
-| YOLOv5x |  640x640   |   62   |  77.9  |    53.3    |
-
-
-<!-- - Testset (old version):
-
-| Models  | Image Size | mAPsmall | mAPmedium | mAPlarge | mAP@0.5:0.95 |
-| ------- | :--------: | :------: | :-------: | :------: | :----------: |
-| YOLOv5s |  640x640   |   6.3    |   28.4    |   30.3   |     30.5     |
-| YOLOv5m |  640x640   |   7.5    |   28.7    |   30.6   |     30.9     |
-| YOLOv5l |  640x640   |   38.4   |   46.8    |   57.9   |     57.5     |
-| YOLOv5x |  640x640   |   55.0   |   48.9    |   59.8   |     55.1     | -->
-</details>
-
-We conclude that the learned models are quite good compared to such huge data with such a variety of dishes, and their complexity is also guaranteed to be suitable for practical applications. We show that the system is scalable and has high practical significance for the people of Vietnam in particular and the world in general.
-<br>
-
-## 💡 **Further Improvements**
-- We have yet to solve the problem of messy data labels (with one sample labeling the dish, another labeling the ingredients of the dish) causing the score to be not really accurate. You can try to train on other food datasets for better experience!
-
-- Feel free to make a contribution to the project by pulling a request or making an issue.
 
 ## 📙 **Credits**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5.
