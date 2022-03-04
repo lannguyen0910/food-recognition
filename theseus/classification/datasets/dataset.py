@@ -9,11 +9,9 @@ class ClassificationDataset(torch.utils.data.Dataset):
 
     def __init__(
         self,
-        test: bool = False,
         **kwargs
     ):
         super(ClassificationDataset, self).__init__(**kwargs)
-        self.train = not (test)
         self.classes_idx = {}
         self.classnames = None
         self.transform = None
@@ -27,7 +25,9 @@ class ClassificationDataset(torch.utils.data.Dataset):
         """
         Get one item
         """
-        image_path, label_name = self.fns[idx]
+        image_name, label_name = self.fns[idx]
+        image_path = os.path.join(self.image_dir, image_name)
+
         im = Image.open(image_path).convert('RGB')
         width, height = im.width, im.height
         class_idx = self.classes_idx[label_name]
@@ -42,7 +42,7 @@ class ClassificationDataset(torch.utils.data.Dataset):
         return {
             "input": im, 
             'target': target,
-            'img_name': os.path.basename(image_path),
+            'img_name': image_name,
             'ori_size': [width, height]
         }
 
@@ -55,12 +55,12 @@ class ClassificationDataset(torch.utils.data.Dataset):
         """
         imgs = torch.stack([s['input'] for s in batch])
         targets = torch.stack([torch.LongTensor(s['target']['labels']) for s in batch])
-
-        # if self.mixupcutmix is not None:
-        #     imgs, targets = self.mixupcutmix(imgs, targets.squeeze(1))
-        # targets = targets.float()
+        img_names = [s['img_name'] for s in batch]
+        ori_sizes = [s['ori_size'] for s in batch]
 
         return {
             'inputs': imgs,
-            'targets': targets
+            'targets': targets,
+            'img_names': img_names,
+            'ori_sizes': ori_sizes,
         }

@@ -4,13 +4,13 @@ import torch
 import numpy as np
 import pandas as pd
 from PIL import Image
-from .dataset import SegmentationDataset
+from .dataset import SemanticDataset
 from theseus.utilities.loggers.observer import LoggerObserver
 
 LOGGER = LoggerObserver.getLogger('main')
 
 
-class CSVDataset(SegmentationDataset):
+class CSVDataset(SemanticDataset):
     r"""CSVDataset multi-labels segmentation dataset
 
     Reads in .csv file with structure below:
@@ -58,9 +58,7 @@ class CSVDataset(SegmentationDataset):
         df = pd.read_csv(self.csv_path)
         for idx, row in df.iterrows():
             img_name, mask_name = row
-            image_path = os.path.join(self.image_dir,img_name)
-            mask_path = os.path.join(self.mask_dir, mask_name)
-            self.fns.append([image_path, mask_path])
+            self.fns.append([img_name, mask_name])
 
     def _calculate_classes_dist(self):
         LOGGER.text("Calculating class distribution...", LoggerObserver.DEBUG)
@@ -76,10 +74,8 @@ class CSVDataset(SegmentationDataset):
 
 
     def _load_mask(self, label_path):
-        mask = Image.open(label_path).convert('RGB')
-        mask = np.array(mask)[:,:,::-1] # (H,W,3)
-        mask = np.argmax(mask, axis=-1)  # (H,W) with each pixel value represent one class
-
+        mask = Image.open(label_path).convert('L')
+        mask = np.array(mask)  # (H,W) with each pixel value represent one class
         return mask 
 
     def _encode_masks(self, masks):

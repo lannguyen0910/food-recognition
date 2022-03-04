@@ -1,12 +1,6 @@
 import torch
-import torch.nn as nn
-import torchvision
 import numpy as np
-import math
-import webcolors
-import cv2
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+
 from ensemble_boxes import weighted_boxes_fusion, nms
 
 

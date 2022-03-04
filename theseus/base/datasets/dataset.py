@@ -60,14 +60,14 @@ class ImageDataset(data.Dataset):
         self.fns = []
         image_names = os.listdir(self.image_dir)
         for image_name in image_names:
-            image_path = os.path.join(self.image_dir, image_name)
-            self.fns.append(image_path)
+            self.fns.append(image_name)
 
     def __getitem__(self, index: int):
         """
         Get an item from memory
         """
-        image_path = self.fns[index]
+        image_name = self.fns[index]
+        image_path = os.path.join(self.image_dir, image_name)
         im = Image.open(image_path).convert('RGB')
         width, height = im.width, im.height
 
@@ -76,7 +76,7 @@ class ImageDataset(data.Dataset):
 
         return {
             "input": im, 
-            'img_name': os.path.basename(image_path),
+            'img_name': image_name,
             'ori_size': [width, height]
         }
 
@@ -86,8 +86,10 @@ class ImageDataset(data.Dataset):
     def collate_fn(self, batch: List):
         imgs = torch.stack([s['input'] for s in batch])
         img_names = [s['img_name'] for s in batch]
+        ori_sizes = [s['ori_size'] for s in batch]
 
         return {
             'inputs': imgs,
-            'img_names': img_names
+            'img_names': img_names,
+            'ori_sizes': ori_sizes
         }

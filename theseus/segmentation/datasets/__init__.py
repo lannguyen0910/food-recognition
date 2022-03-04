@@ -1,7 +1,7 @@
 from theseus.base.datasets import DATASET_REGISTRY, DATALOADER_REGISTRY
 
 from .csv_dataset import CSVDataset
-from .mosaic_dataset import CSVDatasetWithMosaic
+DATASET_REGISTRY.register(CSVDataset, "SEG_")
 
-DATASET_REGISTRY.register(CSVDataset)
-DATASET_REGISTRY.register(CSVDatasetWithMosaic)
+from .mosaic_collator import MosaicCollator
+DATALOADER_REGISTRY.register(MosaicCollator)
