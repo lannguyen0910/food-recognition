@@ -6,12 +6,9 @@ import os
 import pandas as pd
 from theseus.utilities.visualization.visualizer import Visualizer
 from theseus.utilities.download import download_from_drive
+from theseus.utilities import box_fusion, change_box_order
+from theseus.apis.inference import *
 
-from utilities import (
-    detect, Config, get_config, get_class_names,
-    download_weights, draw_boxes_v2, postprocessing,
-    box_fusion, classify, change_box_order,
-    VideoPipeline)
 from analyzer import get_info_from_db
 
 CACHE_DIR = './weights'
@@ -324,7 +321,7 @@ def ensemble_models(input_path, image_size, tta=False):
     return result_dict, class_names
 
 
-def get_detection_prediction(
+def get_prediction(
         input_path,
         output_path,
         model_name,
@@ -332,10 +329,19 @@ def get_detection_prediction(
         ensemble=False,
         min_iou=0.5,
         min_conf=0.1,
+        segmentation=False,
         enhance_labels=False):
 
     # get hashed key from image path
     ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
+
+    if segmentation:
+        seg_args = InferenceArguments(key="segmentation")
+        opts = Opts(seg_args.config).parse_args()
+        seg_pipeline = SegmentationPipeline(opts, input_path)
+        seg_pipeline.inference()
+
+        return output_path
 
     # additional tags
     model_tag = model_name[-1]
@@ -356,21 +362,25 @@ def get_detection_prediction(
         print(f"Load cache from {hashed_key}")
         # class_names, _ = get_class_names(model_name)
         result_dict = load_cache(hashed_key)
+
     else:
         if not ensemble:
-            args = Arguments(model_name=model_name)
-            class_names, _ = get_class_names(model_name)
+            args = DetectionArguments(
+                model_name=model_name,
+                input_path=input_path,
+                output_path=output_path,
+                min_conf=min_conf,
+                min_iou=min_iou,
+                tta=tta,
+                tta_ensemble_mode='wbf',
+                tta_conf_threshold=0.01,
+                tta_iou_threshold=0.9,
+            )
 
-            config = get_config(model_name)
-            if config is None:
-                print("Config not found. Load configs from configs/configs.yaml")
-                config = Config(os.path.join('model/configs', 'configs.yaml'))
-            else:
-                print("Load configs from weight")
-
-            args.input_path = input_path
-            args.tta = tta
-            result_dict = detect(args, config)
+            det_args = InferenceArguments(key="detection")
+            opts = Opts(det_args.config).parse_args()
+            det_pipeline = DetectionPipeline(opts, args)
+            result_dict = det_pipeline.inference()
 
         else:
             result_dict, class_names = ensemble_models(
