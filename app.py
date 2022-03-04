@@ -171,11 +171,6 @@ def homepage():
     return resp
 
 
-@app.route('/about')
-def about_page():
-    return render_template("about-page.html")
-
-
 @app.route('/url')
 def detect_by_url_page():
     return render_template("input-url.html")

@@ -30,3 +30,4 @@ test.py
 .cache
 .zip.zip
 example
+video_detect.py
