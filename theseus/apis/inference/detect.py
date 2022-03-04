@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from theseus.segmentation.models import MODEL_REGISTRY
 from theseus.segmentation.augmentations import TRANSFORM_REGISTRY
-from theseus.segmentation.datasets import DATASET_REGISTRY, DATALOADER_REGISTRY
+from theseus.segmentation.datasets import DATALOADER_REGISTRY
 import pandas as pd
 import os
 import torch
@@ -18,7 +18,6 @@ from theseus.opt import Config
 from tqdm import tqdm
 from datetime import datetime
 from PIL import Image
-from theseus.opt import Opts
 from typing import List, Any
 
 CACHE_DIR = './weights'
@@ -137,11 +136,11 @@ class DetectionPipeline(object):
         )
 
         self.model = get_instance(
-            input_args.model_name,
+            opt['model'],
             registry=MODEL_REGISTRY,
+            weight=input_args.model_name,
             min_iou=input_args.min_iou,
-            min_conf=input_args.min_conf,
-            max_det=self.opt['global']['max_det']
+            min_conf=input_args.min_conf
         ).to(self.device)
 
         global DETECTOR

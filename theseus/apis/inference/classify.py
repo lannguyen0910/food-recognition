@@ -6,14 +6,13 @@ from theseus.utilities.getter import (get_instance, get_instance_recursively)
 from theseus.utilities.cuda import get_devices_info
 from theseus.utilities.loggers import LoggerObserver, StdoutLogger
 from theseus.utilities.loading import load_state_dict
-from theseus.classification.datasets import DATASET_REGISTRY, DATALOADER_REGISTRY
+from theseus.classification.datasets import DATALOADER_REGISTRY
 from theseus.classification.augmentations import TRANSFORM_REGISTRY
 from theseus.classification.models import MODEL_REGISTRY
-from theseus.opt import Config, InferenceArguments
+from theseus.opt import Opts, Config, InferenceArguments
 from tqdm import tqdm
 from datetime import datetime
 from PIL import Image
-from theseus.opt import Opts
 from typing import List
 
 import matplotlib as mpl
@@ -137,7 +136,7 @@ class ClassificationPipeline(object):
     def inference(self):
         self.infocheck()
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
-    
+
         df_dict = {
             'filename': [],
             'label': [],

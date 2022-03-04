@@ -1,3 +1,3 @@
-from .classify import *
-from .segmentize import *
-from .detect import *
+from .classify import ClassificationPipeline
+from .segmentize import SegmentationPipeline
+from .detect import DetectionPipeline

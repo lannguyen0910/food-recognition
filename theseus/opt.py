@@ -18,7 +18,6 @@ class InferenceArguments:
     """
 
     def __init__(self, key: str = None, config_file: str = 'test.yaml') -> None:
-        self.config = None
         assert key is not None, \
             "Please choose a task: ['detection', 'segmentation', 'classification']."
 
