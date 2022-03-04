@@ -109,7 +109,6 @@ class DetectionPipeline(object):
         self.device = torch.device(self.device_name)
 
         self.weights = input_args.weight
-        self.output_path = input_args.output_path
 
         if input_args.tta:
             self.tta = TTA(
@@ -128,7 +127,7 @@ class DetectionPipeline(object):
             transform=self.transform['val']
         )
 
-        CLASSNAMES = self.dataset.classnames
+        self.class_names = opt['global']['class_names']
 
         self.dataloader = get_instance(
             opt['data']["dataloader"],
@@ -138,7 +137,7 @@ class DetectionPipeline(object):
         )
 
         self.model = get_instance(
-            self.opt["model"],
+            input_args.model_name,
             registry=MODEL_REGISTRY,
             min_iou=input_args.min_iou,
             min_conf=input_args.min_conf,
