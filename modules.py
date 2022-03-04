@@ -5,6 +5,7 @@ import numpy as np
 import os
 import pandas as pd
 from theseus.utilities.visualization.visualizer import Visualizer
+from theseus.utilities.download import download_from_drive
 
 from utilities import (
     detect, Config, get_config, get_class_names,
@@ -13,29 +14,40 @@ from utilities import (
     VideoPipeline)
 from analyzer import get_info_from_db
 
-CACHE_DIR = './.cache'
+CACHE_DIR = './weights'
 CSV_FOLDER = './static/csv'
 METADATA_FOLDER = './static/metadata'
 
 
-class Arguments:
-    def __init__(self, model_name=None) -> None:
+class DetectionArguments:
+    def __init__(
+        self,
+        model_name: str = None,
+        input_path: str = "",
+        output_path: str = "",
+        min_conf: float = 0.001,
+        min_iou: float = 0.99,
+        tta: bool = False,
+        tta_ensemble_mode: str = 'wbf',
+        tta_conf_threshold: float = 0.01,
+        tta_iou_threshold: float = 0.9,
+    ) -> None:
         self.model_name = model_name
         self.weight = None
-        self.input_path = ""
-        self.output_path = ""
-        self.min_conf = 0.001
-        self.min_iou = 0.99
-        self.tta = False
-        self.tta_ensemble_mode = "wbf"
-        self.tta_conf_threshold = 0.01
-        self.tta_iou_threshold = 0.9
+        self.input_path = input_path
+        self.output_path = output_path
+        self.min_conf = min_conf
+        self.min_iou = min_iou
+        self.tta = tta
+        self.tta_ensemble_mode = tta_ensemble_mode
+        self.tta_conf_threshold = tta_conf_threshold
+        self.tta_iou_threshold = tta_iou_threshold
 
         if self.model_name:
             tmp_path = os.path.join(CACHE_DIR, self.model_name+'.pt')
             download_pretrained_weights(
                 self.model_name,
-                cached=tmp_path)
+                output=tmp_path)
             self.weight = tmp_path
 
 
@@ -45,12 +57,12 @@ weight_urls = {
     "yolov5l": "1sBciFcRav2ZE6jzhWnca9uegjQ4860om",
     "yolov5x": "1CRD6T9QtH9XEa-h985_Ho6jgLWu58zn0",
     "effnetb4": "1-K_iDfuhxQFHIF9HTy8SvfnIFwjqxtaX",
-    "htc_seg": "1wPVkCE5GPzNCU2pSkq02JnzmQ_A7YV6C",
+    "semantic_seg": "19JRQr9xs2SIeTxX0TQ0k4U9ZnihahvqC"
 }
 
 
-def download_pretrained_weights(name, cached=None):
-    return download_weights(weight_urls[name], cached)
+def download_pretrained_weights(name, output=None):
+    return download_from_drive(weight_urls[name], output)
 
 
 def draw_image(out_path, visualizer, result_dict, class_names):
@@ -147,6 +159,91 @@ def drop_duplicate_fill0(result_dict):
     return new_result_dict
 
 
+def append_food_name(food_dict, class_names):
+    food_labels = food_dict['labels']
+    food_names = [' '.join(class_names[int(i)].split('-'))
+                  for i in food_labels]
+    food_dict['names'] = food_names
+    return food_dict
+
+
+def append_food_info(food_dict):
+    food_names = food_dict['names']
+    food_info = get_info_from_db(food_names)
+    food_dict.update(food_info)
+    return food_dict
+
+
+def convert_dict_to_list(result_dict):
+    result_list = []
+    num_items = len(result_dict['labels'])
+    for i in range(num_items):
+        item_dict = {}
+        for key in result_dict.keys():
+            item_dict[key] = result_dict[key][i]
+        result_list.append(item_dict)
+    return result_list
+
+
+def crop_box(image, box, expand=10):
+
+    h, w, c = image.shape
+    # expand box a little
+    new_box = box.copy()
+    # new_box[0] -= expand
+    # new_box[1] -= expand
+    # new_box[2] += expand
+    # new_box[3] += expand
+
+    # new_box[0] = max(0, new_box[0])
+    # new_box[1] = max(0, new_box[1])
+    # new_box[2] = min(h, new_box[2])
+    # new_box[3] = min(w, new_box[3])
+
+    # xyxy box, cv2 image h,w,c
+    return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
+
+
+def label_enhancement(image, result_dict):
+    boxes = np.array(result_dict['boxes'])
+    labels = np.array(result_dict['labels'])
+    if len(boxes) == 0:
+        return result_dict
+    boxes[:, 2] += boxes[:, 0]  # xyxy
+    boxes[:, 3] += boxes[:, 1]  # xyxy
+
+    # Label starts at 1
+    img_list = []
+    new_id_list = []
+
+    for box_id, (box, label) in enumerate(zip(boxes, labels)):
+        if label == 34 or label == 65:  # perform classification on "food" label and "food-drinks" label
+            cropped = crop_box(image, box)  # rgb
+            img_list.append(cropped.copy())
+            new_id_list.append(box_id)
+
+    tmp_path = os.path.join(CACHE_DIR, 'effnetb4.pth')
+    if not os.path.isfile(tmp_path):
+        download_pretrained_weights(
+            'effnetb4',
+            output=tmp_path)
+
+    new_dict = classify(tmp_path, img_list)
+
+    """
+    new_dict = {
+        'filename': [],
+        'label': [],
+        'score': []
+    }
+    """
+
+    for idx, id in enumerate(new_id_list):
+        result_dict['names'][id] = new_dict['label'][idx]
+
+    return result_dict
+
+
 def ensemble_models(input_path, image_size, tta=False):
 
     args1 = Arguments(model_name='yolov5s')
@@ -227,129 +324,6 @@ def ensemble_models(input_path, image_size, tta=False):
     return result_dict, class_names
 
 
-def append_food_name(food_dict, class_names):
-    food_labels = food_dict['labels']
-    food_names = [' '.join(class_names[int(i)].split('-'))
-                  for i in food_labels]
-    food_dict['names'] = food_names
-    return food_dict
-
-
-def append_food_info(food_dict):
-    food_names = food_dict['names']
-    food_info = get_info_from_db(food_names)
-    food_dict.update(food_info)
-    return food_dict
-
-
-def convert_dict_to_list(result_dict):
-    result_list = []
-    num_items = len(result_dict['labels'])
-    for i in range(num_items):
-        item_dict = {}
-        for key in result_dict.keys():
-            item_dict[key] = result_dict[key][i]
-        result_list.append(item_dict)
-    return result_list
-
-
-def crop_box(image, box, expand=10):
-
-    h, w, c = image.shape
-    # expand box a little
-    new_box = box.copy()
-    # new_box[0] -= expand
-    # new_box[1] -= expand
-    # new_box[2] += expand
-    # new_box[3] += expand
-
-    # new_box[0] = max(0, new_box[0])
-    # new_box[1] = max(0, new_box[1])
-    # new_box[2] = min(h, new_box[2])
-    # new_box[3] = min(w, new_box[3])
-
-    # xyxy box, cv2 image h,w,c
-    return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
-
-
-def label_enhancement(image, result_dict):
-    boxes = np.array(result_dict['boxes'])
-    labels = np.array(result_dict['labels'])
-    if len(boxes) == 0:
-        return result_dict
-    boxes[:, 2] += boxes[:, 0]  # xyxy
-    boxes[:, 3] += boxes[:, 1]  # xyxy
-
-    # Label starts at 1
-    img_list = []
-    new_id_list = []
-
-    for box_id, (box, label) in enumerate(zip(boxes, labels)):
-        if label == 34 or label == 65:  # perform classification on "food" label and "food-drinks" label
-            cropped = crop_box(image, box)  # rgb
-            img_list.append(cropped.copy())
-            new_id_list.append(box_id)
-
-    tmp_path = os.path.join(CACHE_DIR, 'effnetb4.pth')
-    if not os.path.isfile(tmp_path):
-        download_pretrained_weights(
-            'effnetb4',
-            cached=tmp_path)
-
-    new_dict = classify(tmp_path, img_list)
-
-    """
-    new_dict = {
-        'filename': [],
-        'label': [],
-        'score': []
-    }
-    """
-
-    for idx, id in enumerate(new_id_list):
-        result_dict['names'][id] = new_dict['label'][idx]
-
-    return result_dict
-
-
-def get_video_prediction(
-        input_path,
-        output_path,
-        model_name,
-        tta,
-        min_iou=0.5,
-        min_conf=0.1):
-
-    # ignore_keys = [
-    #     'min_iou_val',
-    #     'min_conf_val',
-    #     'tta',
-    #     'gpu_devices',
-    #     'tta_ensemble_mode',
-    #     'tta_conf_threshold',
-    #     'tta_iou_threshold',
-    # ]
-
-    args = Arguments(model_name=model_name)
-
-    config = get_config(model_name)
-
-    if config is None:
-        print("Config not found. Load configs from configs/configs.yaml")
-        config = Config(os.path.join(
-            'utilities/configs', 'configs.yaml'))
-    else:
-        print("Load configs!")
-
-    args.input_path = input_path
-    args.output_path = output_path
-    args.min_conf = min_conf
-    args.min_iou = min_iou
-    args.tta = tta
-    video_detect = VideoPipeline(args, config)
-    return video_detect.run()
-
-
 def get_detection_prediction(
         input_path,
         output_path,
@@ -380,7 +354,7 @@ def get_detection_prediction(
     # check whether cache exists
     if check_cache(hashed_key):
         print(f"Load cache from {hashed_key}")
-        class_names, _ = get_class_names(model_name)
+        # class_names, _ = get_class_names(model_name)
         result_dict = load_cache(hashed_key)
     else:
         if not ensemble:
@@ -401,6 +375,7 @@ def get_detection_prediction(
         else:
             result_dict, class_names = ensemble_models(
                 input_path, [img_w, img_h], tta=tta)
+
         save_cache(result_dict, hashed_key)
         print(f"Save cache to {hashed_key}")
 
