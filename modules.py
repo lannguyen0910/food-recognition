@@ -7,7 +7,8 @@ import pandas as pd
 from theseus.utilities.visualization.visualizer import Visualizer
 from theseus.utilities.download import download_from_drive
 from theseus.utilities import box_fusion, change_box_order
-from theseus.apis.inference import *
+from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
+from theseus.opt import Opts, Config, InferenceArguments
 
 from analyzer import get_info_from_db
 
@@ -225,7 +226,11 @@ def label_enhancement(image, result_dict):
             'effnetb4',
             output=tmp_path)
 
-    new_dict = classify(tmp_path, img_list)
+    cls_args = InferenceArguments(key="classification")
+    opts = Opts(cls_args).parse_args()
+    val_pipeline = ClassificationPipeline(opts, img_list)
+    new_dict = val_pipeline.inference()
+    # new_dict = classify(tmp_path, img_list)
 
     """
     new_dict = {
@@ -242,34 +247,26 @@ def label_enhancement(image, result_dict):
 
 
 def ensemble_models(input_path, image_size, tta=False):
+    args1 = DetectionArguments(model_name='yolov5s', input_path=input_path, tta=tta)
+    args2 = DetectionArguments(model_name='yolov5m', input_path=input_path, tta=tta)
+    args3 = DetectionArguments(model_name='yolov5l', input_path=input_path, tta=tta)
+    args4 = DetectionArguments(model_name='yolov5x', input_path=input_path, tta=tta)
 
-    args1 = Arguments(model_name='yolov5s')
-    args2 = Arguments(model_name='yolov5m')
-    args3 = Arguments(model_name='yolov5l')
-    args4 = Arguments(model_name='yolov5x')
+    det_args = InferenceArguments(key="detection")
+    opts = Opts(det_args).parse_args()
 
-    args1.input_path = input_path
-    args2.input_path = input_path
-    args3.input_path = input_path
-    args4.input_path = input_path
+    det_pipeline1 = DetectionPipeline(opts, args1)
+    result_dict1 = det_pipeline1.inference()
 
-    args1.tta = tta
-    args2.tta = tta
-    args3.tta = tta
-    args4.tta = tta
+    det_pipeline2 = DetectionPipeline(opts, args2)
+    result_dict2 = det_pipeline2.inference()
 
-    # class_names, num_classes = get_class_names(args1.weight)
-    config1 = get_config(model_name='yolov5s')
-    config2 = get_config(model_name='yolov5m')
-    config3 = get_config(model_name='yolov5l')
-    config4 = get_config(model_name='yolov5x')
+    det_pipeline3 = DetectionPipeline(opts, args3)
+    result_dict3 = det_pipeline3.inference()
 
-    class_names, num_classes = get_class_names('yolov5s')
-
-    result_dict1 = detect(args1, config1)
-    result_dict2 = detect(args2, config2)
-    result_dict3 = detect(args3, config3)
-    result_dict4 = detect(args4, config4)
+    det_pipeline4 = DetectionPipeline(opts, args4)
+    result_dict4 = det_pipeline4.inference()
+    class_names = det_pipeline4.class_names
 
     merged_boxes = [
         np.array(result_dict1['boxes']),
@@ -298,7 +295,7 @@ def ensemble_models(input_path, image_size, tta=False):
         mode="wbf",
         image_size=image_size,
         iou_threshold=0.9,
-        weights=[0.25, 0.25, 0.25, 0.25]
+        weights=[0.25, 0.25, 0.4, 0.1]
     )
 
     indexes = np.where(final_scores > 0.001)[0]
@@ -336,8 +333,14 @@ def get_prediction(
     ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
 
     if segmentation:
+        tmp_path = os.path.join(CACHE_DIR, 'semantic_seg.pth')
+        if not os.path.isfile(tmp_path):
+            download_pretrained_weights(
+                'semantic_seg',
+                output=tmp_path)
+
         seg_args = InferenceArguments(key="segmentation")
-        opts = Opts(seg_args.config).parse_args()
+        opts = Opts(seg_args).parse_args()
         seg_pipeline = SegmentationPipeline(opts, input_path)
         seg_pipeline.inference()
 
@@ -371,14 +374,11 @@ def get_prediction(
                 output_path=output_path,
                 min_conf=min_conf,
                 min_iou=min_iou,
-                tta=tta,
-                tta_ensemble_mode='wbf',
-                tta_conf_threshold=0.01,
-                tta_iou_threshold=0.9,
+                tta=tta
             )
 
             det_args = InferenceArguments(key="detection")
-            opts = Opts(det_args.config).parse_args()
+            opts = Opts(det_args).parse_args()
             det_pipeline = DetectionPipeline(opts, args)
             result_dict = det_pipeline.inference()
 
