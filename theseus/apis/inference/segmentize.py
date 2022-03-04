@@ -129,7 +129,7 @@ class SegmentationPipeline(object):
             num_classes=len(CLASSNAMES)).to(self.device)
 
         global SEGMENTIZER
-        # Not to load the same classification model again
+        # Not to load the same segmentation model again
         if SEGMENTIZER is None or SEGMENTIZER.name != self.model.name:
             SEGMENTIZER = self.model
 

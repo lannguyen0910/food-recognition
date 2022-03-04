@@ -146,7 +146,7 @@ class DetectionPipeline(object):
         ).to(self.device)
 
         global DETECTOR
-        # Not to load the same classification model again
+        # Not to load the same detection model again
         if DETECTOR is None or DETECTOR.name != self.model.name:
             DETECTOR = self.model
 

@@ -163,11 +163,6 @@ class ClassificationPipeline(object):
 
         df.to_csv(savepath, index=False)
 
-        # if not os.path.exists(savepath):
-        #     df.to_csv(savepath, index=False)
-        # else:
-        #     df.to_csv(savepath, mode='a', index=False, header=False)
-
         return df_dict
 
 
