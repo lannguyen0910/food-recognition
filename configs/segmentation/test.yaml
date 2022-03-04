@@ -3,7 +3,7 @@ global:
   cfg_transform: configs/segmentation/transform.yaml
   save_dir: static/assets/segmentation
   device: cuda:0 # [cpu, cuda:0]
-  weights: weights/seg_net.pth
+  weights: weights/semantic_seg.pth
 model:
   name: BaseSegModel
   args:
@@ -11,12 +11,6 @@ model:
     encoder_name: efficientnet-b4
 
 data:
-  # dataset:
-  #   name: TestDataset
-  # args:
-  #   image_dir: data/images
-  #   txt_classnames: configs/segmentation/classes.txt
-
   dataloader:
     name: DataLoaderWithCollator
     args:

@@ -3,7 +3,6 @@ global:
   cfg_transform: configs/detection/transform.yaml
   save_dir: static/assets/detection
   device: cuda:0 # [cpu, cuda:0]
-  max_det: 300 # # max detections per image limit, output of NMS, set <0 for default [effdet: 100; frcnn: 100; yolo: 1000]
   class_names:
     [
       "hot-dog",
@@ -97,6 +96,11 @@ global:
       "Hu_tieu",
       "Xoi",
     ]
+
+model:
+  name: YoloBackbone
+  args:
+    max_det: 300 # # max detections per image limit, output of NMS, set <0 for default [effdet: 100; frcnn: 100; yolo: 1000]
 
 data:
   dataloader:

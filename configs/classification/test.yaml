@@ -3,7 +3,7 @@ global:
   cfg_transform: configs/classification/transform.yaml
   save_dir: static/assets/classification
   device: cuda:0 # [cpu, cuda:0]
-  weights: weights/effnet_b4.pth
+  weights: weights/effnetb4.pth
 
 model:
   name: BaseTimmModel
@@ -13,12 +13,6 @@ model:
     num_classes: 180
 
 data:
-  # dataset:
-  #   name: ImageDataset
-  # args:
-  #   image_dir: data/images
-  #   txt_classnames: configs/classification/classes.txt
-
   dataloader:
     name: DataLoader
     args:
