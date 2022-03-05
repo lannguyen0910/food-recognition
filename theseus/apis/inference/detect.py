@@ -32,13 +32,13 @@ class DetectionTestset():
     def __init__(self, image_dir: str, transform: List = None, **kwargs):
         self.image_dir = image_dir  # list of cv2 images
         self.transform = transform
+        self.fns = []
         self.load_data()
 
     def load_data(self):
         """
         Load filepaths into memory
         """
-        self.fns = []
         if os.path.isdir(self.image_dir):  # path to image folder
             paths = sorted(os.listdir(self.image_dir))
             for path in paths:
@@ -52,6 +52,7 @@ class DetectionTestset():
         Get an item from memory
         """
         image_path = self.fns[index]
+
         im = Image.open(image_path).convert('RGB')
         # width, height = im.width, im.height
 
@@ -61,6 +62,7 @@ class DetectionTestset():
         if self.transform is not None:
             item = self.transform(image=im)
             im = item['image']
+            # im = self.transform(im)
 
         return {
             "input": im,
@@ -72,7 +74,12 @@ class DetectionTestset():
         return len(self.fns)
 
     def collate_fn(self, batch: List):
-        imgs = torch.stack([s['input'] for s in batch])
+        print('Batch collate: ', batch)
+        batch = [x for x in batch if x is not None]
+        if len(batch) == 0:
+            return None
+
+        imgs = [s['input'] for s in batch]
         img_names = [s['img_name'] for s in batch]
         ori_imgs = [s['ori_img'] for s in batch]
 
@@ -146,11 +153,11 @@ class DetectionPipeline(object):
         global DETECTOR
         # Not to load the same detection model again
         if DETECTOR is None or DETECTOR.name != self.model.name:
-            DETECTOR = self.model
 
             if self.weights:
                 state_dict = torch.load(self.weights)
-                DETECTOR = load_state_dict(self.model, state_dict, 'model')
+                DETECTOR = load_state_dict(self.model, state_dict,
+                                           'model', is_detection=True)
 
     def infocheck(self):
         device_info = get_devices_info(self.device_name)

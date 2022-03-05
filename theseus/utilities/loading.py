@@ -12,7 +12,7 @@ def load_yaml(path):
         return yaml.safe_load(f)
 
 
-def load_state_dict(instance, state_dict, key=None):
+def load_state_dict(instance, state_dict, key=None, is_detection=False):
     """
     Load trained model checkpoint
     :param model: (nn.Module)
@@ -21,10 +21,13 @@ def load_state_dict(instance, state_dict, key=None):
 
     if isinstance(instance, torch.nn.Module):
         try:
-            if key is not None:
-                instance.load_state_dict(state_dict[key])
+            if is_detection and key is not None:
+                instance.load_state_dict(state_dict[key].state_dict())
             else:
-                instance.load_state_dict(state_dict)
+                if key is not None:
+                    instance.load_state_dict(state_dict[key])
+                else:
+                    instance.load_state_dict(state_dict)
 
             LOGGER.text("Loaded Successfully!", level=LoggerObserver.INFO)
         except RuntimeError as e:
