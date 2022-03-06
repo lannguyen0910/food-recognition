@@ -136,7 +136,7 @@ def draw_bboxes_v2(savepath, img, boxes, label_ids, scores, label_names=None, ob
                         thickness=tf, lineType=cv2.FONT_HERSHEY_SIMPLEX)
 
     # boxes input is xywh
-    boxes = boxes.astype(np.int)
+    boxes = np.array(boxes, np.int)
     img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
     for idx, (box, label_id, score) in enumerate(zip(boxes, label_ids, scores)):

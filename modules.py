@@ -271,7 +271,7 @@ def label_enhancement(image, result_dict):
     opts = Opts(cls_args).parse_args()
     val_pipeline = ClassificationPipeline(opts, img_list)
     new_dict = val_pipeline.inference()
-    
+
     # new_dict = classify(tmp_path, img_list)
 
     """
@@ -288,7 +288,7 @@ def label_enhancement(image, result_dict):
     return result_dict
 
 
-def ensemble_models(input_path, image_size, tta=False):
+def ensemble_models(input_path, image_size, min_iou, min_conf, tta=False):
     args1 = DetectionArguments(
         model_name='yolov5s', input_path=input_path, tta=tta)
     args2 = DetectionArguments(
@@ -315,20 +315,20 @@ def ensemble_models(input_path, image_size, tta=False):
     class_names = det_pipeline4.class_names
 
     merged_boxes = [
-        np.array(result_dict1['boxes']),
-        np.array(result_dict2['boxes']),
-        np.array(result_dict3['boxes']),
-        np.array(result_dict4['boxes'])]
+        np.array(result_dict1['boxes'][0]),
+        np.array(result_dict2['boxes'][0]),
+        np.array(result_dict3['boxes'][0]),
+        np.array(result_dict4['boxes'][0])]
     merged_labels = [
-        np.array(result_dict1['labels']),
-        np.array(result_dict2['labels']),
-        np.array(result_dict3['labels']),
-        np.array(result_dict4['labels'])]
+        np.array(result_dict1['labels'][0]),
+        np.array(result_dict2['labels'][0]),
+        np.array(result_dict3['labels'][0]),
+        np.array(result_dict4['labels'][0])]
     merged_scores = [
-        np.array(result_dict1['scores']),
-        np.array(result_dict2['scores']),
-        np.array(result_dict3['scores']),
-        np.array(result_dict4['scores'])]
+        np.array(result_dict1['scores'][0]),
+        np.array(result_dict2['scores'][0]),
+        np.array(result_dict3['scores'][0]),
+        np.array(result_dict4['scores'][0])]
 
     for i in range(len(merged_boxes)):
         merged_boxes[i][:, 2] += merged_boxes[i][:, 0]  # xyxy
@@ -345,12 +345,16 @@ def ensemble_models(input_path, image_size, tta=False):
         weights=[0.25, 0.25, 0.4, 0.1]
     )
 
-    indexes = np.where(final_scores > 0.001)[0]
-    final_boxes = final_boxes[indexes]
-    final_scores = final_scores[indexes]
-    final_classes = final_classes[indexes]
+    final_dict = {
+        'boxes': final_boxes,
+        'labels': final_classes,
+        'scores': final_scores
+    }
 
-    final_boxes = change_box_order(final_boxes, order='xyxy2xywh')
+    final_dict = postprocess(
+        final_dict, image_size[0], image_size[1], min_iou, min_conf)
+
+    # final_dict['boxes'] = change_box_order(final_dict['boxes'], order='xywh2xyxy')
 
     result_dict = {
         'boxes': [],
@@ -358,7 +362,7 @@ def ensemble_models(input_path, image_size, tta=False):
         'scores': []
     }
 
-    for (box, score, label) in zip(final_boxes, final_scores, final_classes):
+    for (box, score, label) in zip(final_dict['boxes'], final_dict['scores'], final_dict['labels']):
         result_dict['boxes'].append(box)
         result_dict['labels'].append(label)
         result_dict['scores'].append(score)
@@ -428,13 +432,13 @@ def get_prediction(
         result_dict['boxes'] = result_dict['boxes'][0]
         result_dict['labels'] = result_dict['labels'][0]
         result_dict['scores'] = result_dict['scores'][0]
-        
+
         # Post process (optional)
         # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
 
     else:
         result_dict, class_names = ensemble_models(
-            input_path, [img_w, img_h], tta=tta)
+            input_path, [img_w, img_h], min_iou, min_conf, tta=tta)
 
     save_cache(result_dict, hashed_key)
     print(f"Save cache to {hashed_key}")
@@ -448,6 +452,8 @@ def get_prediction(
 
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
+
+    print('Result_dict: ', result_dict)
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
