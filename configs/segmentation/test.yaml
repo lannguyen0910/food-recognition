@@ -12,7 +12,7 @@ model:
 
 data:
   dataloader:
-    name: DataLoaderWithCollator
+    name: DataLoader
     args:
       batch_size: 1
       drop_last: False
