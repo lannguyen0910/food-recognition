@@ -385,7 +385,7 @@ def get_prediction(
         seg_args = InferenceArguments(key="segmentation")
         opts = Opts(seg_args).parse_args()
         seg_pipeline = SegmentationPipeline(opts, input_path)
-        seg_pipeline.inference()
+        output_path = seg_pipeline.inference()
 
         return output_path
 

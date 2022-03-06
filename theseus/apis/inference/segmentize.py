@@ -22,8 +22,6 @@ import pandas as pd
 import matplotlib as mpl
 mpl.use("Agg")
 
-SEGMENTIZER = None  # Global model, only changes when model name changes
-
 
 class SegmentationTestset(torch.utils.data.Dataset):
     def __init__(self, image_dir: str, txt_classnames: str, transform: List = None, **kwargs):
@@ -113,7 +111,7 @@ class SegmentationPipeline(object):
             txt_classnames='./configs/segmentation/classes.txt',
             transform=self.transform['val'])
 
-        CLASSNAMES = self.dataset.classnames
+        self.CLASSNAMES = self.dataset.classnames
 
         self.dataloader = get_instance(
             opt['data']["dataloader"],
@@ -125,17 +123,12 @@ class SegmentationPipeline(object):
         self.model = get_instance(
             self.opt["model"],
             registry=MODEL_REGISTRY,
-            classnames=CLASSNAMES,
-            num_classes=len(CLASSNAMES)).to(self.device)
+            classnames=self.CLASSNAMES,
+            num_classes=len(self.CLASSNAMES)).to(self.device)
 
-        global SEGMENTIZER
-        # Not to load the same segmentation model again
-        if SEGMENTIZER is None or SEGMENTIZER.name != self.model.name:
-            SEGMENTIZER = self.model
-
-            if self.weights:
-                state_dict = torch.load(self.weights)
-                SEGMENTIZER = load_state_dict(self.model, state_dict, 'model')
+        if self.weights:
+            state_dict = torch.load(self.weights)
+            self.model = load_state_dict(self.model, state_dict, 'model')
 
     def infocheck(self):
         device_info = get_devices_info(self.device_name)
@@ -151,7 +144,7 @@ class SegmentationPipeline(object):
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
 
         visualizer = Visualizer()
-        SEGMENTIZER.eval()
+        self.model.eval()
 
         saved_mask_dir = os.path.join(self.savedir, 'masks')
         saved_overlay_dir = os.path.join(self.savedir, 'overlays')
@@ -164,8 +157,9 @@ class SegmentationPipeline(object):
             img_names = batch['img_names']
             ori_sizes = batch['ori_sizes']
 
-            outputs = SEGMENTIZER.get_prediction(batch, self.device)
+            outputs = self.model.get_prediction(batch, self.device)
             preds = outputs['masks']
+            print('Preds: ', preds)
 
             for (input, pred, filename, ori_size) in zip(inputs, preds, img_names, ori_sizes):
                 decode_pred = visualizer.decode_segmap(pred)[:, :, ::-1]
@@ -173,18 +167,20 @@ class SegmentationPipeline(object):
                 resized_decode_mask = cv2.resize(decode_pred, ori_size)
 
                 # Save mask
-                savepath = os.path.join(saved_mask_dir, filename)
-                cv2.imwrite(savepath, resized_decode_mask)
+                savepath_mask = os.path.join(saved_mask_dir, filename)
+                cv2.imwrite(savepath_mask, resized_decode_mask)
 
                 # Save overlay
                 raw_image = visualizer.denormalize(input)
                 ori_image = cv2.resize(raw_image, ori_size)
                 overlay = ori_image * 0.7 + resized_decode_mask * 0.3
-                savepath = os.path.join(saved_overlay_dir, filename)
-                cv2.imwrite(savepath, overlay)
+                savepath_overlay = os.path.join(saved_overlay_dir, filename)
+                cv2.imwrite(savepath_overlay, overlay)
 
                 self.logger.text(
-                    f"Save image at {savepath}", level=LoggerObserver.INFO)
+                    f"Save image at {savepath_mask} and {savepath_overlay}", level=LoggerObserver.INFO)
+
+        return savepath_mask
 
 
 if __name__ == '__main__':

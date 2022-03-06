@@ -287,6 +287,8 @@ class Visualizer():
         palette = palette[:, ::-1].astype(np.uint8)
 
         segmap = segmap.astype(np.uint8)
+        segmap = np.expand_dims(segmap, axis=0)
+        print('segmap: ', segmap.shape)
         rgb = Image.fromarray(segmap, 'P')
         rgb.putpalette(palette)
 
