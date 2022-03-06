@@ -197,7 +197,8 @@ class Visualizer():
 
         # boxes input is xywh
         boxes = boxes.astype(np.int)
-        img_bgr = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
+        # img_bgr = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
+        img_bgr = self.image
 
         for idx, (box, label_id, score) in enumerate(zip(boxes, label_ids, scores)):
             if label_names is not None:
