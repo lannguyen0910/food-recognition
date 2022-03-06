@@ -2,10 +2,14 @@ val:
   name: AlbCompose
   args:
     transforms:
-      - name: get_resize_augmentation
+      # - name: get_resize_augmentation
+      #   args:
+      #     image_size: [640, 640] # should be square and multiple of 32 to prevent bugs [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
+      #     keep_ratio: True # # whether to use resize padding
+      - name: AlbResize
         args:
-          image_size: [640, 640] # should be square and multiple of 32 to prevent bugs [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
-          keep_ratio: True # # whether to use resize padding
+          width: 640
+          height: 640
 
       - name: AlbNormalize
         args:
