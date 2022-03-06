@@ -50,8 +50,6 @@ class YoloBackbone(BaseBackbone):
 
         self.model.conf = min_conf  # NMS confidence threshold
         self.model.iou = min_iou  # NMS IoU threshold
-        # (optional list) filter by class, i.e. = [0, 15, 16] for persons, cats and dogs
-
         self.model.multi_label = False  # NMS multiple labels per box
         self.model.max_det = max_det  # maximum number of detections per image
 
@@ -66,9 +64,9 @@ class YoloBackbone(BaseBackbone):
         return outputs
 
     def get_prediction(self, adict: Dict[str, Any], device: torch.device):
-        inputs = adict["inputs"].to(device)
+        inputs = adict["img_names"]
         results = self.model(inputs)  # inference
-
+        # print('Results: ', results)
         outputs = results.pandas().xyxy
 
         out = []
