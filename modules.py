@@ -96,14 +96,15 @@ def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
                 'w': boxes[:, 2],
                 'h': boxes[:, 3],
             })
+
     for key in cache_dict.keys():
         if len(cache_dict[key]) == 0:
             return
+
     for key in result_dict.keys():
         if key != 'boxes' and key not in exclude:
             cache_dict[key] = result_dict[key]
-    print('Cache_dict: ', cache_dict)
-    # cache_dict = np.squeeze(cache_dict)
+
     df = pd.DataFrame(cache_dict)
 
     df.to_csv(f'{cache_dir}/{cache_name}.csv', index=False)
@@ -270,6 +271,7 @@ def label_enhancement(image, result_dict):
     opts = Opts(cls_args).parse_args()
     val_pipeline = ClassificationPipeline(opts, img_list)
     new_dict = val_pipeline.inference()
+    
     # new_dict = classify(tmp_path, img_list)
 
     """
@@ -426,11 +428,9 @@ def get_prediction(
         result_dict['boxes'] = result_dict['boxes'][0]
         result_dict['labels'] = result_dict['labels'][0]
         result_dict['scores'] = result_dict['scores'][0]
-        # post process
+        
+        # Post process (optional)
         # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
-    #     Result dict after:  {'boxes': array([[     48.129,      186.14,       193.6,      160.56],
-    #    [     208.53,      95.233,      330.93,      248.26]]), 'labels': array([20, 80]), 'scores': array([    0.73275,     0.66873])}
-        print('Result dict after: ', result_dict)
 
     else:
         result_dict, class_names = ensemble_models(
