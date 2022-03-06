@@ -402,7 +402,7 @@ def get_prediction(
 
     ori_img = cv2.imread(input_path)
 
-    # ori_img = np.array(ori_img, dtype=np.uint8)
+    ori_img = np.array(ori_img, dtype=np.uint16)
     ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
     img_h, img_w, _ = ori_img.shape
 
@@ -422,13 +422,14 @@ def get_prediction(
         class_names = det_pipeline.class_names
 
         result_dict = det_pipeline.inference()
-        print('Result_dict: ', result_dict)
 
         result_dict['boxes'] = result_dict['boxes'][0]
         result_dict['labels'] = result_dict['labels'][0]
         result_dict['scores'] = result_dict['scores'][0]
         # post process
-        result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+        # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+    #     Result dict after:  {'boxes': array([[     48.129,      186.14,       193.6,      160.56],
+    #    [     208.53,      95.233,      330.93,      248.26]]), 'labels': array([20, 80]), 'scores': array([    0.73275,     0.66873])}
         print('Result dict after: ', result_dict)
 
     else:

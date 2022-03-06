@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from .colors import color_list
 
+
 def draw_mask(polygons, mask_img):
     ImageDraw.Draw(mask_img).polygon(polygons, outline=1, fill=1)
     return mask_img
@@ -121,6 +122,7 @@ def draw_bboxes_v2(savepath, img, boxes, label_ids, scores, label_names=None, ob
         c1, c2 = (int(coord[0]), int(coord[1])
                   ), (int(coord[2]), int(coord[3]))
         cv2.rectangle(img, c1, c2, color, thickness=tl*2)
+        print('Color: ', color)
         if key is not None and value is not None:
             header = f'{key}: {value}'
             tf = max(tl - 2, 1)  # font thickness
@@ -130,6 +132,7 @@ def draw_bboxes_v2(savepath, img, boxes, label_ids, scores, label_names=None, ob
                 f'{key}:', 0, fontScale=float(tl) / 3, thickness=tf)[0]
             c2 = c1[0] + t_size[0] + s_size[0] + 15, c1[1] - t_size[1] - 3
             cv2.rectangle(img, c1, c2, color, -1)  # filled
+            print('Header: ', header)
             cv2.putText(img, header, (c1[0], c1[1] - 2), 0, float(tl) / 3, [0, 0, 0],
                         thickness=tf, lineType=cv2.FONT_HERSHEY_SIMPLEX)
 
@@ -142,12 +145,14 @@ def draw_bboxes_v2(savepath, img, boxes, label_ids, scores, label_names=None, ob
             label = label_names[idx]
         if obj_list is not None:
             label = obj_list[label_id]
+        
+        new_color = tuple(i*255.0 for i in color_list[int(label_id)])
 
         plot_one_box(
             img_bgr,
             box,
             key=label,
             value='{:.0%}'.format(float(score)),
-            color=color_list[int(label_id)])
+            color=new_color)
 
     cv2.imwrite(savepath, img_bgr)
