@@ -84,6 +84,7 @@ def draw_image(out_path, visualizer, result_dict, class_names):
 
 
 def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
+    print('Result_dict: ', result_dict)
     cache_dict = {}
     if 'boxes' not in exclude:
         boxes = np.array(result_dict['boxes'])
@@ -98,6 +99,8 @@ def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
     for key in result_dict.keys():
         if key != 'boxes' and key not in exclude:
             cache_dict[key] = result_dict[key]
+    print('Cache_dict: ', cache_dict)
+    cache_dict = np.squeeze(cache_dict)
     df = pd.DataFrame(cache_dict)
 
     df.to_csv(f'{cache_dir}/{cache_name}.csv', index=False)
@@ -247,10 +250,14 @@ def label_enhancement(image, result_dict):
 
 
 def ensemble_models(input_path, image_size, tta=False):
-    args1 = DetectionArguments(model_name='yolov5s', input_path=input_path, tta=tta)
-    args2 = DetectionArguments(model_name='yolov5m', input_path=input_path, tta=tta)
-    args3 = DetectionArguments(model_name='yolov5l', input_path=input_path, tta=tta)
-    args4 = DetectionArguments(model_name='yolov5x', input_path=input_path, tta=tta)
+    args1 = DetectionArguments(
+        model_name='yolov5s', input_path=input_path, tta=tta)
+    args2 = DetectionArguments(
+        model_name='yolov5m', input_path=input_path, tta=tta)
+    args3 = DetectionArguments(
+        model_name='yolov5l', input_path=input_path, tta=tta)
+    args4 = DetectionArguments(
+        model_name='yolov5x', input_path=input_path, tta=tta)
 
     det_args = InferenceArguments(key="detection")
     opts = Opts(det_args).parse_args()
@@ -361,12 +368,12 @@ def get_prediction(
     img_h, img_w, _ = ori_img.shape
 
     # check whether cache exists
-    if check_cache(hashed_key):
-        print(f"Load cache from {hashed_key}")
-        # class_names, _ = get_class_names(model_name)
-        result_dict = load_cache(hashed_key)
+    # if check_cache(hashed_key):
+    #     print(f"Load cache from {hashed_key}")
+    #     # class_names, _ = get_class_names(model_name)
+    #     result_dict = load_cache(hashed_key)
 
-    else:
+    if True:
         if not ensemble:
             args = DetectionArguments(
                 model_name=model_name,
@@ -380,19 +387,21 @@ def get_prediction(
             det_args = InferenceArguments(key="detection")
             opts = Opts(det_args).parse_args()
             det_pipeline = DetectionPipeline(opts, args)
+            class_names = det_pipeline.class_names
+
             result_dict = det_pipeline.inference()
+            print('Result_dict: ', result_dict)
 
         else:
             result_dict, class_names = ensemble_models(
                 input_path, [img_w, img_h], tta=tta)
 
-        save_cache(result_dict, hashed_key)
-        print(f"Save cache to {hashed_key}")
+        # save_cache(result_dict, hashed_key)
+        # print(f"Save cache to {hashed_key}")
 
     # class_names.insert(0, "Background")
 
-    # post process
-    # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+    # Result_dict:  {'boxes': [array([[     76.953,      63.647,      78.431,      88.624]])], 'labels': [array([32])], 'scores': [array([    0.18407])], 'names': ['Tomato'], 'calories': [18.0], 'protein': [0.88], 'fat': [0.2], 'carbs': [3.89], 'fiber': [1.2]}
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)

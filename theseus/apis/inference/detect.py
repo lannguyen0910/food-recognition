@@ -1,13 +1,12 @@
 import matplotlib as mpl
-import cv2
 import numpy as np
-from theseus.segmentation.models import MODEL_REGISTRY
-from theseus.segmentation.augmentations import TRANSFORM_REGISTRY
-from theseus.segmentation.datasets import DATALOADER_REGISTRY
-import pandas as pd
 import os
 import torch
+from albumentations.pytorch.transforms import ToTensorV2
 
+from theseus.detection.models import MODEL_REGISTRY
+from theseus.detection.augmentations import *
+from theseus.base.datasets import DATALOADER_REGISTRY
 from theseus.utilities.getter import (get_instance, get_instance_recursively)
 from theseus.utilities.cuda import get_devices_info
 from theseus.utilities.loggers import LoggerObserver, StdoutLogger
@@ -62,11 +61,10 @@ class DetectionTestset():
         if self.transform is not None:
             item = self.transform(image=im)
             im = item['image']
-            # im = self.transform(im)
 
         return {
             "input": im,
-            'img_name': os.path.basename(image_path),
+            'img_name': image_path,
             'ori_img': ori_img,
         }
 
@@ -79,7 +77,7 @@ class DetectionTestset():
         if len(batch) == 0:
             return None
 
-        imgs = [s['input'] for s in batch]
+        imgs = torch.stack([s['input'] for s in batch])
         img_names = [s['img_name'] for s in batch]
         ori_imgs = [s['ori_img'] for s in batch]
 
@@ -128,9 +126,18 @@ class DetectionPipeline(object):
             self.transform_cfg, registry=TRANSFORM_REGISTRY
         )
 
+        # self.transform = A.Compose([
+        #     get_resize_augmentation(
+        #         image_size=[640, 640], keep_ratio=True),
+        #     A.Normalize(mean=[0.0, 0.0, 0.0], std=[
+        #                 1.0, 1.0, 1.0], max_pixel_value=1.0, p=1.0),
+        #     ToTensorV2(p=1.0)
+        # ])
+
         self.dataset = DetectionTestset(
             image_dir=input_args.input_path,
-            transform=self.transform['val']
+            transform=self.transform['val'],
+            # transform=self.transform
         )
 
         self.class_names = opt['global']['class_names']
