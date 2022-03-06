@@ -14,6 +14,8 @@ from theseus.utilities.loading import load_state_dict
 from theseus.detection.augmentations import TRANSFORM_REGISTRY, TTA
 from theseus.detection.models import MODEL_REGISTRY
 from theseus.opt import Config
+from theseus.utilities import postprocessing
+
 from tqdm import tqdm
 from datetime import datetime
 from PIL import Image
@@ -52,10 +54,15 @@ class DetectionTestset():
         """
         image_path = self.fns[index]
 
-        im = Image.open(image_path).convert('RGB')
-        # width, height = im.width, im.height
+        # im = Image.open(image_path).convert('RGB')
+        # # width, height = im.width, im.height
 
-        im = np.array(im)
+        # im = np.array(im)
+        im = cv2.imread(image_path)
+        image_w, image_h = 640, 640
+        ori_height, ori_width, c = im.shape
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB).astype(np.float32)
+        im /= 255.0
         ori_img = im.copy()
 
         if self.transform is not None:
@@ -66,13 +73,16 @@ class DetectionTestset():
             "input": im,
             'img_name': image_path,
             'ori_img': ori_img,
+            'image_ori_w': ori_width,
+            'image_ori_h': ori_height,
+            'image_w': image_w,
+            'image_h': image_h,
         }
 
     def __len__(self):
         return len(self.fns)
 
     def collate_fn(self, batch: List):
-        print('Batch collate: ', batch)
         batch = [x for x in batch if x is not None]
         if len(batch) == 0:
             return None
@@ -80,11 +90,24 @@ class DetectionTestset():
         imgs = torch.stack([s['input'] for s in batch])
         img_names = [s['img_name'] for s in batch]
         ori_imgs = [s['ori_img'] for s in batch]
+        image_ori_ws = [s['image_ori_w'] for s in batch]
+        image_ori_hs = [s['image_ori_h'] for s in batch]
+        image_ws = [s['image_w'] for s in batch]
+        image_hs = [s['image_h'] for s in batch]
+        img_scales = torch.tensor([1.0]*len(batch), dtype=torch.float)
+        img_sizes = torch.tensor(
+            [imgs[0].shape[-2:]]*len(batch), dtype=torch.float)
 
         return {
             'inputs': imgs,
             'img_names': img_names,
             'ori_imgs': ori_imgs,
+            'image_ori_ws': image_ori_ws,
+            'image_ori_hs': image_ori_hs,
+            'image_ws': image_ws,
+            'image_hs': image_hs,
+            'img_sizes': img_sizes,
+            'img_scales': img_scales
         }
 
 
@@ -113,6 +136,7 @@ class DetectionPipeline(object):
         self.device = torch.device(self.device_name)
 
         self.weights = input_args.weight
+        self.args = input_args
 
         if input_args.tta:
             self.tta = TTA(
@@ -154,7 +178,7 @@ class DetectionPipeline(object):
             registry=MODEL_REGISTRY,
             weight=input_args.model_name,
             min_iou=input_args.min_iou,
-            min_conf=input_args.min_conf
+            min_conf=input_args.min_conf,
         ).to(self.device)
 
         global DETECTOR
@@ -194,17 +218,24 @@ class DetectionPipeline(object):
             else:
                 preds = DETECTOR.get_prediction(batch, self.device)
 
-            # for (bboxes, filename, labels, scores) in zip(outputs['bboxes'], img_names, outputs['labels'], outputs['scores']):
-            #     savepath = os.path.join(self.savedir, filename)
-            #     # Write bboxes and texts to image and save to "savepath"
-            #     visualizer.draw_bbox(savepath, bboxes, labels, scores)
-
-            #     self.logger.text(
-            #         f"Save image at {savepath}", level=LoggerObserver.INFO)
-            for id, outputs in enumerate(preds):
+            for idx, outputs in enumerate(preds):
+                # img_w = batch['image_ws'][idx]
+                # img_h = batch['image_hs'][idx]
+                # img_ori_ws = batch['image_ori_ws'][idx]
+                # img_ori_hs = batch['image_ori_hs'][idx]
+     
+                # outputs = postprocessing(
+                #     outputs,
+                #     current_img_size=[img_w, img_h],
+                #     ori_img_size=[img_ori_ws, img_ori_hs],
+                #     min_iou=self.args.min_iou,
+                #     min_conf=self.args.min_conf,
+                #     keep_ratio=True,
+                #     output_format='xywh',
+                #     mode='nms'
+                # )
+                
                 boxes = outputs['bboxes']
-
-                # Here, labels start from 1, subtract 1
                 labels = outputs['classes']
                 scores = outputs['scores']
 

@@ -6,7 +6,7 @@ import os
 import pandas as pd
 from theseus.utilities.visualization.visualizer import Visualizer
 from theseus.utilities.download import download_from_drive
-from theseus.utilities import box_fusion, change_box_order
+from theseus.utilities import box_fusion, change_box_order, postprocessing, resize_postprocessing
 from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
 from theseus.opt import Opts, Config, InferenceArguments
 
@@ -84,23 +84,24 @@ def draw_image(out_path, visualizer, result_dict, class_names):
 
 
 def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
-    print('Result_dict: ', result_dict)
     cache_dict = {}
     if 'boxes' not in exclude:
         boxes = np.array(result_dict['boxes'])
         if len(boxes) != 0:
             cache_dict.update({
-                'x': boxes[:, 0],
-                'y': boxes[:, 1],
-                'w': boxes[:, 2],
-                'h': boxes[:, 3],
+                'x1': boxes[:, 0],
+                'y1': boxes[:, 1],
+                'x2': boxes[:, 2],
+                'y2': boxes[:, 3],
             })
-
+    for key in cache_dict.keys():
+        if len(cache_dict[key]) == 0:
+            return
     for key in result_dict.keys():
         if key != 'boxes' and key not in exclude:
             cache_dict[key] = result_dict[key]
     print('Cache_dict: ', cache_dict)
-    cache_dict = np.squeeze(cache_dict)
+    # cache_dict = np.squeeze(cache_dict)
     df = pd.DataFrame(cache_dict)
 
     df.to_csv(f'{cache_dir}/{cache_name}.csv', index=False)
@@ -161,7 +162,7 @@ def drop_duplicate_fill0(result_dict):
 
 
 def append_food_name(food_dict, class_names):
-    food_labels = food_dict['labels']
+    food_labels = food_dict['labels'] #[0].to_list()
     food_names = [' '.join(class_names[int(i)].split('-'))
                   for i in food_labels]
     food_dict['names'] = food_names
@@ -203,6 +204,40 @@ def crop_box(image, box, expand=10):
 
     # xyxy box, cv2 image h,w,c
     return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
+
+
+def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
+
+    boxes = np.array(result_dict['boxes'])
+    scores = np.array(result_dict['scores'])
+    labels = np.array(result_dict['labels'])
+    if len(boxes) != 0:
+        boxes[0, :, 2] += boxes[0, :, 0]
+        boxes[0, :, 3] += boxes[0, :, 1]
+
+        outputs = {
+            'bboxes': boxes,
+            'scores': scores,
+            'classes': labels
+        }
+
+        outputs = postprocessing(
+            outputs,
+            current_img_size=[img_w, img_h],
+            min_iou=min_iou,
+            min_conf=min_conf,
+            output_format='xywh',
+            mode='nms')
+
+        boxes = outputs['bboxes']
+        labels = outputs['classes']
+        scores = outputs['scores']
+
+    return {
+        'boxes': boxes,
+        'labels': labels,
+        'scores': scores
+    }
 
 
 def label_enhancement(image, result_dict):
@@ -302,6 +337,7 @@ def ensemble_models(input_path, image_size, tta=False):
         mode="wbf",
         image_size=image_size,
         iou_threshold=0.9,
+        # YOLOv5l performance best, YOLOv5x performance least (in current weights)
         weights=[0.25, 0.25, 0.4, 0.1]
     )
 
@@ -364,7 +400,8 @@ def get_prediction(
 
     ori_img = cv2.imread(input_path)
 
-    ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+    ori_img = np.array(ori_img, dtype=np.uint8)
+    # ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
     img_h, img_w, _ = ori_img.shape
 
     # check whether cache exists
@@ -392,16 +429,27 @@ def get_prediction(
             result_dict = det_pipeline.inference()
             print('Result_dict: ', result_dict)
 
+            result_dict['boxes'] = result_dict['boxes'][0]
+            result_dict['labels'] = result_dict['labels'][0]
+            result_dict['scores'] = result_dict['scores'][0]
+            print('Result dict after: ', result_dict)
+
         else:
             result_dict, class_names = ensemble_models(
                 input_path, [img_w, img_h], tta=tta)
 
-        # save_cache(result_dict, hashed_key)
-        # print(f"Save cache to {hashed_key}")
+        save_cache(result_dict, hashed_key)
+        print(f"Save cache to {hashed_key}")
 
     # class_names.insert(0, "Background")
 
     # Result_dict:  {'boxes': [array([[     76.953,      63.647,      78.431,      88.624]])], 'labels': [array([32])], 'scores': [array([    0.18407])], 'names': ['Tomato'], 'calories': [18.0], 'protein': [0.88], 'fat': [0.2], 'carbs': [3.89], 'fiber': [1.2]}
+    # boxes, labels, scores = result_dict['boxes'],  result_dict['labels'],  result_dict['scores']
+
+    # post process
+    # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+    # print('Result post: ', result_dict)
+    
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)
