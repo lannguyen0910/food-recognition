@@ -4,9 +4,9 @@ from PIL import Image
 import numpy as np
 import os
 import pandas as pd
-from theseus.utilities.visualization.visualizer import Visualizer
+from theseus.utilities.visualization.utils import draw_bboxes_v2
 from theseus.utilities.download import download_from_drive
-from theseus.utilities import box_fusion, change_box_order, postprocessing, resize_postprocessing
+from theseus.utilities import box_fusion, change_box_order, postprocessing
 from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
 from theseus.opt import Opts, Config, InferenceArguments
 
@@ -63,20 +63,22 @@ def download_pretrained_weights(name, output=None):
     return download_from_drive(weight_urls[name], output)
 
 
-def draw_image(out_path, visualizer, result_dict, class_names):
+def draw_image(out_path, img, result_dict, class_names):
     if os.path.isfile(out_path):
         os.remove(out_path)
 
     if "names" in result_dict.keys():
-        visualizer.draw_bboxes_v2(
+        draw_bboxes_v2(
             out_path,
+            img,
             result_dict["boxes"],
             result_dict["labels"],
             result_dict["scores"],
             label_names=result_dict["names"])
     else:
-        visualizer.draw_bboxes_v2(
+        draw_bboxes_v2(
             out_path,
+            img,
             result_dict["boxes"],
             result_dict["labels"],
             result_dict["scores"],
@@ -212,8 +214,8 @@ def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
     scores = np.array(result_dict['scores'])
     labels = np.array(result_dict['labels'])
     if len(boxes) != 0:
-        boxes[0, :, 2] += boxes[0, :, 0]
-        boxes[0, :, 3] += boxes[0, :, 1]
+        boxes[:, 2] += boxes[:, 0]
+        boxes[:, 3] += boxes[:, 1]
 
         outputs = {
             'bboxes': boxes,
@@ -400,55 +402,41 @@ def get_prediction(
 
     ori_img = cv2.imread(input_path)
 
-    ori_img = np.array(ori_img, dtype=np.uint8)
-    # ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+    # ori_img = np.array(ori_img, dtype=np.uint8)
+    ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
     img_h, img_w, _ = ori_img.shape
 
-    # check whether cache exists
-    # if check_cache(hashed_key):
-    #     print(f"Load cache from {hashed_key}")
-    #     # class_names, _ = get_class_names(model_name)
-    #     result_dict = load_cache(hashed_key)
+    if not ensemble:
+        args = DetectionArguments(
+            model_name=model_name,
+            input_path=input_path,
+            output_path=output_path,
+            min_conf=min_conf,
+            min_iou=min_iou,
+            tta=tta
+        )
 
-    if True:
-        if not ensemble:
-            args = DetectionArguments(
-                model_name=model_name,
-                input_path=input_path,
-                output_path=output_path,
-                min_conf=min_conf,
-                min_iou=min_iou,
-                tta=tta
-            )
+        det_args = InferenceArguments(key="detection")
+        opts = Opts(det_args).parse_args()
+        det_pipeline = DetectionPipeline(opts, args)
+        class_names = det_pipeline.class_names
 
-            det_args = InferenceArguments(key="detection")
-            opts = Opts(det_args).parse_args()
-            det_pipeline = DetectionPipeline(opts, args)
-            class_names = det_pipeline.class_names
+        result_dict = det_pipeline.inference()
+        print('Result_dict: ', result_dict)
 
-            result_dict = det_pipeline.inference()
-            print('Result_dict: ', result_dict)
+        result_dict['boxes'] = result_dict['boxes'][0]
+        result_dict['labels'] = result_dict['labels'][0]
+        result_dict['scores'] = result_dict['scores'][0]
+        # post process
+        result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+        print('Result dict after: ', result_dict)
 
-            result_dict['boxes'] = result_dict['boxes'][0]
-            result_dict['labels'] = result_dict['labels'][0]
-            result_dict['scores'] = result_dict['scores'][0]
-            print('Result dict after: ', result_dict)
+    else:
+        result_dict, class_names = ensemble_models(
+            input_path, [img_w, img_h], tta=tta)
 
-        else:
-            result_dict, class_names = ensemble_models(
-                input_path, [img_w, img_h], tta=tta)
-
-        save_cache(result_dict, hashed_key)
-        print(f"Save cache to {hashed_key}")
-
-    # class_names.insert(0, "Background")
-
-    # Result_dict:  {'boxes': [array([[     76.953,      63.647,      78.431,      88.624]])], 'labels': [array([32])], 'scores': [array([    0.18407])], 'names': ['Tomato'], 'calories': [18.0], 'protein': [0.88], 'fat': [0.2], 'carbs': [3.89], 'fiber': [1.2]}
-    # boxes, labels, scores = result_dict['boxes'],  result_dict['labels'],  result_dict['scores']
-
-    # post process
-    # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
-    # print('Result post: ', result_dict)
+    save_cache(result_dict, hashed_key)
+    print(f"Save cache to {hashed_key}")
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)
@@ -460,11 +448,8 @@ def get_prediction(
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
 
-    visualizer = Visualizer()
-    visualizer.set_image(ori_img)
-
     # draw result
-    draw_image(output_path, visualizer, result_dict, class_names)
+    draw_image(output_path, ori_img, result_dict, class_names)
 
     result_list = convert_dict_to_list(result_dict)
 

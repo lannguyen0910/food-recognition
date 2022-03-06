@@ -1,21 +1,27 @@
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from .colors import color_list
 
 def draw_mask(polygons, mask_img):
     ImageDraw.Draw(mask_img).polygon(polygons, outline=1, fill=1)
     return mask_img
 
+
 def draw_polylines(image, polygons):
-    image = cv2.polylines(image, [np.array(polygons, dtype=np.int)], True, (0,0,1), 2)
+    image = cv2.polylines(
+        image, [np.array(polygons, dtype=np.int)], True, (0, 0, 1), 2)
     return image
 
+
 def draw_text(image, text, polygons, font, color, font_size):
-    im  =  Image.fromarray(np.uint8(image*255))
-    draw  =  ImageDraw.Draw ( im )
+    im = Image.fromarray(np.uint8(image*255))
+    draw = ImageDraw.Draw(im)
     unicode_font = ImageFont.truetype(font, font_size)
-    draw.text((polygons[0][0],polygons[0][1]+10), text, font=unicode_font, fill=color )
+    draw.text((polygons[0][0], polygons[0][1]+10),
+              text, font=unicode_font, fill=color)
     return np.asarray(im)/255
+
 
 def get_font_size(image, text, polygons, font_type):
     fontsize = 1  # starting font size
@@ -35,16 +41,18 @@ def get_font_size(image, text, polygons, font_type):
         font = ImageFont.truetype(font_type, fontsize)
         idx -= 1
 
-        if idx <=0:
+        if idx <= 0:
             break
     fontsize -= 1
     return fontsize
 
+
 def reduce_opacity(image):
-    #pre-multiplication
+    # pre-multiplication
     a_channel = np.ones(image.shape, dtype=np.float)/3.0
     img = image*a_channel
     return img
+
 
 def draw_text_cv2(
     img,
@@ -98,3 +106,48 @@ def draw_text_cv2(
         )
 
         uv_top_left += [0, h * line_spacing]
+
+
+def draw_bboxes_v2(savepath, img, boxes, label_ids, scores, label_names=None, obj_list=None):
+    """
+    Visualize an image with its bouding boxes
+    rgb image + xywh box
+    """
+    def plot_one_box(img, box, key=None, value=None, color=None, line_thickness=None):
+        tl = line_thickness or int(
+            round(0.001 * max(img.shape[0:2])))  # line thickness
+
+        coord = [box[0], box[1], box[0]+box[2], box[1]+box[3]]
+        c1, c2 = (int(coord[0]), int(coord[1])
+                  ), (int(coord[2]), int(coord[3]))
+        cv2.rectangle(img, c1, c2, color, thickness=tl*2)
+        if key is not None and value is not None:
+            header = f'{key}: {value}'
+            tf = max(tl - 2, 1)  # font thickness
+            s_size = cv2.getTextSize(
+                f' {value}', 0, fontScale=float(tl) / 3, thickness=tf)[0]
+            t_size = cv2.getTextSize(
+                f'{key}:', 0, fontScale=float(tl) / 3, thickness=tf)[0]
+            c2 = c1[0] + t_size[0] + s_size[0] + 15, c1[1] - t_size[1] - 3
+            cv2.rectangle(img, c1, c2, color, -1)  # filled
+            cv2.putText(img, header, (c1[0], c1[1] - 2), 0, float(tl) / 3, [0, 0, 0],
+                        thickness=tf, lineType=cv2.FONT_HERSHEY_SIMPLEX)
+
+    # boxes input is xywh
+    boxes = boxes.astype(np.int)
+    img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+    for idx, (box, label_id, score) in enumerate(zip(boxes, label_ids, scores)):
+        if label_names is not None:
+            label = label_names[idx]
+        if obj_list is not None:
+            label = obj_list[label_id]
+
+        plot_one_box(
+            img_bgr,
+            box,
+            key=label,
+            value='{:.0%}'.format(float(score)),
+            color=color_list[int(label_id)])
+
+    cv2.imwrite(savepath, img_bgr)
