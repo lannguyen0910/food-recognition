@@ -23,9 +23,6 @@ from typing import List, Any
 
 CACHE_DIR = './weights'
 
-# Global model, only changes when model name changes
-DETECTOR = None
-
 mpl.use("Agg")
 
 
@@ -135,7 +132,6 @@ class DetectionPipeline(object):
         self.device_name = opt['global']['device']
         self.device = torch.device(self.device_name)
 
-        self.weights = input_args.weight
         self.args = input_args
 
         if input_args.tta:
@@ -176,19 +172,16 @@ class DetectionPipeline(object):
         self.model = get_instance(
             opt['model'],
             registry=MODEL_REGISTRY,
-            weight=input_args.model_name,
+            weight=input_args.weight,
             min_iou=input_args.min_iou,
             min_conf=input_args.min_conf,
         ).to(self.device)
 
-        global DETECTOR
-        # Not to load the same detection model again
-        if DETECTOR is None or DETECTOR.name != self.model.name:
 
-            if self.weights:
-                state_dict = torch.load(self.weights)
-                DETECTOR = load_state_dict(self.model, state_dict,
-                                           'model', is_detection=True)
+        if input_args.weight:
+            state_dict = torch.load(input_args.weight)
+            self.model = load_state_dict(self.model, state_dict,
+                                        'model', is_detection=True)
 
     def infocheck(self):
         device_info = get_devices_info(self.device_name)
@@ -203,7 +196,7 @@ class DetectionPipeline(object):
         self.infocheck()
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
 
-        DETECTOR.eval()
+        self.model.eval()
 
         boxes_result = []
         labels_result = []
@@ -214,9 +207,9 @@ class DetectionPipeline(object):
             os.makedirs(self.savedir, exist_ok=True)
 
             if self.tta is not None:
-                preds = self.tta.make_tta_predictions(DETECTOR, batch)
+                preds = self.tta.make_tta_predictions(self.model, batch)
             else:
-                preds = DETECTOR.get_prediction(batch, self.device)
+                preds = self.model.get_prediction(batch, self.device)
 
             for idx, outputs in enumerate(preds):
                 # img_w = batch['image_ws'][idx]

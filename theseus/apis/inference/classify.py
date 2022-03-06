@@ -18,8 +18,6 @@ from typing import List
 import matplotlib as mpl
 mpl.use("Agg")
 
-CLASSIFIER = None  # Global model, only changes when model name changes
-
 
 class ClassificationTestset():
     def __init__(self, image_dir: list, txt_classnames: str, transform: List = None, **kwargs):
@@ -115,14 +113,9 @@ class ClassificationPipeline(object):
             registry=MODEL_REGISTRY,
             classnames=CLASSNAMES).to(self.device)
 
-        global CLASSIFIER
-        # Not to load the same classification model again
-        if CLASSIFIER is None or CLASSIFIER.name != self.model.name:
-            CLASSIFIER = self.model
-
-            if self.weights:
-                state_dict = torch.load(self.weights)
-                CLASSIFIER = load_state_dict(self.model, state_dict, 'model')
+        if self.weights:
+            state_dict = torch.load(self.weights)
+            self.model = load_state_dict(self.model, state_dict, 'model')
 
     def infocheck(self):
         device_info = get_devices_info(self.device_name)
@@ -143,11 +136,11 @@ class ClassificationPipeline(object):
             'score': []
         }
 
-        CLASSIFIER.eval()
+        self.model.eval()
 
         for idx, batch in enumerate(tqdm(self.dataloader)):
             img_names = batch['img_names']
-            outputs = CLASSIFIER.get_prediction(batch, self.device)
+            outputs = self.model.get_prediction(batch, self.device)
             preds = outputs['names']
             probs = outputs['confidences']
 

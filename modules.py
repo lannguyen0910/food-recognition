@@ -89,10 +89,10 @@ def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
         boxes = np.array(result_dict['boxes'])
         if len(boxes) != 0:
             cache_dict.update({
-                'x1': boxes[:, 0],
-                'y1': boxes[:, 1],
-                'x2': boxes[:, 2],
-                'y2': boxes[:, 3],
+                'x': boxes[:, 0],
+                'y': boxes[:, 1],
+                'w': boxes[:, 2],
+                'h': boxes[:, 3],
             })
     for key in cache_dict.keys():
         if len(cache_dict[key]) == 0:
@@ -162,7 +162,7 @@ def drop_duplicate_fill0(result_dict):
 
 
 def append_food_name(food_dict, class_names):
-    food_labels = food_dict['labels'] #[0].to_list()
+    food_labels = food_dict['labels']  # [0].to_list()
     food_names = [' '.join(class_names[int(i)].split('-'))
                   for i in food_labels]
     food_dict['names'] = food_names
@@ -449,7 +449,6 @@ def get_prediction(
     # post process
     # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
     # print('Result post: ', result_dict)
-    
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)
@@ -460,9 +459,6 @@ def get_prediction(
 
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
-
-    # Save metadata food info as CSV
-    save_cache(result_dict, ori_hashed_key+'_metadata', METADATA_FOLDER)
 
     visualizer = Visualizer()
     visualizer.set_image(ori_img)
