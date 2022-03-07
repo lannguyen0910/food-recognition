@@ -67,7 +67,7 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
-<strong><i>[../03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>. <br>
+<strong><i>[07/03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>. <br>
 <strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 latest versions P5-P6. Can load checkpoints from original repo.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android. <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app. <br>
@@ -111,7 +111,9 @@ food-detection-yolov5
 In total, there are 3 implementation versions:
 1. Training using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
 2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
-3. Update Theseus template. Add semantic segmentation to webapp. Techniques adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
+3. Update **Theseus** template, currently supports ```food detection```, ```food classification```, ```multi-class food semantic segmentation``` only on **images**.  For this version, we introduce Theseus, which is just a part of [Theseus template](https://github.com/kaylode/theseus). Moreover, we omitted some weak or unnecessary features to make the project more robust. Theseus adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
+  
+For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
 
  ## 🌟 **Inference**
 - File structure
@@ -149,9 +151,9 @@ global:
 ```
 
 ## 🌟 **Dataset**
-- Detection: [link](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged 2 datasets) 
+- Detection: [link](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged OID and Vietnamese Lunch dataset)
 - Classification: [link](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing) (MAFood121)
-- Semantic segmentation: [link](https://mm.cs.uec.ac.jp/uecfoodpix/UECFOODPIXCOMPLETE.tar)
+- Semantic segmentation: [link](https://mm.cs.uec.ac.jp/uecfoodpix/UECFOODPIXCOMPLETE.tar) (UECFood)
 
 ## 🌟 **Dataset details**
 <details>
@@ -176,7 +178,7 @@ We also perform the aggregation of the two data sets above into one. The new set
 <details>
 <summary>Implementation details</summary>
    
-The two functions: ```get_prediction``` and ```get_video_prediction``` are two inference functions for images and videos. Implemented in ```modules.py```, where the image detection process (get_prediction) will call the Edamam API to get nutritional information in the food. We also save nutritional information in csv files in the folder ```/static/csv```.
+The function ```get_prediction``` is an inference function for ```detection```, ```classification``` and ```semantic segmentation``` tasks, depends on which inputs you choose. Implemented in ```modules.py```, where the image detection process will call the Edamam API to get nutritional information in the food. We also save nutritional information in csv files in the folder ```/static/csv```.
 <br>
 
 We provide the user with the ability to customize the threshold of confidence and iou so that the user can find a suitable threshold for the input image. In order not to have to rerun the whole model every time these parameters are changed, when the image is sent from the client, the server will perform a ```perceptual hash``` encryption algorithm to encrypt the image and using that resulting string to name the image when saving to the server. This helps when the client sends an image whose encoding already exists in the database, the server will only post-process the previously predicted result without having to re-execute the prediction.
