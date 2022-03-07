@@ -9,6 +9,7 @@ model:
   args:
     name: unetplusplus
     encoder_name: efficientnet-b4
+    num_classes: 102
 
 data:
   dataloader:

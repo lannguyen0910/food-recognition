@@ -43,11 +43,12 @@ class SegmentationTestset(torch.utils.data.Dataset):
         im = Image.open(image_path).convert('RGB')
         width, height = im.width, im.height
 
-        im = np.array(im)
+        # im = np.array(im)
 
         if self.transform is not None:
-            item = self.transform(image=im)
-            im = item['image']
+            im = self.transform(im)
+            # item = self.transform(image=im)
+            # im = item['image']
 
         return {
             "input": im,
@@ -100,18 +101,12 @@ class SegmentationPipeline(object):
             self.transform_cfg, registry=TRANSFORM_REGISTRY
         )
 
-        # self.dataset = get_instance(
-        #     opt['data']["dataset"],
-        #     registry=DATASET_REGISTRY,
-        #     transform=self.transform['val'],
-        # )
-
         self.dataset = SegmentationTestset(
             image_dir=image_dir,
             txt_classnames='./configs/segmentation/classes.txt',
             transform=self.transform['val'])
 
-        self.CLASSNAMES = self.dataset.classnames
+        CLASSNAMES = self.dataset.classnames
 
         self.dataloader = get_instance(
             opt['data']["dataloader"],
@@ -123,8 +118,7 @@ class SegmentationPipeline(object):
         self.model = get_instance(
             self.opt["model"],
             registry=MODEL_REGISTRY,
-            classnames=self.CLASSNAMES,
-            num_classes=len(self.CLASSNAMES)).to(self.device)
+            classnames=CLASSNAMES).to(self.device)
 
         if self.weights:
             state_dict = torch.load(self.weights)
@@ -159,10 +153,9 @@ class SegmentationPipeline(object):
 
             outputs = self.model.get_prediction(batch, self.device)
             preds = outputs['masks']
-            print('Preds: ', preds)
 
-            for (input, pred, filename, ori_size) in zip(inputs, preds, img_names, ori_sizes):
-                decode_pred = visualizer.decode_segmap(pred)[:, :, ::-1]
+            for (input, filename, ori_size) in zip(inputs, img_names, ori_sizes):
+                decode_pred = visualizer.decode_segmap(preds)[:, :, ::-1]
                 # decode_pred = (decode_pred * 255).astype(np.uint8)
                 resized_decode_mask = cv2.resize(decode_pred, ori_size)
 
