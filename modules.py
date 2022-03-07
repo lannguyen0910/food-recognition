@@ -395,7 +395,7 @@ def get_prediction(
         seg_pipeline = SegmentationPipeline(opts, input_path)
         output_path = seg_pipeline.inference()
 
-        return output_path
+        return output_path, 'semantic'
 
     # additional tags
     model_tag = model_name[-1]
@@ -470,4 +470,4 @@ def get_prediction(
     df.set_index('names').T.to_csv(os.path.join(
         CSV_FOLDER, ori_hashed_key+'_info2.csv'))
 
-    return output_path
+    return output_path, 'detection'

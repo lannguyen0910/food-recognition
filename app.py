@@ -261,7 +261,7 @@ def analyze():
                 app.config['DETECTION_FOLDER'], filename) if not segmentation else os.path.join(
                 app.config['SEGMENTATION_FOLDER'], filename)
 
-            output_path = get_prediction(
+            output_path, output_type = get_prediction(
                 filepath,
                 output_path,
                 model_name=model_types,
@@ -285,12 +285,12 @@ def analyze():
             app.config['CSV_FOLDER'], csv_name + '_info2.csv')
 
         if 'url-button' in request.form:
-            return render_template('detect-input-url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+            return render_template('detect-input-url.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
         elif 'webcam-button' in request.form:
-            return render_template('detect-webcam-capture.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+            return render_template('detect-webcam-capture.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
-        return render_template('detect-upload-file.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+        return render_template('detect-upload-file.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
     return redirect('/')
 
