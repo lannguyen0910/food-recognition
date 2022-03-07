@@ -43,12 +43,11 @@ class SegmentationTestset(torch.utils.data.Dataset):
         im = Image.open(image_path).convert('RGB')
         width, height = im.width, im.height
 
-        # im = np.array(im)
+        im = np.array(im)
 
         if self.transform is not None:
-            im = self.transform(im)
-            # item = self.transform(image=im)
-            # im = item['image']
+            item = self.transform(image=im)
+            im = item['image']
 
         return {
             "input": im,
