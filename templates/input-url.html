@@ -26,6 +26,11 @@
     <div class='center' style="position:relative;">
       <div class="panel panel-default result-panel">
         <div class="panel-body w3-card">
+          <div class="container">
+            <div class="row justify-content-center">
+              <h2>Detection inputs</h2>
+            </div>
+          </div>
           <div class='content'>
             <form id="file-upload" action = "/analyze" method = "POST" enctype="multipart/form-data">
               <div class="row">
@@ -82,6 +87,17 @@
                   </div>
                 </div>
 
+                <div class="container">
+                  <div class="row justify-content-md-center">
+                    <div class="col-md-3">
+                      <h1>Segmentation inputs</h1>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="seg" name="seg">
+                        <label class="form-check-label" for="seg">Semantic Segmentation</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="row">
