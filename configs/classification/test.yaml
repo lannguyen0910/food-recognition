@@ -1,0 +1,21 @@
+global:
+  debug: True
+  cfg_transform: configs/classification/transform.yaml
+  save_dir: static/assets/classifications
+  device: cuda:0 # [cpu, cuda:0]
+  weights: weights/effnetb4.pth
+
+model:
+  name: BaseTimmModel
+  args:
+    name: efficientnet_b4
+    from_pretrained: False
+    num_classes: 180
+
+data:
+  dataloader:
+    name: DataLoader
+    args:
+      batch_size: 1
+      drop_last: False
+      shuffle: False

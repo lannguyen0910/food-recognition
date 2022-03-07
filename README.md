@@ -1,10 +1,10 @@
-<h1 align="center">🍔🍟🍗 Meal analysis using yolov5 🍞🍖🍕</h1>
+<h1 align="center">🍔🍟 Meal analysis with Theseus 🍖🍕</h1>
 
 <p align="center">
 
 <!--  <img src="https://visitor-badge.laobi.icu/badge?page_id=lannguyen0910.food-detection-yolov5" alt="visitors" />
   -->
- <a><img  src="./demo/pipeline.png"></a>
+ <a><img  src="./static/assets/demo/pipeline.png"></a>
   <br>
 </p>
 
@@ -67,23 +67,27 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
+<strong><i>[07/03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>. <br>
 <strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 latest versions P5-P6. Can load checkpoints from original repo.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android. <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app. <br>
  <strong><i>[16/07/2021]</i></strong> All trained checkpoints on custom data have been lost. Now use pretrained models on COCO for inference. 
 </details>
 
+
+<!-- - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights. -->
 ## 📔  **Notebook**
 - For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
-- For training, refer to this notebook for your own training:
-  - Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
+- For training, refer to these notebooks for your own training:
+  -  Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
+  -  Classification: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/12h295CW3AQt0ix-NDd4dYfX1aj5CGjVj?usp=sharing)
+  - Semantic segmentation: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1N6cd29mrVaAhuFSGP6njeJeZ2ds3qBjN?usp=sharing)
 <!-- - For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing) -->
 
-
-## 📝 **Pretrained-weights**
-- Link: [weights](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing)
+## 🥇 **Pretrained-weights**
+- [Link](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing)
 - Detection: <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a>
-
+ 
 | Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
 | ------- | :--------: | :----: | :-----: | :----------: |
 | YOLOv5s |  640x640   |  172   |  90.7   |     67.1     |
@@ -91,8 +95,41 @@ food-detection-yolov5
 | YOLOv5l |  640x640   |  118   |   94    |      73      |
 | YOLOv5x |  640x640   |   62   |  77.9   |     53.3     |
 
+- Segmentation:
+  
+| Models | Image Size | Epochs | Pixel AP | Pixel AR | Dice score |
+| ------ | :--------: | :----: | :------: | :------: | :--------: |
+| UNet++ |  640x640   |   5    |  0.931   |  0.935   |   99.95    |
+
+- Classification:
+  
+| Models          | Image Size | Epochs |  Acc   | Balanced Acc | F1-score |
+| --------------- | :--------: | :----: | :----: | :----------: | :------: |
+| EfficientNet-b4 |  640x640   |   7    | 84.069 |    86.033    |  84.116  |
+
+## 🌟 **Logs detail**
+In total, there are 3 implementation versions:
+1. Training using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
+2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
+3. Update **Theseus** template, currently supports ```food detection```, ```food classification```, ```multi-class food semantic segmentation``` only on **images**.  For this version, we introduce Theseus, which is just a part of [Theseus template](https://github.com/kaylode/theseus). Moreover, we omitted some weak or unnecessary features to make the project more robust. Theseus adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
+  
+For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
 
  ## 🌟 **Inference**
+- File structure
+```
+this repo
+│   app.py
+└───configs
+│     └───classification          # Contains classification's configurations
+|             └───test.yaml 
+│     └───detection          # Contains detection's configurations
+|             └───....
+│     └───segmentation          # Contains segmentation's configurations
+|             └───....
+
+```
+
 - Install dependencies.
 ```
 pip install -r requirements.txt
@@ -108,19 +145,91 @@ sudo apt-get install ffmpeg
 run.bat
 ```
 
-- Switch from ```CPU``` to ```GPU``` for faster inference, change 4 yolov5 config files in ```utilities/configs``` 
+<!-- - Switch between ```CPU``` and ```GPU``` in ```configs```
+```python
+global:
+    device: cuda:0 #cpu
+``` -->
+## 📔  **Notebook**
+- For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
+- For training, refer to this notebook for your own training:
+  -  Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
+  -  Classification: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/12h295CW3AQt0ix-NDd4dYfX1aj5CGjVj?usp=sharing)
+  - Semantic segmentation: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1N6cd29mrVaAhuFSGP6njeJeZ2ds3qBjN?usp=sharing)
+<!-- - For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing) -->
+
+
+## 🥇 **Pretrained-weights**
+- [Link](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing)
+- Detection: <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a>
+ 
+| Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
+| ------- | :--------: | :----: | :-----: | :----------: |
+| YOLOv5s |  640x640   |  172   |  90.7   |     67.1     |
+| YOLOv5m |  640x640   |  112   |  89.7   |     66.6     |
+| YOLOv5l |  640x640   |  118   |   94    |      73      |
+| YOLOv5x |  640x640   |   62   |  77.9   |     53.3     |
+
+- Segmentation:
+  
+| Models | Image Size | Epochs | Pixel AP | Pixel AR | Dice score |
+| ------ | :--------: | :----: | :------: | :------: | :--------: |
+| UNet++ |  640x640   |   5    |  0.931   |  0.935   |   99.95    |
+
+- Classification:
+  
+| Models          | Image Size | Epochs |  Acc   | Balanced Acc | F1-score |
+| --------------- | :--------: | :----: | :----: | :----------: | :------: |
+| EfficientNet-b4 |  640x640   |   7    | 84.069 |    86.033    |  84.116  |
+
+
+ ## 🌟 **Inference**
+- File structure
 ```
-gpu: True
+this repo
+│   app.py
+└───configs
+│     └───classification          # Contains classification's configurations
+|             └───test.yaml 
+│     └───detection          # Contains detection's configurations
+|             └───....
+│     └───segmentation          # Contains segmentation's configurations
+|             └───....
+
 ```
+- Install dependencies.
+```
+pip install -r requirements.txt
+```
+
+<!-- - (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display ```MP4``` video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the inference notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
+```
+sudo apt-get install ffmpeg
+``` -->
+
+- Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
+```
+run.bat
+```
+
+<!-- - Switch between ```CPU``` and ```GPU``` in ```configs```
+```python
+global:
+    device: cuda:0 #cpu
+``` -->
 
 ## 🌟 **Logs detail**
-We use <b>4 YOLOv5 versions (s, m, l and x)</b> and their pre-trained weights to train on our problem. We have 2 implementation versions:
-1. Train using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
+In total, there are 3 implementation versions:
+1. Training using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images. Label enhancement technique, if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
 2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
+3. Update **Theseus** template, currently supports ```food detection```, ```food classification```, ```multi-class food semantic segmentation``` only on **images**.  For this version, we introduce Theseus, which is just a part of [Theseus template](https://github.com/kaylode/theseus). Moreover, we omitted some weak or unnecessary features to make the project more robust. Theseus adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
+  
+For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
 
 ## 🌟 **Dataset**
-- Detection: [link](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged 2 datasets).
+- Detection: [link](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged OID and Vietnamese Lunch dataset)
 - Classification: [link](https://drive.google.com/drive/folders/11PH1ZF3ZCMKDQvxrblBA-Zy02iWgM4lq?usp=sharing) (MAFood121)
+- Semantic segmentation: [link](https://mm.cs.uec.ac.jp/uecfoodpix/UECFOODPIXCOMPLETE.tar) (UECFood)
 
 ## 🌟 **Dataset details**
 <details>
@@ -144,13 +253,11 @@ We also perform the aggregation of the two data sets above into one. The new set
 <details>
 <summary>Implementation details</summary>
    
-The two functions: ```get_prediction``` and ```get_video_prediction``` are two inference functions for images and videos. Implemented in ```modules.py```, where the image detection process (get_prediction) will call the Edamam API to get nutritional information in the food. We also save nutritional information in csv files in the folder ```/static/csv```.
+The function ```get_prediction``` is an inference function for ```detection```, ```classification``` and ```semantic segmentation``` tasks, depends on which inputs you choose. Implemented in ```modules.py```, where the image detection process will call the Edamam API to get nutritional information in the food. We also save nutritional information in csv files in the folder ```/static/csv```.
 <br>
 
 We provide the user with the ability to customize the threshold of confidence and iou so that the user can find a suitable threshold for the input image. In order not to have to rerun the whole model every time these parameters are changed, when the image is sent from the client, the server will perform a ```perceptual hash``` encryption algorithm to encrypt the image and using that resulting string to name the image when saving to the server. This helps when the client sends an image whose encoding already exists in the database, the server will only post-process the previously predicted result without having to re-execute the prediction.
-<br>
 
-In addition, the team also saved the models as ```global variables```. When starting Flask Server, the model will be initialized only once. Only when there is a change in model selection, this variable will be reinitialized, otherwise the model will not be reinitialized when there are new image queries, this will somewhat reduce the processing time.
 </details>
    
 ## 🌟 **Additional Methods**
@@ -176,14 +283,13 @@ When a dish is predicted, we provide more information about the nutritional leve
 
 ## 🍱 **Sample Results**
 <p float="left">
-  <img src="demo/2.jpg" width="100%" /> 
-  <img src="demo/1.jpg" width="100%" />
-  <img src="demo/3.jpg" width="100%" />
-  <img src="demo/4.jpg" width="100%" />
-  <img src="demo/5.jpg" width="100%" /> 
-  <img src="demo/6.jpg" width="100%" />
+  <img src="static/assets/demo/2.jpg" width="100%" /> 
+  <img src="static/assets/demo/1.jpg" width="100%" />
+  <img src="static/assets/demo/3.jpg" width="100%" />
+  <img src="static/assets/demo/4.jpg" width="100%" />
+  <img src="static/assets/demo/5.jpg" width="100%" /> 
+  <img src="static/assets/demo/6.jpg" width="100%" />
 </p>
-
 
 ## 📙 **Credits**
 - YOLOv5 official repo: https://github.com/ultralytics/yolov5.

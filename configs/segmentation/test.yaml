@@ -1,0 +1,20 @@
+global:
+  debug: True
+  cfg_transform: configs/segmentation/transform.yaml
+  save_dir: static/assets/segmentations
+  device: cuda:0 # [cpu, cuda:0]
+  weights: weights/semantic_seg.pth
+model:
+  name: BaseSegModel
+  args:
+    name: unetplusplus
+    encoder_name: efficientnet-b4
+    num_classes: 102
+
+data:
+  dataloader:
+    name: DataLoader
+    args:
+      batch_size: 1
+      drop_last: False
+      shuffle: False

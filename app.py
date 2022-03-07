@@ -13,7 +13,7 @@ from PIL import Image
 from flask import Flask, request, render_template, redirect, make_response, jsonify
 from pathlib import Path
 from werkzeug.utils import secure_filename
-from modules import get_prediction, get_video_prediction
+from modules import get_prediction
 from flask_ngrok import run_with_ngrok
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
@@ -36,14 +36,14 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 UPLOAD_FOLDER = './static/assets/uploads/'
 CSV_FOLDER = './static/csv/'
-VIDEO_FOLDER = './static/assets/videos/'
+SEGMENTATION_FOLDER = './static/assets/segmentations/'
 DETECTION_FOLDER = './static/assets/detections/'
 METADATA_FOLDER = './static/metadata/'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['CSV_FOLDER'] = CSV_FOLDER
 app.config['DETECTION_FOLDER'] = DETECTION_FOLDER
-app.config['VIDEO_FOLDER'] = VIDEO_FOLDER
+app.config['SEGMENTATION_FOLDER'] = SEGMENTATION_FOLDER
 
 IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 VIDEO_ALLOWED_EXTENSIONS = {'mp4', 'avi', '3gpp', '3gp'}
@@ -199,7 +199,7 @@ def analyze():
 
             f = request.files['blob-file']
             ori_file_name = secure_filename(f.filename)
-            filetype = file_type(ori_file_name)
+            # filetype = file_type(ori_file_name)
 
             filename = time.strftime("%Y%m%d-%H%M%S") + '.png'
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -214,7 +214,7 @@ def analyze():
             url = request.form['url_link']
             filename, filepath = download(url)
 
-            filetype = file_type(filename)
+            # filetype = file_type(filename)
 
         elif 'upload-button' in request.form:
             # Get uploaded file
@@ -237,14 +237,6 @@ def analyze():
                 img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
                 cv2.imwrite(filepath, img)
 
-            elif filetype == 'video':
-                temp_filepath = os.path.join(
-                    app.config['UPLOAD_FOLDER'], ori_file_name)
-                f.save(temp_filepath)
-                filename = hash_video(temp_filepath)
-                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                os.rename(temp_filepath, filepath)
-
         # Get all inputs in form
         iou = request.form.get('threshold-range')
         confidence = request.form.get('confidence-range')
@@ -252,22 +244,24 @@ def analyze():
         enhanced = request.form.get('enhanced')
         ensemble = request.form.get('ensemble')
         tta = request.form.get('tta')
+        segmentation = request.form.get('seg')
 
         ensemble = True if ensemble == 'on' else False
         tta = True if tta == 'on' else False
         enhanced = True if enhanced == 'on' else False
+        segmentation = True if segmentation == 'on' else False
         model_types = str.lower(model_types)
         min_conf = float(confidence)/100
         min_iou = float(iou)/100
 
         if filetype == 'image':
             # Get filename of detected image
-
             out_name = "Image Result"
             output_path = os.path.join(
-                app.config['DETECTION_FOLDER'], filename)
+                app.config['DETECTION_FOLDER'], filename) if not segmentation else os.path.join(
+                app.config['SEGMENTATION_FOLDER'], filename)
 
-            filename = get_prediction(
+            output_path, output_type = get_prediction(
                 filepath,
                 output_path,
                 model_name=model_types,
@@ -275,27 +269,14 @@ def analyze():
                 ensemble=ensemble,
                 min_conf=min_conf,
                 min_iou=min_iou,
-                enhance_labels=enhanced)
+                enhance_labels=enhanced,
+                segmentation=segmentation)
 
-        elif filetype == 'video':
-            # Get filename of detected video
-
-            out_name = "Video Result"
-            output_path = os.path.join(
-                app.config['DETECTION_FOLDER'], filename)
-
-            filename = get_video_prediction(
-                filepath,
-                output_path,
-                model_name=model_types,
-                tta=tta,
-                min_conf=min_conf,
-                min_iou=min_iou)
         else:
             error_msg = "Invalid input url!!!"
             return render_template('detect-input-url.html', error_msg=error_msg)
 
-        filename = os.path.basename(filename)
+        filename = os.path.basename(output_path)
         csv_name, _ = os.path.splitext(filename)
 
         csv_name1 = os.path.join(
@@ -304,55 +285,14 @@ def analyze():
             app.config['CSV_FOLDER'], csv_name + '_info2.csv')
 
         if 'url-button' in request.form:
-            return render_template('detect-input-url.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+            return render_template('detect-input-url.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
         elif 'webcam-button' in request.form:
-            return render_template('detect-webcam-capture.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+            return render_template('detect-webcam-capture.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
-        return render_template('detect-upload-file.html', out_name=out_name, fname=filename, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+        return render_template('detect-upload-file.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
     return redirect('/')
-
-
-@app.route('/api', methods=['POST'])
-def api_call():
-    if request.method == 'POST':
-        response = {}
-        if not request.json or 'url' not in request.json:
-            response['code'] = 404
-            return jsonify(response)
-        else:
-            # get the base64 encoded string
-            url = request.json['url']
-            filename, filepath = download(url)
-
-            model_types = request.json['model_types']
-            ensemble = request.json['ensemble']
-            min_conf = request.json['min_conf']
-            min_iou = request.json['min_iou']
-            enhanced = request.json['enhanced']
-
-            output_path = os.path.join(
-                app.config['DETECTION_FOLDER'], filename)
-
-            get_prediction(
-                filepath,
-                output_path,
-                model_name=model_types,
-                ensemble=ensemble,
-                min_conf=min_conf,
-                min_iou=min_iou,
-                enhance_labels=enhanced)
-
-            with open(output_path, "rb") as f:
-                res_im_bytes = f.read()
-            res_im_b64 = base64.b64encode(res_im_bytes).decode("utf8")
-            response['res_image'] = res_im_b64
-            response['filename'] = filename
-            response['code'] = 200
-            return jsonify(response)
-
-    return jsonify({"code": 400})
 
 
 @app.after_request
@@ -373,16 +313,14 @@ if __name__ == '__main__':
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     if not os.path.exists(DETECTION_FOLDER):
         os.makedirs(DETECTION_FOLDER, exist_ok=True)
-    if not os.path.exists(VIDEO_FOLDER):
-        os.makedirs(VIDEO_FOLDER, exist_ok=True)
+    if not os.path.exists(SEGMENTATION_FOLDER):
+        os.makedirs(SEGMENTATION_FOLDER, exist_ok=True)
     if not os.path.exists(CSV_FOLDER):
         os.makedirs(CSV_FOLDER, exist_ok=True)
     if not os.path.exists(METADATA_FOLDER):
         os.makedirs(METADATA_FOLDER, exist_ok=True)
 
     args = parser.parse_args()
-
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     if args.ngrok:
         run_with_ngrok(app)
@@ -397,5 +335,3 @@ if __name__ == '__main__':
 
         app.run(host=host, port=port, debug=args.debug, use_reloader=False,
                 ssl_context='adhoc')
-
-# Run: python app.py --host localhost:8000

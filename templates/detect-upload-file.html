@@ -27,6 +27,11 @@
       {% block content %}
       <div class="panel panel-default result-panel">
         <div class="panel-body w3-card">
+          <div class="container">
+            <div class="row justify-content-center">
+              <h2>Detection inputs</h2>
+            </div>
+          </div>
           <div class='content'>
             <form action = "{{ url_for('analyze') }}" method = "POST" enctype="multipart/form-data">
               <div class="row">
@@ -35,9 +40,9 @@
                     <div class="panel-body">
                       <div id="threshold-text">
                         <b>IOU Threshold:</b>
-                        <span>25</span>%
+                        <span>50</span>%
                       </div>
-                      <input id="threshold-range" type="range" min="0" max="100" value="25" class="slider" name="threshold-range">
+                      <input id="threshold-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
                     </div>
                   </div>
                 </div>
@@ -83,8 +88,21 @@
                   </div>
                 </div>
 
-              </div>
+                <div class="container">
+                  <div class="row justify-content-md-center">
+                    <div class="col-md-3">
+                      <h1>Segmentation inputs</h1>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="seg" name="seg">
+                        <label class="form-check-label" for="seg">Semantic Segmentation</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
+              </div>
+              
+              <br/>
 
               <div class='no-display'>
                 <input id='file-input'
@@ -95,12 +113,7 @@
               </div>
 
               <button class='btn btn-primary' type='button' onclick='showPicker()'>Upload File</button>
-              <button class="btn btn-secondary" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
 
-              <div id="wrapper">
-                <button class="btn btn-danger" type="button" id="capture-img" disabled="disabled">Capture</button>
-                <button class="btn btn-success" type="button" id="download-img" disabled="disabled">Download</button>
-              </div>
 
               <div class='upload-label'>
                 <label id='upload-label'></label>
@@ -113,8 +126,6 @@
                       <div id='image-display'>
                         {% if filetype == 'image' %}
                         <img id="user-image" src="{{url_for('static', filename='assets/uploads/' + fname)}}" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px">
-                        {% else %}
-                        <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/uploads/' + fname)}}" type="video/mp4"></source></video>
                         {% endif %}
                       </div>
                     </div>
@@ -140,14 +151,15 @@
               </div>
 
               <br/>
-              {% if filetype == 'image' %}
+              {% if output_type == 'detection' %}
                 <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
-                <label id="csv_file" style="display:none">{{csv_name}}</label>
-                <label id="csv_file2" style="display:none">{{csv_name2}}</label>
                 
-              {% else %}
-                <video autoplay id="result-video" controls> <source id="result-source" src="{{url_for('static', filename='assets/detections/' + fname)}}"></source></video>
+              {% elif output_type == 'semantic' %}
+                <a href="{{url_for('static', filename='assets/segmentations/masks/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/segmentations/masks/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
               {% endif %}
+
+              <label id="csv_file" style="display:none">{{csv_name}}</label>
+              <label id="csv_file2" style="display:none">{{csv_name2}}</label>
 
             </div>
           </div>

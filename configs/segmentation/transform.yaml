@@ -1,0 +1,13 @@
+val:
+  name: AlbCompose
+  args:
+    transforms:
+      - name: AlbResize
+        args:
+          width: 640
+          height: 640
+      - name: AlbNormalize
+        args:
+          mean: [0.229, 0.224, 0.225]
+          std: [0.485, 0.456, 0.406]
+      - name: AlbToTensorV2

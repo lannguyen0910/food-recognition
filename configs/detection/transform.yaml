@@ -1,0 +1,20 @@
+val:
+  name: AlbCompose
+  args:
+    transforms:
+      # - name: get_resize_augmentation
+      #   args:
+      #     image_size: [640, 640] # should be square and multiple of 32 to prevent bugs [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
+      #     keep_ratio: True # # whether to use resize padding
+      - name: AlbResize
+        args:
+          width: 640
+          height: 640
+
+      - name: AlbNormalize
+        args:
+          mean: [0.0, 0.0, 0.0]
+          std: [1.0, 1.0, 1.0]
+          max_pixel_value: 1.0
+
+      - name: AlbToTensorV2

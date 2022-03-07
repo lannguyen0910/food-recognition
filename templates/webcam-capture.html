@@ -26,6 +26,11 @@
     <div class='center' style="position:relative;">
       <div class="panel panel-default result-panel">
         <div class="panel-body w3-card">
+          <div class="container">
+            <div class="row justify-content-center">
+              <h2>Detection inputs</h2>
+            </div>
+          </div>
           <div class='content'>
             <form id="file-upload" action = "{{ url_for('analyze') }}" method = "POST" enctype="multipart/form-data">
               <div class="row">
@@ -34,9 +39,9 @@
                     <div class="panel-body">
                       <div id="threshold-text">
                         <b>IOU Threshold:</b>
-                        <span>25</span>%
+                        <span>50</span>%
                       </div>
-                      <input id="threshold-range" type="range" min="0" max="100" value="25" class="slider" name="threshold-range">
+                      <input id="threshold-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
                     </div>
                   </div>
                 </div>
@@ -82,12 +87,24 @@
                   </div>
                 </div>
 
+                <div class="container">
+                  <div class="row justify-content-md-center">
+                    <div class="col-md-3">
+                      <h1>Segmentation inputs</h1>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="seg" name="seg">
+                        <label class="form-check-label" for="seg">Semantic Segmentation</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
+              <br/>
               
               <input type="file" name="blob-file" id="blob-file" accept="image/*" style="display:none">
 
               <button class="btn btn-secondary" id="webcam-btn" type="button" onclick="runWebcam()">Use Webcam</button>
-
 
               <div id="wrapper">
                 <button class="btn btn-danger" type="button" id="capture-img" disabled="disabled">Capture</button>

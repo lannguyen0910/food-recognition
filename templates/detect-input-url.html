@@ -25,6 +25,11 @@
     <div class='center' style="position:relative;">
         <div class="panel panel-default result-panel">
             <div class="panel-body w3-card">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <h2>Detection inputs</h2>
+                    </div>
+                </div>
                 <div class='content'>
                     <form id="file-upload" action = "/analyze" method = "POST" enctype="multipart/form-data">
                         <div class="row">
@@ -33,9 +38,9 @@
                                 <div class="panel-body">
                                 <div id="threshold-text">
                                     <b>IOU Threshold:</b>
-                                    <span>25</span>%
+                                    <span>50</span>%
                                 </div>
-                                <input id="threshold-range" type="range" min="0" max="100" value="25" class="slider" name="threshold-range">
+                                <input id="threshold-range" type="range" min="0" max="100" value="50" class="slider" name="threshold-range">
                                 </div>
                             </div>
                             </div>
@@ -81,7 +86,20 @@
                                 </div>
                             </div>
 
+                            <div class="container">
+                                <div class="row justify-content-md-center">
+                                    <div class="col-md-3">
+                                        <h1>Segmentation inputs</h1>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="seg" name="seg">
+                                            <label class="form-check-label" for="seg">Semantic Segmentation</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
+                        <br/>
 
                         {% if error_msg %}
                             <div id="alert" class="alert alert-danger alert-dismissible alert-margin" role="alert">
@@ -96,9 +114,9 @@
                             <div class="col-lg-6">
                             <div class="panel panel-default margin">
                                 <div class="panel-body">
-                                <div class="header-setting">
-                                    <b style="font-size:medium;">Detect Image and Video</b>
-                                </div>
+                                {% comment %} <div class="header-setting">
+                                    <b style="font-size:medium;">Detect Image</b>
+                                </div> {% endcomment %}
                                 <p style="margin-top: 5px; margin-bottom: 0px;">Select From URL</p>
                                 <div>
                                     <input type=url class="form-control" id="url" name="url_link" onchange="trackURL(this.value)" placeholder="http://">
@@ -122,28 +140,14 @@
                         <b>{{out_name}}</b>
                     </div>
                     <br/>
-                    {% if filetype == 'image' %}
-                    <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                    {% if output_type == 'detection' %}
+                        <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                    {% elif output_type == 'semantic' %}
+                      <a href="{{url_for('static', filename='assets/segmentations/masks/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/segmentations/masks/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                    {% endif %}
                     <label id="csv_file" style="display:none">{{csv_name}}</label>
                     <label id="csv_file2" style="display:none">{{csv_name2}}</label>
 
-                    {% else %}
-                    <video autoplay id="user-video" controls> <source id="user-source" src="{{url_for('static', filename='assets/detections/' + fname)}}" type="video/mp4"></source></video>
-                    {% endif %}
-
-                    <!-- {{result_dict}} -->
-                    <!-- <tr>
-                        {%for item in result_dict %}
-                        <div class='result-label'> 
-                            {% if item.calories %}
-                            <h2 id='label'>{{item.names}} || Calories: {{item.calories}}kcal || Protein: {{item.protein}}g || Fiber: {{item.fiber}}g || Fat: {{item.fat}}g || Carbs: {{item.carbs}}g </h2>
-                            {% else %}
-                            <h2 id='label'>{{item.names}} || No information </h2>
-                            {% endif %}
-                            <h3 id='calories'></h3>
-                        </div>
-                        {% endfor %}
-                    </tr> -->
                 </div>
             </div>
 

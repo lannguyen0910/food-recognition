@@ -1,73 +1,67 @@
-from re import I
 import cv2
-from PIL import Image
 import numpy as np
 import os
 import pandas as pd
-from utilities import (
-    detect, Config, get_config, get_class_names,
-    download_weights, draw_boxes_v2, postprocessing,
-    box_fusion, classify, change_box_order,
-    VideoPipeline)
-from api import get_info_from_db
+from theseus.utilities.visualization.utils import draw_bboxes_v2
+from theseus.utilities.download import download_pretrained_weights
+from theseus.utilities import box_fusion, change_box_order, postprocessing
+from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
+from theseus.opt import Opts, Config, InferenceArguments
 
-CACHE_DIR = './.cache'
+from analyzer import get_info_from_db
+
+CACHE_DIR = './weights'
 CSV_FOLDER = './static/csv'
-METADATA_FOLDER = './static/metadata'
 
 
-class Arguments:
-    def __init__(self, model_name=None) -> None:
+class DetectionArguments:
+    def __init__(
+        self,
+        model_name: str = None,
+        input_path: str = "",
+        output_path: str = "",
+        min_conf: float = 0.001,
+        min_iou: float = 0.99,
+        tta: bool = False,
+        tta_ensemble_mode: str = 'wbf',
+        tta_conf_threshold: float = 0.01,
+        tta_iou_threshold: float = 0.9,
+    ) -> None:
         self.model_name = model_name
         self.weight = None
-        self.input_path = ""
-        self.output_path = ""
-        self.gpus = "0"
-        self.min_conf = 0.001
-        self.min_iou = 0.99
-        self.tta = False
-        self.tta_ensemble_mode = "wbf"
-        self.tta_conf_threshold = 0.01
-        self.tta_iou_threshold = 0.9
+        self.input_path = input_path
+        self.output_path = output_path
+        self.min_conf = min_conf
+        self.min_iou = min_iou
+        self.tta = tta
+        self.tta_ensemble_mode = tta_ensemble_mode
+        self.tta_conf_threshold = tta_conf_threshold
+        self.tta_iou_threshold = tta_iou_threshold
 
         if self.model_name:
             tmp_path = os.path.join(CACHE_DIR, self.model_name+'.pt')
             download_pretrained_weights(
                 self.model_name,
-                cached=tmp_path)
+                output=tmp_path)
             self.weight = tmp_path
 
 
-weight_urls = {
-    'yolov5s': "1rISMag8OCM5v99TYuavAobm3LkwjtAi9",
-    "yolov5m": "1I649VGqkam_IcCCW8WUA965vPrW_pqDX",
-    "yolov5l": "1sBciFcRav2ZE6jzhWnca9uegjQ4860om",
-    "yolov5x": "1CRD6T9QtH9XEa-h985_Ho6jgLWu58zn0",
-    "effnetb4": "1-K_iDfuhxQFHIF9HTy8SvfnIFwjqxtaX",
-    "htc_seg": "1wPVkCE5GPzNCU2pSkq02JnzmQ_A7YV6C",
-}
-
-
-def download_pretrained_weights(name, cached=None):
-    return download_weights(weight_urls[name], cached)
-
-
-def draw_image(out_path, ori_img, result_dict, class_names):
+def draw_image(out_path, img, result_dict, class_names):
     if os.path.isfile(out_path):
         os.remove(out_path)
 
     if "names" in result_dict.keys():
-        draw_boxes_v2(
+        draw_bboxes_v2(
             out_path,
-            ori_img,
+            img,
             result_dict["boxes"],
             result_dict["labels"],
             result_dict["scores"],
             label_names=result_dict["names"])
     else:
-        draw_boxes_v2(
+        draw_bboxes_v2(
             out_path,
-            ori_img,
+            img,
             result_dict["boxes"],
             result_dict["labels"],
             result_dict["scores"],
@@ -86,9 +80,14 @@ def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
                 'h': boxes[:, 3],
             })
 
+    for key in cache_dict.keys():
+        if len(cache_dict[key]) == 0:
+            return
+
     for key in result_dict.keys():
         if key != 'boxes' and key not in exclude:
             cache_dict[key] = result_dict[key]
+
     df = pd.DataFrame(cache_dict)
 
     df.to_csv(f'{cache_dir}/{cache_name}.csv', index=False)
@@ -148,6 +147,51 @@ def drop_duplicate_fill0(result_dict):
     return new_result_dict
 
 
+def append_food_name(food_dict, class_names):
+    food_labels = food_dict['labels']  # [0].to_list()
+    food_names = [' '.join(class_names[int(i)].split('-'))
+                  for i in food_labels]
+    food_dict['names'] = food_names
+    return food_dict
+
+
+def append_food_info(food_dict):
+    food_names = food_dict['names']
+    food_info = get_info_from_db(food_names)
+    food_dict.update(food_info)
+    return food_dict
+
+
+def convert_dict_to_list(result_dict):
+    result_list = []
+    num_items = len(result_dict['labels'])
+    for i in range(num_items):
+        item_dict = {}
+        for key in result_dict.keys():
+            item_dict[key] = result_dict[key][i]
+        result_list.append(item_dict)
+    return result_list
+
+
+def crop_box(image, box, expand=10):
+    h, w, c = image.shape
+
+    # expand box a little (optional)
+    new_box = box.copy()
+    # new_box[0] -= expand
+    # new_box[1] -= expand
+    # new_box[2] += expand
+    # new_box[3] += expand
+
+    # new_box[0] = max(0, new_box[0])
+    # new_box[1] = max(0, new_box[1])
+    # new_box[2] = min(h, new_box[2])
+    # new_box[3] = min(w, new_box[3])
+
+    # xyxy box, cv2 image h,w,c
+    return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
+
+
 def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
 
     boxes = np.array(result_dict['boxes'])
@@ -182,141 +226,6 @@ def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
     }
 
 
-def ensemble_models(input_path, image_size, tta=False):
-
-    # ignore_keys = [
-    #     'min_iou_val',
-    #     'min_conf_val',
-    #     'tta',
-    #     'gpu_devices',
-    #     'tta_ensemble_mode',
-    #     'tta_conf_threshold',
-    #     'tta_iou_threshold',
-    # ]
-
-    args1 = Arguments(model_name='yolov5s')
-    args2 = Arguments(model_name='yolov5m')
-    args3 = Arguments(model_name='yolov5l')
-    args4 = Arguments(model_name='yolov5x')
-
-    args1.input_path = input_path
-    args2.input_path = input_path
-    args3.input_path = input_path
-    args4.input_path = input_path
-
-    args1.tta = tta
-    args2.tta = tta
-    args3.tta = tta
-    args4.tta = tta
-
-    # class_names, num_classes = get_class_names(args1.weight)
-    config1 = get_config(model_name=os.path.join('detection', 'yolov5s'))
-    config2 = get_config(model_name=os.path.join('detection', 'yolov5m'))
-    config3 = get_config(model_name=os.path.join('detection', 'yolov5l'))
-    config4 = get_config(model_name=os.path.join('detection', 'yolov5x'))
-
-    class_names, num_classes = get_class_names(model_name=os.path.join('detection','yolov5s'))
-
-    result_dict1 = detect(args1, config1)
-    result_dict2 = detect(args2, config2)
-    result_dict3 = detect(args3, config3)
-    result_dict4 = detect(args4, config4)
-
-    merged_boxes = [
-        np.array(result_dict1['boxes']),
-        np.array(result_dict2['boxes']),
-        np.array(result_dict3['boxes']),
-        np.array(result_dict4['boxes'])]
-    merged_labels = [
-        np.array(result_dict1['labels']),
-        np.array(result_dict2['labels']),
-        np.array(result_dict3['labels']),
-        np.array(result_dict4['labels'])]
-    merged_scores = [
-        np.array(result_dict1['scores']),
-        np.array(result_dict2['scores']),
-        np.array(result_dict3['scores']),
-        np.array(result_dict4['scores'])]
-
-    for i in range(len(merged_boxes)):
-        merged_boxes[i][:, 2] += merged_boxes[i][:, 0]  # xyxy
-        merged_boxes[i][:, 3] += merged_boxes[i][:, 1]  # xyxy
-
-    final_boxes, final_scores, final_classes = box_fusion(
-        merged_boxes,
-        merged_scores,
-        merged_labels,
-        mode="wbf",
-        image_size=image_size,
-        iou_threshold=0.9,
-        weights=[0.25, 0.25, 0.25, 0.25]
-    )
-
-    indexes = np.where(final_scores > 0.001)[0]
-    final_boxes = final_boxes[indexes]
-    final_scores = final_scores[indexes]
-    final_classes = final_classes[indexes]
-
-    final_boxes = change_box_order(final_boxes, order='xyxy2xywh')
-
-    result_dict = {
-        'boxes': [],
-        'labels': [],
-        'scores': []
-    }
-
-    for (box, score, label) in zip(final_boxes, final_scores, final_classes):
-        result_dict['boxes'].append(box)
-        result_dict['labels'].append(label)
-        result_dict['scores'].append(score)
-    return result_dict, class_names
-
-
-def append_food_name(food_dict, class_names):
-    food_labels = food_dict['labels']
-    food_names = [' '.join(class_names[int(i)].split('-'))
-                  for i in food_labels]
-    food_dict['names'] = food_names
-    return food_dict
-
-
-def append_food_info(food_dict):
-    food_names = food_dict['names']
-    food_info = get_info_from_db(food_names)
-    food_dict.update(food_info)
-    return food_dict
-
-
-def convert_dict_to_list(result_dict):
-    result_list = []
-    num_items = len(result_dict['labels'])
-    for i in range(num_items):
-        item_dict = {}
-        for key in result_dict.keys():
-            item_dict[key] = result_dict[key][i]
-        result_list.append(item_dict)
-    return result_list
-
-
-def crop_box(image, box, expand=10):
-
-    h, w, c = image.shape
-    # expand box a little
-    new_box = box.copy()
-    # new_box[0] -= expand
-    # new_box[1] -= expand
-    # new_box[2] += expand
-    # new_box[3] += expand
-
-    # new_box[0] = max(0, new_box[0])
-    # new_box[1] = max(0, new_box[1])
-    # new_box[2] = min(h, new_box[2])
-    # new_box[3] = min(w, new_box[3])
-
-    # xyxy box, cv2 image h,w,c
-    return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
-
-
 def label_enhancement(image, result_dict):
     boxes = np.array(result_dict['boxes'])
     labels = np.array(result_dict['labels'])
@@ -339,52 +248,108 @@ def label_enhancement(image, result_dict):
     if not os.path.isfile(tmp_path):
         download_pretrained_weights(
             'effnetb4',
-            cached=tmp_path)
+            output=tmp_path)
 
-    new_names, new_probs = classify(tmp_path, img_list)
+    cls_args = InferenceArguments(key="classification")
+    opts = Opts(cls_args).parse_args()
+    val_pipeline = ClassificationPipeline(opts, img_list)
+    new_dict = val_pipeline.inference()
+
+    # new_dict = classify(tmp_path, img_list)
+
+    """
+    new_dict = {
+        'filename': [],
+        'label': [],
+        'score': []
+    }
+    """
 
     for idx, id in enumerate(new_id_list):
-        result_dict['names'][id] = new_names[idx]
+        result_dict['names'][id] = new_dict['label'][idx]
 
     return result_dict
 
 
-def get_video_prediction(
-        input_path,
-        output_path,
-        model_name,
-        tta,
-        min_iou=0.5,
-        min_conf=0.1):
+def ensemble_models(input_path, image_size, min_iou, min_conf, tta=False):
+    args1 = DetectionArguments(
+        model_name='yolov5s', input_path=input_path, tta=tta)
+    args2 = DetectionArguments(
+        model_name='yolov5m', input_path=input_path, tta=tta)
+    args3 = DetectionArguments(
+        model_name='yolov5l', input_path=input_path, tta=tta)
+    args4 = DetectionArguments(
+        model_name='yolov5x', input_path=input_path, tta=tta)
 
-    # ignore_keys = [
-    #     'min_iou_val',
-    #     'min_conf_val',
-    #     'tta',
-    #     'gpu_devices',
-    #     'tta_ensemble_mode',
-    #     'tta_conf_threshold',
-    #     'tta_iou_threshold',
-    # ]
+    det_args = InferenceArguments(key="detection")
+    opts = Opts(det_args).parse_args()
 
-    args = Arguments(model_name=model_name)
+    det_pipeline1 = DetectionPipeline(opts, args1)
+    result_dict1 = det_pipeline1.inference()
 
-    config = get_config(model_name=os.path.join('detection', model_name))
+    det_pipeline2 = DetectionPipeline(opts, args2)
+    result_dict2 = det_pipeline2.inference()
 
-    if config is None:
-        print("Config not found. Load configs from configs/configs.yaml")
-        config = Config(os.path.join(
-            'utilities/configs', 'configs.yaml'))
-    else:
-        print("Load configs!")
+    det_pipeline3 = DetectionPipeline(opts, args3)
+    result_dict3 = det_pipeline3.inference()
 
-    args.input_path = input_path
-    args.output_path = output_path
-    args.min_conf = min_conf
-    args.min_iou = min_iou
-    args.tta = tta
-    video_detect = VideoPipeline(args, config)
-    return video_detect.run()
+    det_pipeline4 = DetectionPipeline(opts, args4)
+    result_dict4 = det_pipeline4.inference()
+    class_names = det_pipeline4.class_names
+
+    merged_boxes = [
+        np.array(result_dict1['boxes'][0]),
+        np.array(result_dict2['boxes'][0]),
+        np.array(result_dict3['boxes'][0]),
+        np.array(result_dict4['boxes'][0])]
+    merged_labels = [
+        np.array(result_dict1['labels'][0]),
+        np.array(result_dict2['labels'][0]),
+        np.array(result_dict3['labels'][0]),
+        np.array(result_dict4['labels'][0])]
+    merged_scores = [
+        np.array(result_dict1['scores'][0]),
+        np.array(result_dict2['scores'][0]),
+        np.array(result_dict3['scores'][0]),
+        np.array(result_dict4['scores'][0])]
+
+    for i in range(len(merged_boxes)):
+        merged_boxes[i][:, 2] += merged_boxes[i][:, 0]  # xyxy
+        merged_boxes[i][:, 3] += merged_boxes[i][:, 1]  # xyxy
+
+    final_boxes, final_scores, final_classes = box_fusion(
+        merged_boxes,
+        merged_scores,
+        merged_labels,
+        mode="wbf",
+        image_size=image_size,
+        iou_threshold=0.9,
+        # YOLOv5l performance best, YOLOv5x performance least (in current weights)
+        weights=[0.25, 0.25, 0.4, 0.1]
+    )
+
+    final_dict = {
+        'boxes': final_boxes,
+        'labels': final_classes,
+        'scores': final_scores
+    }
+
+    final_dict = postprocess(
+        final_dict, image_size[1], image_size[0], min_iou, min_conf)
+
+    # final_dict['boxes'] = change_box_order(final_dict['boxes'], order='xywh2xyxy')
+
+    result_dict = {
+        'boxes': [],
+        'labels': [],
+        'scores': []
+    }
+
+    for (box, score, label) in zip(final_dict['boxes'], final_dict['scores'], final_dict['labels']):
+        result_dict['boxes'].append(box)
+        result_dict['labels'].append(label)
+        result_dict['scores'].append(score)
+    return result_dict, class_names
 
 
 def get_prediction(
@@ -395,66 +360,71 @@ def get_prediction(
         ensemble=False,
         min_iou=0.5,
         min_conf=0.1,
+        segmentation=False,
         enhance_labels=False):
 
-    # ignore_keys = [
-    #     'min_iou_val',
-    #     'min_conf_val',
-    #     'tta',
-    #     'gpu_devices',
-    #     'tta_ensemble_mode',
-    #     'tta_conf_threshold',
-    #     'tta_iou_threshold',
-    # ]
+    if segmentation:
+        tmp_path = os.path.join(CACHE_DIR, 'semantic_seg.pth')
+        if not os.path.isfile(tmp_path):
+            download_pretrained_weights(
+                'semantic_seg',
+                output=tmp_path)
+
+        seg_args = InferenceArguments(key="segmentation")
+        opts = Opts(seg_args).parse_args()
+        seg_pipeline = SegmentationPipeline(opts, input_path)
+        output_path = seg_pipeline.inference()
+
+        return output_path, 'semantic'
 
     # get hashed key from image path
     ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
 
-    # additional tags
-    model_tag = model_name[-1]
-    ensemble_tag = 'ens' if ensemble else ''
+    # # additional tags
+    # model_tag = model_name[-1]
+    # ensemble_tag = 'ens' if ensemble else ''
 
-    if ensemble:
-        hashed_key = ori_hashed_key + f"_{ensemble_tag}"
-    else:
-        hashed_key = ori_hashed_key + f"_{model_tag}"
+    # if ensemble:
+    #     hashed_key = ori_hashed_key + f"_{ensemble_tag}"
+    # else:
+    #     hashed_key = ori_hashed_key + f"_{model_tag}"
 
     ori_img = cv2.imread(input_path)
 
+    ori_img = np.array(ori_img, dtype=np.uint16)
     ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
     img_h, img_w, _ = ori_img.shape
 
-    # check whether cache exists
-    if check_cache(hashed_key):
-        print(f"Load cache from {hashed_key}")
-        class_names, _ = get_class_names(model_name=os.path.join('detection', model_name))
-        result_dict = load_cache(hashed_key)
+    if not ensemble:
+        args = DetectionArguments(
+            model_name=model_name,
+            input_path=input_path,
+            output_path=output_path,
+            min_conf=min_conf,
+            min_iou=min_iou,
+            tta=tta
+        )
+
+        det_args = InferenceArguments(key="detection")
+        opts = Opts(det_args).parse_args()
+        det_pipeline = DetectionPipeline(opts, args)
+        class_names = det_pipeline.class_names
+
+        result_dict = det_pipeline.inference()
+
+        result_dict['boxes'] = result_dict['boxes'][0]
+        result_dict['labels'] = result_dict['labels'][0]
+        result_dict['scores'] = result_dict['scores'][0]
+
+        # Post process (optional)
+        # result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+
     else:
-        if not ensemble:
-            args = Arguments(model_name=model_name)
-            class_names, _ = get_class_names(model_name=os.path.join('detection', model_name))
+        result_dict, class_names = ensemble_models(
+            input_path, [img_w, img_h], min_iou, min_conf, tta=tta)
 
-            config = get_config(model_name=os.path.join('detection', model_name))
-            if config is None:
-                print("Config not found. Load configs from configs/configs.yaml")
-                config = Config(os.path.join('model/configs', 'configs.yaml'))
-            else:
-                print("Load configs from weight")
-
-            args.input_path = input_path
-            args.tta = tta
-            result_dict = detect(args, config)
-
-        else:
-            result_dict, class_names = ensemble_models(
-                input_path, [img_w, img_h], tta=tta)
-        save_cache(result_dict, hashed_key)
-        print(f"Save cache to {hashed_key}")
-
-    class_names.insert(0, "Background")
-
-    # post process
-    result_dict = postprocess(result_dict, img_w, img_h, min_iou, min_conf)
+    # save_cache(result_dict, hashed_key)
+    # print(f"Save cache to {hashed_key}")
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)
@@ -466,8 +436,7 @@ def get_prediction(
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
 
-    # Save metadata food info as CSV
-    save_cache(result_dict, ori_hashed_key+'_metadata', METADATA_FOLDER)
+    print('Result_dict: ', result_dict)
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)
@@ -484,4 +453,4 @@ def get_prediction(
     df.set_index('names').T.to_csv(os.path.join(
         CSV_FOLDER, ori_hashed_key+'_info2.csv'))
 
-    return output_path
+    return output_path, 'detection'

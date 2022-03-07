@@ -1,6 +1,0 @@
-settings:
-  #################   INFERENCE CONFIG   ###################
-
-  model_name: "efficientnet_b4" #[]
-  image_size: [640, 640] # should be square to prevent bugs [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
-  keep_ratio: True # whether to use resize padding
