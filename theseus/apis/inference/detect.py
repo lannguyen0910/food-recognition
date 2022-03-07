@@ -51,23 +51,21 @@ class DetectionTestset():
         """
         image_path = self.fns[index]
 
-        # im = Image.open(image_path).convert('RGB')
-        # # width, height = im.width, im.height
-
-        # im = np.array(im)
-        im = cv2.imread(image_path)
+        im = cv2.imread(image_path)[..., ::-1]
         image_w, image_h = 640, 640
         ori_height, ori_width, c = im.shape
-        im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB).astype(np.float32)
-        im /= 255.0
+        # im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+
         ori_img = im.copy()
+        clone_img = im.copy()
 
         if self.transform is not None:
-            item = self.transform(image=im)
-            im = item['image']
+            item = self.transform(image=clone_img)
+            clone_img = item['image']
 
         return {
             "input": im,
+            "torch_input": clone_img,
             'img_name': image_path,
             'ori_img': ori_img,
             'image_ori_w': ori_width,
@@ -84,7 +82,8 @@ class DetectionTestset():
         if len(batch) == 0:
             return None
 
-        imgs = torch.stack([s['input'] for s in batch])
+        imgs = [s['input'] for s in batch]
+        torch_imgs = torch.stack([s['torch_input'] for s in batch])
         img_names = [s['img_name'] for s in batch]
         ori_imgs = [s['ori_img'] for s in batch]
         image_ori_ws = [s['image_ori_w'] for s in batch]
@@ -97,6 +96,7 @@ class DetectionTestset():
 
         return {
             'inputs': imgs,
+            'torch_inputs': torch_imgs,
             'img_names': img_names,
             'ori_imgs': ori_imgs,
             'image_ori_ws': image_ori_ws,
@@ -177,11 +177,10 @@ class DetectionPipeline(object):
             min_conf=input_args.min_conf,
         ).to(self.device)
 
-
         if input_args.weight:
             state_dict = torch.load(input_args.weight)
             self.model = load_state_dict(self.model, state_dict,
-                                        'model', is_detection=True)
+                                         'model', is_detection=True)
 
     def infocheck(self):
         device_info = get_devices_info(self.device_name)
@@ -207,7 +206,8 @@ class DetectionPipeline(object):
             os.makedirs(self.savedir, exist_ok=True)
 
             if self.tta is not None:
-                preds = self.tta.make_tta_predictions(self.model, batch)
+                preds = self.tta.make_tta_predictions(
+                    self.model, batch, self.device, self.args.weight)
             else:
                 preds = self.model.get_prediction(batch, self.device)
 
@@ -216,7 +216,7 @@ class DetectionPipeline(object):
                 # img_h = batch['image_hs'][idx]
                 # img_ori_ws = batch['image_ori_ws'][idx]
                 # img_ori_hs = batch['image_ori_hs'][idx]
-     
+
                 # outputs = postprocessing(
                 #     outputs,
                 #     current_img_size=[img_w, img_h],
@@ -227,7 +227,7 @@ class DetectionPipeline(object):
                 #     output_format='xywh',
                 #     mode='nms'
                 # )
-                
+
                 boxes = outputs['bboxes']
                 labels = outputs['classes']
                 scores = outputs['scores']
@@ -243,3 +243,24 @@ class DetectionPipeline(object):
             "boxes": boxes_result,
             "labels": labels_result,
             "scores": scores_result}
+
+
+""" 
+Result after inference:  <models.common.Detections object at 0x7ff7e759c2d0>
+
+TTA
+[00:00<?, ?it/s]Result after inference:  tensor([[[7.58108e+00, 3.29767e+00, 8.19291e+00,  ..., 1.63066e-03, 1.83365e-03, 3.13231e-03],
+         [1.48919e+01, 2.81062e+00, 9.60818e+00,  ..., 1.08319e-03, 8.73214e-04, 1.84057e-03],
+         [1.97235e+01, 3.86513e+00, 1.48165e+01,  ..., 7.01686e-04, 6.10586e-04, 8.99242e-04],
+         ...,
+         [5.62207e+02, 5.96428e+02, 1.67612e+02,  ..., 6.05156e-02, 4.12644e-02, 1.58415e-02],
+         [5.92910e+02, 5.98386e+02, 1.88376e+02,  ..., 1.05861e-01, 6.31578e-02, 2.09839e-02],
+         [6.30867e+02, 6.02710e+02, 1.75896e+02,  ..., 1.14207e-01, 6.17458e-02, 1.67981e-02]]], device='cuda:0')
+Result after inference tta:  [[[     7.5811      3.2977      8.1929 ...   0.0016307   0.0018337   0.0031323]
+  [     14.892      2.8106      9.6082 ...   0.0010832  0.00087321   0.0018406]
+  [     19.723      3.8651      14.816 ...  0.00070169  0.00061059  0.00089924]
+  ...
+  [     562.21      596.43      167.61 ...    0.060516    0.041264    0.015841]
+  [     592.91      598.39      188.38 ...     0.10586    0.063158    0.020984]
+  [     630.87      602.71       175.9 ...     0.11421    0.061746    0.016798]]]
+"""

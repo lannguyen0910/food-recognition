@@ -63,10 +63,10 @@ class YoloBackbone(BaseBackbone):
         outputs = self.model(x)
         return outputs
 
-    def get_prediction(self, adict: Dict[str, Any], device: torch.device):
-        inputs = adict["img_names"]
+    def get_prediction(self, adict: Dict[str, Any], device: torch.device, is_tta=False):
+        inputs = adict["inputs"]
         results = self.model(inputs)  # inference
-        # print('Results: ', results)
+
         outputs = results.pandas().xyxy
 
         out = []

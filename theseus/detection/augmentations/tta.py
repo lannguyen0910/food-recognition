@@ -111,11 +111,11 @@ class TTA():
         self.tta_transforms = [TTACompose([i]) if i is not None else None for i in [
             None, TTAHorizontalFlip(), TTAVerticalFlip(), TTARotate90()]]
 
-    def make_tta_predictions(self, model, batch, weights=None):
+    def make_tta_predictions(self, model, batch, device, weights=None):
 
         # Set image size for all transforms
-        batch_size = batch['inputs'].shape[0]
-        image_size = batch['inputs'].shape[-1]
+        batch_size = 1
+        image_size = batch['image_ori_ws'][0]  # [480, 640]
         for tta_transform in self.tta_transforms:
             if tta_transform is not None:
                 for single_transform in tta_transform.transforms:
@@ -129,7 +129,7 @@ class TTA():
                 'scores': {}
             }
             for aug_idx, tta_transform in enumerate(self.tta_transforms):
-                imgs = batch['inputs']
+                imgs = batch['torch_inputs']
                 if tta_transform is not None:
                     tta_imgs = tta_transform.batch_augment(imgs)
                 else:
@@ -140,7 +140,7 @@ class TTA():
                 }
 
                 #  Feed imgs through model
-                outputs = model.get_prediction(tta_batch)
+                outputs = model.get_prediction(tta_batch, device, is_tta=True)
 
                 for i, output in enumerate(outputs):
 
