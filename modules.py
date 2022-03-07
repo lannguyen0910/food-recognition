@@ -363,8 +363,6 @@ def get_prediction(
         segmentation=False,
         enhance_labels=False):
 
-    # get hashed key from image path
-    ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
 
     if segmentation:
         tmp_path = os.path.join(CACHE_DIR, 'semantic_seg.pth')
@@ -379,6 +377,9 @@ def get_prediction(
         output_path = seg_pipeline.inference()
 
         return output_path, 'semantic'
+    
+    # get hashed key from image path
+    ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
 
     # # additional tags
     # model_tag = model_name[-1]

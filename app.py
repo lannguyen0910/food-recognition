@@ -36,7 +36,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 UPLOAD_FOLDER = './static/assets/uploads/'
 CSV_FOLDER = './static/csv/'
-SEGMENTATION_FOLDER = './static/assets/segmentation/'
+SEGMENTATION_FOLDER = './static/assets/segmentations/'
 DETECTION_FOLDER = './static/assets/detections/'
 METADATA_FOLDER = './static/metadata/'
 
