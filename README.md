@@ -144,11 +144,11 @@ sudo apt-get install ffmpeg
 run.bat
 ```
 
-- Switch between ```CPU``` and ```GPU``` in ```configs```
+<!-- - Switch between ```CPU``` and ```GPU``` in ```configs```
 ```python
 global:
     device: cuda:0 #cpu
-```
+``` -->
 
 ## 🌟 **Dataset**
 - Detection: [link](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged OID and Vietnamese Lunch dataset)
