@@ -1,11 +1,9 @@
-from re import I
 import cv2
-from PIL import Image
 import numpy as np
 import os
 import pandas as pd
 from theseus.utilities.visualization.utils import draw_bboxes_v2
-from theseus.utilities.download import download_from_drive
+from theseus.utilities.download import download_pretrained_weights
 from theseus.utilities import box_fusion, change_box_order, postprocessing
 from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
 from theseus.opt import Opts, Config, InferenceArguments
@@ -14,7 +12,6 @@ from analyzer import get_info_from_db
 
 CACHE_DIR = './weights'
 CSV_FOLDER = './static/csv'
-METADATA_FOLDER = './static/metadata'
 
 
 class DetectionArguments:
@@ -47,20 +44,6 @@ class DetectionArguments:
                 self.model_name,
                 output=tmp_path)
             self.weight = tmp_path
-
-
-weight_urls = {
-    'yolov5s': "1rISMag8OCM5v99TYuavAobm3LkwjtAi9",
-    "yolov5m": "1I649VGqkam_IcCCW8WUA965vPrW_pqDX",
-    "yolov5l": "1sBciFcRav2ZE6jzhWnca9uegjQ4860om",
-    "yolov5x": "1CRD6T9QtH9XEa-h985_Ho6jgLWu58zn0",
-    "effnetb4": "1-K_iDfuhxQFHIF9HTy8SvfnIFwjqxtaX",
-    "semantic_seg": "19JRQr9xs2SIeTxX0TQ0k4U9ZnihahvqC"
-}
-
-
-def download_pretrained_weights(name, output=None):
-    return download_from_drive(weight_urls[name], output)
 
 
 def draw_image(out_path, img, result_dict, class_names):
@@ -191,9 +174,9 @@ def convert_dict_to_list(result_dict):
 
 
 def crop_box(image, box, expand=10):
-
     h, w, c = image.shape
-    # expand box a little
+
+    # expand box a little (optional)
     new_box = box.copy()
     # new_box[0] -= expand
     # new_box[1] -= expand
@@ -352,7 +335,7 @@ def ensemble_models(input_path, image_size, min_iou, min_conf, tta=False):
     }
 
     final_dict = postprocess(
-        final_dict, image_size[0], image_size[1], min_iou, min_conf)
+        final_dict, image_size[1], image_size[0], min_iou, min_conf)
 
     # final_dict['boxes'] = change_box_order(final_dict['boxes'], order='xywh2xyxy')
 
@@ -397,14 +380,14 @@ def get_prediction(
 
         return output_path, 'semantic'
 
-    # additional tags
-    model_tag = model_name[-1]
-    ensemble_tag = 'ens' if ensemble else ''
+    # # additional tags
+    # model_tag = model_name[-1]
+    # ensemble_tag = 'ens' if ensemble else ''
 
-    if ensemble:
-        hashed_key = ori_hashed_key + f"_{ensemble_tag}"
-    else:
-        hashed_key = ori_hashed_key + f"_{model_tag}"
+    # if ensemble:
+    #     hashed_key = ori_hashed_key + f"_{ensemble_tag}"
+    # else:
+    #     hashed_key = ori_hashed_key + f"_{model_tag}"
 
     ori_img = cv2.imread(input_path)
 
@@ -440,8 +423,8 @@ def get_prediction(
         result_dict, class_names = ensemble_models(
             input_path, [img_w, img_h], min_iou, min_conf, tta=tta)
 
-    save_cache(result_dict, hashed_key)
-    print(f"Save cache to {hashed_key}")
+    # save_cache(result_dict, hashed_key)
+    # print(f"Save cache to {hashed_key}")
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)
