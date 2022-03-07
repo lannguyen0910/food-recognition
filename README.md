@@ -75,81 +75,6 @@ food-detection-yolov5
 </details>
 
 
-<!-- - Visualize [test images](https://drive.google.com/drive/folders/1Af7Ilg99fI8p3T7BM5cFo5lJz_xY-Jxt?usp=sharing) with best current weights. -->
-## 📔  **Notebook**
-- For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
-- For training, refer to these notebooks for your own training:
-  -  Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
-  -  Classification: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/12h295CW3AQt0ix-NDd4dYfX1aj5CGjVj?usp=sharing)
-  - Semantic segmentation: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1N6cd29mrVaAhuFSGP6njeJeZ2ds3qBjN?usp=sharing)
-<!-- - For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing) -->
-
-## 🥇 **Pretrained-weights**
-- [Link](https://drive.google.com/drive/folders/15PlXWkFheuBxJOYkwm9iS_aZCcr8L0A7?usp=sharing)
-- Detection: <a href="https://wandb.ai/lannguyen/food-detection-yolov5"><img src="https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg" alt="WandB"></a>
- 
-| Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
-| ------- | :--------: | :----: | :-----: | :----------: |
-| YOLOv5s |  640x640   |  172   |  90.7   |     67.1     |
-| YOLOv5m |  640x640   |  112   |  89.7   |     66.6     |
-| YOLOv5l |  640x640   |  118   |   94    |      73      |
-| YOLOv5x |  640x640   |   62   |  77.9   |     53.3     |
-
-- Segmentation:
-  
-| Models | Image Size | Epochs | Pixel AP | Pixel AR | Dice score |
-| ------ | :--------: | :----: | :------: | :------: | :--------: |
-| UNet++ |  640x640   |   5    |  0.931   |  0.935   |   99.95    |
-
-- Classification:
-  
-| Models          | Image Size | Epochs |  Acc   | Balanced Acc | F1-score |
-| --------------- | :--------: | :----: | :----: | :----------: | :------: |
-| EfficientNet-b4 |  640x640   |   7    | 84.069 |    86.033    |  84.116  |
-
-## 🌟 **Logs detail**
-In total, there are 3 implementation versions:
-1. Training using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images, don't use for videos because of time expense. Label enhancement technique is also added, it means if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
-2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
-3. Update **Theseus** template, currently supports ```food detection```, ```food classification```, ```multi-class food semantic segmentation``` only on **images**.  For this version, we introduce Theseus, which is just a part of [Theseus template](https://github.com/kaylode/theseus). Moreover, we omitted some weak or unnecessary features to make the project more robust. Theseus adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
-  
-For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
-
- ## 🌟 **Inference**
-- File structure
-```
-this repo
-│   app.py
-└───configs
-│     └───classification          # Contains classification's configurations
-|             └───test.yaml 
-│     └───detection          # Contains detection's configurations
-|             └───....
-│     └───segmentation          # Contains segmentation's configurations
-|             └───....
-
-```
-
-- Install dependencies.
-```
-pip install -r requirements.txt
-```
-
-<!-- - (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display ```MP4``` video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the inference notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
-```
-sudo apt-get install ffmpeg
-``` -->
-
-- Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
-```
-run.bat
-```
-
-<!-- - Switch between ```CPU``` and ```GPU``` in ```configs```
-```python
-global:
-    device: cuda:0 #cpu
-``` -->
 ## 📔  **Notebook**
 - For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
 - For training, refer to this notebook for your own training:
@@ -182,6 +107,13 @@ global:
 | --------------- | :--------: | :----: | :----: | :----------: | :------: |
 | EfficientNet-b4 |  640x640   |   7    | 84.069 |    86.033    |  84.116  |
 
+## 🌟 **Logs detail**
+In total, there are 3 implementation versions:
+1. Training using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique, merge result of 4 models, only for images. Label enhancement technique, if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
+2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
+3. Update **Theseus** template, currently supports ```food detection```, ```food classification```, ```multi-class food semantic segmentation``` only on **images**.  For this version, we introduce **Theseus**, which is just a part of [Theseus template](https://github.com/kaylode/theseus). Moreover, we omitted some weak or unnecessary features to make the project more robust. **Theseus** adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
+  
+For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
 
  ## 🌟 **Inference**
 - File structure
@@ -218,13 +150,7 @@ global:
     device: cuda:0 #cpu
 ``` -->
 
-## 🌟 **Logs detail**
-In total, there are 3 implementation versions:
-1. Training using our own object detection's template. The model's source code is inherited from the <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo, the dataset is used in COCO format and the training and data processing steps are reinstalled by us using Pytorch. Ensemble technique is added, merge result of 4 models, only for images. Label enhancement technique, if the output label (after detection) is either "Food" or "Food-drinks", we use a pretrained Efficientnet-B4 classifier (on 255 classes) to re-classify it to another reasonable label.
-2. Big refactor, update the training steps, used from <a href="https://github.com/ultralytics/yolov5">Ultralytics</a> source code repo too. The models yield better accuracy. Test-time augmentation technique is added to the web app.
-3. Update **Theseus** template, currently supports ```food detection```, ```food classification```, ```multi-class food semantic segmentation``` only on **images**.  For this version, we introduce Theseus, which is just a part of [Theseus template](https://github.com/kaylode/theseus). Moreover, we omitted some weak or unnecessary features to make the project more robust. Theseus adapted from big project templates such as: [mmocr](https://github.com/open-mmlab/mmocr), [fairseq](https://github.com/pytorch/fairseq), [timm](https://github.com/rwightman/pytorch-image-models), [paddleocr](https://github.com/PaddlePaddle/PaddleOCR),... 
-  
-For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
+
 
 ## 🌟 **Dataset**
 - Detection: [link](https://drive.google.com/drive/folders/14rJclN97hZqe6bmGkTjnvPaDBBIF4v5w?usp=sharing) (merged OID and Vietnamese Lunch dataset)
