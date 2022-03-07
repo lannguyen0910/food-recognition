@@ -51,7 +51,7 @@ class ClassificationTestset():
         }
 
     def __len__(self):
-        return len(self.fns)
+        return len(self.img_list)
 
     def collate_fn(self, batch: List):
         imgs = torch.stack([s['input'] for s in batch])
