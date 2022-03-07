@@ -11,7 +11,7 @@
 
 <p align="center">
     <a href="./LICENSE"><img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg" alt="MIT" /></a>
-  <a href="https://www.codefactor.io/repository/github/lannguyen0910/food-recognition-baseline/overview/master"><img src="https://www.codefactor.io/repository/github/lannguyen0910/food-recognition-baseline/badge/master?s=9716a4eb0076053fa36e0d967bba5161b85b8fb5" alt="CodeFactor" /></a>
+  <a href="https://www.codefactor.io/repository/github/lannguyen0910/food-recognition/overview/master"><img src="https://www.codefactor.io/repository/github/lannguyen0910/food-recognition/badge/master?s=9716a4eb0076053fa36e0d967bba5161b85b8fb5" alt="CodeFactor" /></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg" alt="Python" /></a> 
 <!--    <a href="https://github.com/lannguyen0910/food-detection-yolov5/stargazers">
     <img src="https://img.shields.io/github/stars/lannguyen0910/food-detection-yolov5?style=flat-square" alt="Stars"/>
