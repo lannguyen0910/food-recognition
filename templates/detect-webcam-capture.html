@@ -147,7 +147,7 @@
                     {% if output_type == 'detection' %}
                       <a href="{{url_for('static', filename='assets/detections/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/detections/' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
                     {% elif output_type == 'semantic' %}
-                      <a href="{{url_for('static', filename='assets/segmentations/masks' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/segmentations/masks' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
+                      <a href="{{url_for('static', filename='assets/segmentations/masks/' + fname)}}" target="_new"><img src="{{url_for('static', filename='assets/segmentations/masks' + fname)}}" class="upload-image-thumb" style="display: block;margin-left: auto;margin-right: auto;width: 640px; height: 480px"></a>
                     {% endif %}
 
                     <label id="csv_file" style="display:none">{{csv_name}}</label>
