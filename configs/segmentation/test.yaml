@@ -1,7 +1,7 @@
 global:
   debug: True
   cfg_transform: configs/segmentation/transform.yaml
-  save_dir: static/assets/segmentation
+  save_dir: static/assets/segmentations
   device: cuda:0 # [cpu, cuda:0]
   weights: weights/semantic_seg.pth
 model:
