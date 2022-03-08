@@ -123,24 +123,6 @@ function downloadPhoto() {
   }, "image/jpeg", 1);
 }
 
-// Send image source from client to server under base64 format
-var sendBase64ToServer = function(base64){
-    let httpPost = new XMLHttpRequest(),
-        path = "/analyze",
-        data = JSON.stringify({image: base64});
-        console.log(data);
-    httpPost.onreadystatechange = function(err) {
-            if (httpPost.readyState == 4 && httpPost.status == 200){
-                console.log(httpPost.responseText);
-            } else {
-                console.log(err);
-            }
-        };
-    // Set the content type of the request to json since that's what's being sent
-    httpPost.open("POST", path, true);
-    httpPost.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    httpPost.send(data);
-};
 
 function base64ToBlob(base64, mime) 
 {

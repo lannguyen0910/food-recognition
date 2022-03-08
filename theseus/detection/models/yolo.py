@@ -65,6 +65,9 @@ class YoloBackbone(BaseBackbone):
 
     def get_prediction(self, adict: Dict[str, Any], device: torch.device, is_tta=False):
         inputs = adict["inputs"]
+        if is_tta:
+            inputs = inputs.squeeze(0)
+            inputs = inputs.cpu().detach().numpy()
         results = self.model(inputs)  # inference
 
         outputs = results.pandas().xyxy
@@ -82,17 +85,20 @@ class YoloBackbone(BaseBackbone):
                 labels.append(obj_dict["class"])
                 scores.append(obj_dict["confidence"])
 
+            if len(boxes) == 0:
+                continue
+
             if len(boxes) > 0:
                 out.append({
                     'bboxes': np.array(boxes),
                     'classes': np.array(labels),
                     'scores': np.array(scores),
                 })
-            else:
-                out.append({
-                    'bboxes': np.array(()),
-                    'classes': np.array(()),
-                    'scores': np.array(()),
-                })
+            # else:
+            #     out.append({
+            #         'bboxes': np.array(()),
+            #         'classes': np.array(()),
+            #         'scores': np.array(()),
+            #     })
 
         return out

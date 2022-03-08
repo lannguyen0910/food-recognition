@@ -255,18 +255,9 @@ def label_enhancement(image, result_dict):
     val_pipeline = ClassificationPipeline(opts, img_list)
     new_dict = val_pipeline.inference()
 
-    # new_dict = classify(tmp_path, img_list)
 
-    """
-    new_dict = {
-        'filename': [],
-        'label': [],
-        'score': []
-    }
-    """
-
-    for idx, id in enumerate(new_id_list):
-        result_dict['names'][id] = new_dict['label'][idx]
+    for label_id, name_id in enumerate(new_id_list):
+        result_dict['names'][name_id] = new_dict['label'][label_id]
 
     return result_dict
 
@@ -313,7 +304,7 @@ def ensemble_models(input_path, image_size, min_iou, min_conf, tta=False):
         np.array(result_dict3['scores'][0]),
         np.array(result_dict4['scores'][0])]
 
-    for i in range(len(merged_boxes)):
+    for i, _ in enumerate(merged_boxes):
         merged_boxes[i][:, 2] += merged_boxes[i][:, 0]  # xyxy
         merged_boxes[i][:, 3] += merged_boxes[i][:, 1]  # xyxy
 
@@ -435,8 +426,6 @@ def get_prediction(
 
     # add food infomation and save to file
     result_dict = append_food_info(result_dict)
-
-    print('Result_dict: ', result_dict)
 
     # draw result
     draw_image(output_path, ori_img, result_dict, class_names)

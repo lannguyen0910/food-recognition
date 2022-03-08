@@ -177,7 +177,6 @@ class TTA():
                 mode=self.postprocess_mode,
                 image_size=image_size,
                 iou_threshold=self.min_iou,
-                weights=weights
             )
 
             indexes = np.where(final_scores > self.min_conf)[0]

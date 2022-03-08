@@ -207,7 +207,7 @@ class DetectionPipeline(object):
 
             if self.tta is not None:
                 preds = self.tta.make_tta_predictions(
-                    self.model, batch, self.device, self.args.weight)
+                    self.model, batch, self.device)
             else:
                 preds = self.model.get_prediction(batch, self.device)
 
@@ -243,24 +243,3 @@ class DetectionPipeline(object):
             "boxes": boxes_result,
             "labels": labels_result,
             "scores": scores_result}
-
-
-""" 
-Result after inference:  <models.common.Detections object at 0x7ff7e759c2d0>
-
-TTA
-[00:00<?, ?it/s]Result after inference:  tensor([[[7.58108e+00, 3.29767e+00, 8.19291e+00,  ..., 1.63066e-03, 1.83365e-03, 3.13231e-03],
-         [1.48919e+01, 2.81062e+00, 9.60818e+00,  ..., 1.08319e-03, 8.73214e-04, 1.84057e-03],
-         [1.97235e+01, 3.86513e+00, 1.48165e+01,  ..., 7.01686e-04, 6.10586e-04, 8.99242e-04],
-         ...,
-         [5.62207e+02, 5.96428e+02, 1.67612e+02,  ..., 6.05156e-02, 4.12644e-02, 1.58415e-02],
-         [5.92910e+02, 5.98386e+02, 1.88376e+02,  ..., 1.05861e-01, 6.31578e-02, 2.09839e-02],
-         [6.30867e+02, 6.02710e+02, 1.75896e+02,  ..., 1.14207e-01, 6.17458e-02, 1.67981e-02]]], device='cuda:0')
-Result after inference tta:  [[[     7.5811      3.2977      8.1929 ...   0.0016307   0.0018337   0.0031323]
-  [     14.892      2.8106      9.6082 ...   0.0010832  0.00087321   0.0018406]
-  [     19.723      3.8651      14.816 ...  0.00070169  0.00061059  0.00089924]
-  ...
-  [     562.21      596.43      167.61 ...    0.060516    0.041264    0.015841]
-  [     592.91      598.39      188.38 ...     0.10586    0.063158    0.020984]
-  [     630.87      602.71       175.9 ...     0.11421    0.061746    0.016798]]]
-"""
