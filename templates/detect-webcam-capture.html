@@ -155,6 +155,7 @@
 
                 </div>
             </div>
+            {% if filetype == 'image' && output_type == 'detection' %}
             <div class="panel panel-default result-panel">
                 <div class="panel-body w3-card">
 
@@ -170,6 +171,7 @@
                 <canvas id="container2" style="width:100%; height:480px; display:none"></canvas>
                 </div>
             </div>
+            {% endif %}
         </div>
       {% endblock %}
     </div>
