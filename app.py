@@ -285,12 +285,12 @@ def analyze():
             app.config['CSV_FOLDER'], csv_name + '_info2.csv')
 
         if 'url-button' in request.form:
-            return render_template('detect-input-url.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+            return render_template('detect-input-url.html', out_name=out_name, segname=output_path, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
         elif 'webcam-button' in request.form:
-            return render_template('detect-webcam-capture.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+            return render_template('detect-webcam-capture.html', out_name=out_name, segname=output_path, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
-        return render_template('detect-upload-file.html', out_name=out_name, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
+        return render_template('detect-upload-file.html', out_name=out_name, segname=output_path, fname=filename, output_type=output_type, filetype=filetype, csv_name=csv_name1, csv_name2=csv_name2)
 
     return redirect('/')
 

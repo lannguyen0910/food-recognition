@@ -255,7 +255,6 @@ def label_enhancement(image, result_dict):
     val_pipeline = ClassificationPipeline(opts, img_list)
     new_dict = val_pipeline.inference()
 
-
     for label_id, name_id in enumerate(new_id_list):
         result_dict['names'][name_id] = new_dict['label'][label_id]
 
@@ -366,19 +365,14 @@ def get_prediction(
         seg_pipeline = SegmentationPipeline(opts, input_path)
         output_path = seg_pipeline.inference()
 
+        # get real output for segmentation task to display in webapp
+        output_path = output_path.split('/')[-3:]
+        output_path = os.path.join(output_path[0], output_path[1], output_path[2])
+
         return output_path, 'semantic'
 
     # get hashed key from image path
     ori_hashed_key = os.path.splitext(os.path.basename(input_path))[0]
-
-    # # additional tags
-    # model_tag = model_name[-1]
-    # ensemble_tag = 'ens' if ensemble else ''
-
-    # if ensemble:
-    #     hashed_key = ori_hashed_key + f"_{ensemble_tag}"
-    # else:
-    #     hashed_key = ori_hashed_key + f"_{model_tag}"
 
     ori_img = cv2.imread(input_path)
 
