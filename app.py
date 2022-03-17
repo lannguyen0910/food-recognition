@@ -3,11 +3,8 @@ import argparse
 import requests
 import cv2
 import numpy as np
-import tldextract
-import pytube
 import hashlib
 import time
-import base64
 
 from PIL import Image
 from flask import Flask, request, render_template, redirect, make_response, jsonify
@@ -18,7 +15,7 @@ from flask_ngrok import run_with_ngrok
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 
-parser = argparse.ArgumentParser('YOLOv5 Online Food Recognition')
+parser = argparse.ArgumentParser('Online Food Recognition')
 parser.add_argument('--ngrok', action='store_true',
                     default=False, help="Run on local or ngrok")
 parser.add_argument('--host',  type=str,
@@ -75,70 +72,31 @@ def file_type(path):
     return filetype
 
 
-def download_yt(url):
-    """
-    Download youtube video by url and save to video folder
-    """
-    youtube = pytube.YouTube(url)
-    video = youtube.streams.get_highest_resolution()
-    path = video.download(app.config['VIDEO_FOLDER'])
-
-    return path
-
-
-def hash_video(video_path):
-    """
-    Hash a frame in video and use as a filename
-    """
-    _, ext = os.path.splitext(video_path)
-    stream = cv2.VideoCapture(video_path)
-    success, ori_frame = stream.read()
-    stream.release()
-    stream = None
-    image_bytes = cv2.imencode('.jpg', ori_frame)[1].tobytes()
-    filename = hashlib.sha256(image_bytes).hexdigest() + f'{ext}'
-    return filename
-
-
 def download(url):
     """
     Handle input url from client 
     """
 
-    ext = tldextract.extract(url)
-    if ext.domain == 'youtube':
+    make_dir(app.config['UPLOAD_FOLDER'])
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2)',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+               'Accept-Encoding': 'none',
+               'Accept-Language': 'en-US,en;q=0.8',
+               'Connection': 'keep-alive'}
+    r = requests.get(url, stream=True, headers=headers)
+    print('Image Url')
 
-        make_dir(app.config['VIDEO_FOLDER'])
+    # Get cache name by hashing image
+    data = r.content
+    ori_filename = url.split('/')[-1]
+    _, ext = os.path.splitext(ori_filename)
+    filename = hashlib.sha256(data).hexdigest() + f'{ext}'
 
-        print('Youtube')
-        ori_path = download_yt(url)
-        filename = hash_video(ori_path)
+    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-        path = os.path.join(app.config['VIDEO_FOLDER'], filename)
-
-        Path(ori_path).rename(path)
-
-    else:
-        make_dir(app.config['UPLOAD_FOLDER'])
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2)',
-                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                   'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-                   'Accept-Encoding': 'none',
-                   'Accept-Language': 'en-US,en;q=0.8',
-                   'Connection': 'keep-alive'}
-        r = requests.get(url, stream=True, headers=headers)
-        print('Image Url')
-
-        # Get cache name by hashing image
-        data = r.content
-        ori_filename = url.split('/')[-1]
-        _, ext = os.path.splitext(ori_filename)
-        filename = hashlib.sha256(data).hexdigest() + f'{ext}'
-
-        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
-        with open(path, "wb") as file:
-            file.write(r.content)
+    with open(path, "wb") as file:
+        file.write(r.content)
 
     return filename, path
 
@@ -199,7 +157,7 @@ def analyze():
 
             f = request.files['blob-file']
             ori_file_name = secure_filename(f.filename)
-            # filetype = file_type(ori_file_name)
+            filetype = file_type(ori_file_name)
 
             filename = time.strftime("%Y%m%d-%H%M%S") + '.png'
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -214,7 +172,7 @@ def analyze():
             url = request.form['url_link']
             filename, filepath = download(url)
 
-            # filetype = file_type(filename)
+            filetype = file_type(filename)
 
         elif 'upload-button' in request.form:
             # Get uploaded file
