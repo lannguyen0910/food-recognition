@@ -9,17 +9,18 @@ from theseus.utilities.loading import load_state_dict
 from theseus.classification.datasets import DATALOADER_REGISTRY
 from theseus.classification.augmentations import TRANSFORM_REGISTRY
 from theseus.classification.models import MODEL_REGISTRY
-from theseus.opt import Opts, Config, InferenceArguments
+from theseus.opt import Config
 from tqdm import tqdm
 from datetime import datetime
 from PIL import Image
 from typing import List
 
-import matplotlib as mpl
-mpl.use("Agg")
-
 
 class ClassificationTestset():
+    """
+    Custom classification dataset on a list of cropped images
+    """
+
     def __init__(self, image_dir: list, txt_classnames: str, transform: List = None, **kwargs):
         self.img_list = image_dir  # list of cv2 images
         self.txt_classnames = txt_classnames
@@ -150,17 +151,7 @@ class ClassificationPipeline(object):
                 df_dict['score'].append(prob)
 
         df = pd.DataFrame(df_dict)
-
         savepath = os.path.join(self.savedir, 'prediction.csv')
-
         df.to_csv(savepath, index=False)
 
         return df_dict
-
-
-if __name__ == '__main__':
-    cls_args = InferenceArguments(key="classification")
-    opts = Opts(cls_args.config).parse_args()
-    img_dir = []  # contain list of cropped boxes of the detected image
-    val_pipeline = ClassificationPipeline(opts, img_dir)
-    val_pipeline.inference()

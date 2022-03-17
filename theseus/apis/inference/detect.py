@@ -1,8 +1,5 @@
-import matplotlib as mpl
-import numpy as np
 import os
 import torch
-from albumentations.pytorch.transforms import ToTensorV2
 
 from theseus.detection.models import MODEL_REGISTRY
 from theseus.detection.augmentations import *
@@ -14,19 +11,20 @@ from theseus.utilities.loading import load_state_dict
 from theseus.detection.augmentations import TRANSFORM_REGISTRY, TTA
 from theseus.detection.models import MODEL_REGISTRY
 from theseus.opt import Config
-from theseus.utilities import postprocessing
 
 from tqdm import tqdm
 from datetime import datetime
-from PIL import Image
 from typing import List, Any
 
 CACHE_DIR = './weights'
 
-mpl.use("Agg")
 
 
 class DetectionTestset():
+    """
+    Custom detection dataset on a single image path
+    """
+
     def __init__(self, image_dir: str, transform: List = None, **kwargs):
         self.image_dir = image_dir  # list of cv2 images
         self.transform = transform
@@ -54,7 +52,6 @@ class DetectionTestset():
         im = cv2.imread(image_path)[..., ::-1]
         image_w, image_h = 640, 640
         ori_height, ori_width, c = im.shape
-        # im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 
         ori_img = im.copy()
         clone_img = im.copy()
@@ -132,8 +129,10 @@ class DetectionPipeline(object):
         self.device_name = opt['global']['device']
         self.device = torch.device(self.device_name)
 
+        # Dection arguments defined in modules.py
         self.args = input_args
 
+        # Whether to use test-time augmentation
         if input_args.tta:
             self.tta = TTA(
                 min_conf=input_args.tta_conf_threshold,
@@ -146,18 +145,9 @@ class DetectionPipeline(object):
             self.transform_cfg, registry=TRANSFORM_REGISTRY
         )
 
-        # self.transform = A.Compose([
-        #     get_resize_augmentation(
-        #         image_size=[640, 640], keep_ratio=True),
-        #     A.Normalize(mean=[0.0, 0.0, 0.0], std=[
-        #                 1.0, 1.0, 1.0], max_pixel_value=1.0, p=1.0),
-        #     ToTensorV2(p=1.0)
-        # ])
-
         self.dataset = DetectionTestset(
             image_dir=input_args.input_path,
             transform=self.transform['val'],
-            # transform=self.transform
         )
 
         self.class_names = opt['global']['class_names']
@@ -212,22 +202,6 @@ class DetectionPipeline(object):
                 preds = self.model.get_prediction(batch, self.device)
 
             for idx, outputs in enumerate(preds):
-                # img_w = batch['image_ws'][idx]
-                # img_h = batch['image_hs'][idx]
-                # img_ori_ws = batch['image_ori_ws'][idx]
-                # img_ori_hs = batch['image_ori_hs'][idx]
-
-                # outputs = postprocessing(
-                #     outputs,
-                #     current_img_size=[img_w, img_h],
-                #     ori_img_size=[img_ori_ws, img_ori_hs],
-                #     min_iou=self.args.min_iou,
-                #     min_conf=self.args.min_conf,
-                #     keep_ratio=True,
-                #     output_format='xywh',
-                #     mode='nms'
-                # )
-
                 boxes = outputs['bboxes']
                 labels = outputs['classes']
                 scores = outputs['scores']

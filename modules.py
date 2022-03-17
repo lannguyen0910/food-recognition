@@ -2,12 +2,12 @@ import cv2
 import numpy as np
 import os
 import pandas as pd
+
 from theseus.utilities.visualization.utils import draw_bboxes_v2
 from theseus.utilities.download import download_pretrained_weights
 from theseus.utilities import box_fusion, change_box_order, postprocessing
 from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
-from theseus.opt import Opts, Config, InferenceArguments
-
+from theseus.opt import Opts, InferenceArguments
 from analyzer import get_info_from_db
 
 CACHE_DIR = './weights'
@@ -15,6 +15,10 @@ CSV_FOLDER = './static/csv'
 
 
 class DetectionArguments:
+    """
+    Arguments from input to perform food detection
+    """
+
     def __init__(
         self,
         model_name: str = None,
@@ -47,6 +51,9 @@ class DetectionArguments:
 
 
 def draw_image(out_path, img, result_dict, class_names):
+    """
+    Draw bboxes and labels for detected image
+    """
     if os.path.isfile(out_path):
         os.remove(out_path)
 
@@ -69,6 +76,9 @@ def draw_image(out_path, img, result_dict, class_names):
 
 
 def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
+    """
+    Save detection info to csv
+    """
     cache_dict = {}
     if 'boxes' not in exclude:
         boxes = np.array(result_dict['boxes'])
@@ -93,37 +103,10 @@ def save_cache(result_dict, cache_name, cache_dir=CACHE_DIR, exclude=[]):
     df.to_csv(f'{cache_dir}/{cache_name}.csv', index=False)
 
 
-def check_cache(cache_name):
-    return os.path.isfile(f'./{CACHE_DIR}/{cache_name}.csv')
-
-
-def load_cache(image_name):
-    df = pd.read_csv(f'./{CACHE_DIR}/{image_name}.csv')
-    result_dict = {
-        'boxes': [],
-        'labels': [],
-        'scores': []
-    }
-
-    ann = [i for i in zip(df.x, df.y, df.w, df.h, df.labels, df.scores)]
-
-    for row in ann:
-        x, y, w, h, label, score = row
-        x = float(x)
-        y = float(y)
-        w = float(w)
-        h = float(h)
-        box = [x, y, w, h]
-        label = int(label)
-        score = float(score)
-        result_dict['boxes'].append(box)
-        result_dict['labels'].append(label)
-        result_dict['scores'].append(score)
-
-    return result_dict
-
-
 def drop_duplicate_fill0(result_dict):
+    """
+    Drop value-0 from detection result
+    """
     labels = result_dict['labels']
     num_items = len(labels)
 
@@ -148,6 +131,9 @@ def drop_duplicate_fill0(result_dict):
 
 
 def append_food_name(food_dict, class_names):
+    """
+    Append food names from labels for nutrition analysis
+    """
     food_labels = food_dict['labels']  # [0].to_list()
     food_names = [' '.join(class_names[int(i)].split('-'))
                   for i in food_labels]
@@ -156,6 +142,9 @@ def append_food_name(food_dict, class_names):
 
 
 def append_food_info(food_dict):
+    """
+    Append nutrition info from database (db.json)
+    """
     food_names = food_dict['names']
     food_info = get_info_from_db(food_names)
     food_dict.update(food_info)
@@ -227,6 +216,9 @@ def postprocess(result_dict, img_w, img_h, min_iou, min_conf):
 
 
 def label_enhancement(image, result_dict):
+    """
+    Perform classification on cropped images (in some specific labels)
+    """
     boxes = np.array(result_dict['boxes'])
     labels = np.array(result_dict['labels'])
     if len(boxes) == 0:
@@ -239,7 +231,7 @@ def label_enhancement(image, result_dict):
     new_id_list = []
 
     for box_id, (box, label) in enumerate(zip(boxes, labels)):
-        if label == 34 or label == 65:  # perform classification on "food" label and "food-drinks" label
+        if label == 34 or label == 65:  # classification on "food" label and "food-drinks" label
             cropped = crop_box(image, box)  # rgb
             img_list.append(cropped.copy())
             new_id_list.append(box_id)
@@ -262,6 +254,9 @@ def label_enhancement(image, result_dict):
 
 
 def ensemble_models(input_path, image_size, min_iou, min_conf, tta=False):
+    """
+    Ensemble technique on 4 YOLOv5 models
+    """
     args1 = DetectionArguments(
         model_name='yolov5s', input_path=input_path, tta=tta)
     args2 = DetectionArguments(
@@ -367,7 +362,8 @@ def get_prediction(
 
         # get real output for segmentation task to display in webapp
         output_path = output_path.split('/')[-3:]
-        output_path = os.path.join(output_path[0], output_path[1], output_path[2])
+        output_path = os.path.join(
+            output_path[0], output_path[1], output_path[2])
 
         return output_path, 'semantic'
 
@@ -407,9 +403,6 @@ def get_prediction(
     else:
         result_dict, class_names = ensemble_models(
             input_path, [img_w, img_h], min_iou, min_conf, tta=tta)
-
-    # save_cache(result_dict, hashed_key)
-    # print(f"Save cache to {hashed_key}")
 
     # add food name
     result_dict = append_food_name(result_dict, class_names)

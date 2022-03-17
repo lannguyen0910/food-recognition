@@ -1,3 +1,9 @@
+import numpy as np
+import torch
+import cv2
+import os
+import pandas as pd
+
 from theseus.utilities.visualization.visualizer import Visualizer
 from theseus.utilities.getter import (get_instance, get_instance_recursively)
 from theseus.utilities.cuda import get_devices_info
@@ -6,24 +12,20 @@ from theseus.utilities.loading import load_state_dict
 from theseus.segmentation.datasets import DATALOADER_REGISTRY
 from theseus.segmentation.augmentations import TRANSFORM_REGISTRY
 from theseus.segmentation.models import MODEL_REGISTRY
-from theseus.opt import Config, Opts, InferenceArguments
+from theseus.opt import Config
+
 from typing import List
 from PIL import Image
 from datetime import datetime
 from tqdm import tqdm
 
-import numpy as np
-import torch
-import cv2
-import os
-import pandas as pd
 
-
-import matplotlib as mpl
-mpl.use("Agg")
 
 
 class SegmentationTestset(torch.utils.data.Dataset):
+    """
+    Custom semantic segmentation dataset on a single image path
+    """
     def __init__(self, image_dir: str, txt_classnames: str, transform: List = None, **kwargs):
         self.image_dir = image_dir
         self.txt_classnames = txt_classnames
@@ -173,11 +175,3 @@ class SegmentationPipeline(object):
                     f"Save image at {savepath_mask} and {savepath_overlay}", level=LoggerObserver.INFO)
 
         return savepath_mask
-
-
-if __name__ == '__main__':
-    seg_args = InferenceArguments(key="segmentation")
-    opts = Opts(seg_args.config).parse_args()
-    img_dir = ""
-    val_pipeline = SegmentationPipeline(opts, img_dir)
-    val_pipeline.inference()
