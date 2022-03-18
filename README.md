@@ -129,9 +129,9 @@ this repo
 |             └───....
 
 ```
-- Install dependencies.
+- Install requirements.
 ```
-pip install -r requirements.txt
+pip install -e .
 ```
 
 <!-- - (Optional) Install [ffmpeg](http://ffmpeg.org/). Rebuild ```ffmpeg``` with ```OpenCV``` to display ```MP4``` video in browser: [link](https://stackoverflow.com/questions/31040746/cant-open-video-using-opencv). Or check out the inference notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
@@ -218,8 +218,10 @@ When a dish is predicted, we provide more information about the nutritional leve
 </p>
 
 ## 📙 **Credits**
-- YOLOv5 official repo: https://github.com/ultralytics/yolov5.
+
 - Custom template: https://github.com/kaylode/theseus.
+- YOLOv5 official repo: https://github.com/ultralytics/yolov5.
+- Semantic segmentation models: https://github.com/qubvel/segmentation_models.pytorch
 - Base code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
 - Ncnn by Tencent: https://github.com/Tencent/ncnn
 - Edamam API: https://developer.edamam.com/food-database-api-docs.
