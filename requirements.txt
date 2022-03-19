@@ -1,14 +1,14 @@
 gunicorn==20.1.0
-albumentations==0.5.2
+albumentations>=1.1.0
 pyyaml>=5.1
 webcolors
 tensorboard
 tqdm
 ensemble-boxes
-timm
+timm>=0.5.4
 omegaconf
 pycocotools
-gdown==4.3.0
+gdown>=4.4.0
 flask-cors
 flask_ngrok
 cryptography
