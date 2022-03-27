@@ -79,8 +79,8 @@ food-detection-yolov5
 - For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
 - For training, refer to these notebooks for your own training:
   -  Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
-  -  Classification: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/12h295CW3AQt0ix-NDd4dYfX1aj5CGjVj?usp=sharing)
-  - Semantic segmentation: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1N6cd29mrVaAhuFSGP6njeJeZ2ds3qBjN?usp=sharing)
+  -  Classification: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/11VzRR8NmJyZGJ-3obkuV0zZAlYAPhCY1?usp=sharing)
+  - Semantic segmentation: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/16xe6WL5mAAmpm-ab0xo1LONV3tAtI-4O?usp=sharing)
 <!-- - For export, use this notebook and follow the instructions [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nf0lLo6e2nMAt_AtDNoHmeXzdAB9kxsj?usp=sharing) -->
 
 
@@ -105,7 +105,7 @@ food-detection-yolov5
   
 | Models          | Image Size | Epochs |  Acc   | Balanced Acc | F1-score |
 | --------------- | :--------: | :----: | :----: | :----------: | :------: |
-| EfficientNet-b4 |  640x640   |   7    | 84.069 |    86.033    |  84.116  |
+| EfficientNet-B4 |  640x640   |   7    | 84.069 |    86.033    |  84.116  |
 
 ## 🌟 **Logs detail**
 In total, there are 3 implementation versions:
