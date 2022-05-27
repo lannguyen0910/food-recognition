@@ -3,7 +3,10 @@ import setuptools
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
-
+    
+with open("requirements.txt", 'r') as f:
+    reqs = f.read().splitlines()
+    
 setuptools.setup(
     name="food-recognition",
     version='0.0.1',
@@ -20,25 +23,5 @@ setuptools.setup(
         "Operating System :: OS Independent"
     ],
     python_requires='>=3.7',
-    install_requires=[
-        "numpy",
-        "torch",
-        "gunicorn==20.1.0"
-        "albumentations>=1.1.0"
-        "pyyaml>=5.1"
-        "webcolors"
-        "tensorboard"
-        "tqdm"
-        "ensemble-boxes"
-        "timm>=0.5.4"
-        "omegaconf"
-        "pycocotools"
-        "gdown>=4.4.0"
-        "flask-cors"
-        "flask_ngrok"
-        "cryptography"
-        "tabulate"
-        "segmentation-models-pytorch"
-        "opencv-python-headless==4.2.0.32 "
-    ],
+    install_requires=reqs,
 )
