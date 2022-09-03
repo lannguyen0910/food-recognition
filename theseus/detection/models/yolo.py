@@ -94,11 +94,5 @@ class YoloBackbone(BaseBackbone):
                     'classes': np.array(labels),
                     'scores': np.array(scores),
                 })
-            # else:
-            #     out.append({
-            #         'bboxes': np.array(()),
-            #         'classes': np.array(()),
-            #         'scores': np.array(()),
-            #     })
 
         return out
