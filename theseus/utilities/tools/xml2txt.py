@@ -56,8 +56,7 @@ def convert(files, file_path):
                 box_height = round((y_max - y_min)/height, 6)
 
                 res = [i_class, x, y, box_width, box_height]
-                for e in res:
-                    s += str(e) + ' '
+                s += ' '.join([str(e) for e in res])
             s += '\n'
 
         with open(PATH+'txt', 'w') as f:
