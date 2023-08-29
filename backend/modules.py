@@ -5,7 +5,7 @@ import pandas as pd
 
 from theseus.utilities.visualization.utils import draw_bboxes_v2
 from theseus.utilities.download import download_pretrained_weights
-from theseus.utilities import box_fusion, change_box_order, postprocessing
+from theseus.utilities import box_fusion, postprocessing
 from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
 from theseus.opt import Opts, InferenceArguments
 from analyzer import get_info_from_db
@@ -18,7 +18,6 @@ class DetectionArguments:
     """
     Arguments from input to perform food detection
     """
-
     def __init__(
         self,
         model_name: str = None,

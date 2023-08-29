@@ -10,7 +10,7 @@ from PIL import Image
 from flask import Flask, request, render_template, redirect, make_response, jsonify
 from pathlib import Path
 from werkzeug.utils import secure_filename
-from modules import get_prediction
+from backend.modules import get_prediction
 from flask_ngrok import run_with_ngrok
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
@@ -29,22 +29,20 @@ ASSETS_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, template_folder='templates', static_folder='static')
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
-
 UPLOAD_FOLDER = './static/assets/uploads/'
 CSV_FOLDER = './static/csv/'
 SEGMENTATION_FOLDER = './static/assets/segmentations/'
 DETECTION_FOLDER = './static/assets/detections/'
 METADATA_FOLDER = './static/metadata/'
 
+IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+VIDEO_ALLOWED_EXTENSIONS = {'mp4', 'avi', '3gpp', '3gp'}
+
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['CSV_FOLDER'] = CSV_FOLDER
 app.config['DETECTION_FOLDER'] = DETECTION_FOLDER
 app.config['SEGMENTATION_FOLDER'] = SEGMENTATION_FOLDER
-
-IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-VIDEO_ALLOWED_EXTENSIONS = {'mp4', 'avi', '3gpp', '3gp'}
-
 
 def allowed_file_image(filename):
     return '.' in filename and \
@@ -117,10 +115,6 @@ def save_upload(file):
     file.save(path)
 
     return path
-
-
-path = Path(__file__).parent
-
 
 @app.route('/')
 def homepage():
