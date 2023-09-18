@@ -94,6 +94,7 @@ food-detection-yolov5
 | YOLOv5m |  640x640   |  112   |  89.7   |     66.6     |
 | YOLOv5l |  640x640   |  118   |   94    |      73      |
 | YOLOv5x |  640x640   |   62   |  77.9   |     53.3     |
+| YOLOv8s |  640x640   |   62   |  77.9   |     53.3     |
 
 - Segmentation:
   
@@ -219,10 +220,10 @@ When a dish is predicted, we provide more information about the nutritional leve
 
 ## 📙 **Credits**
 
-- Custom template: https://github.com/kaylode/theseus.
-- YOLOv5 official repo: https://github.com/ultralytics/yolov5.
-- Semantic segmentation models: https://github.com/qubvel/segmentation_models.pytorch
-- Base code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
-- Ncnn by Tencent: https://github.com/Tencent/ncnn
-- Edamam API: https://developer.edamam.com/food-database-api-docs.
-- Chart.js: https://github.com/chartjs/Chart.js.
+- Custom template: https://github.com/kaylode/theseus
+- YOLOv5: https://github.com/ultralytics/yolov5
+- YOLOv8: https://github.com/ultralytics/ultralytics
+- Timm models: https://github.com/ultralytics/ultralytics
+- Segmentation models: https://github.com/qubvel/segmentation_models.pytorch
+- Edamam API: https://developer.edamam.com/food-database-api-docs
+- Chart.js: https://github.com/chartjs/Chart.js

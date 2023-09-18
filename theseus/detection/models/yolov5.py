@@ -1,23 +1,11 @@
 # Author: Zylo117
+from typing import Any, Dict
 import json
 import numpy as np
 
 import torch
-from torch import nn
+from .backbone import BaseBackbone
 
-from typing import Any, Dict
-
-
-class BaseBackbone(nn.Module):
-    def __init__(self, **kwargs):
-        super(BaseBackbone, self).__init__()
-        pass
-
-    def forward(self, batch):
-        pass
-
-    def detect(self, batch):
-        pass
 
 
 class YoloBackbone(BaseBackbone):

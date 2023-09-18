@@ -1,6 +1,6 @@
+import os
 import cv2
 import numpy as np
-import os
 import pandas as pd
 
 from theseus.utilities.visualization.utils import draw_bboxes_v2
@@ -8,10 +8,9 @@ from theseus.utilities.download import download_pretrained_weights
 from theseus.utilities import box_fusion, postprocessing
 from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
 from theseus.opt import Opts, InferenceArguments
-from analyzer import get_info_from_db
 
-CACHE_DIR = './weights'
-CSV_FOLDER = './static/csv'
+from .edamam.api import get_info_from_db
+from .constants import CACHE_DIR, CSV_FOLDER
 
 
 class DetectionArguments:

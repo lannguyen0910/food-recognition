@@ -1,8 +1,6 @@
 import os
-from re import S, sub
 from tqdm import tqdm
 import cv2
-from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 
 TRAIN_PATH = 'data/train/'
