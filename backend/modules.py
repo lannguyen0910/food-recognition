@@ -332,6 +332,7 @@ def ensemble_models(input_path, image_size, min_iou, min_conf, tta=False):
         result_dict['boxes'].append(box)
         result_dict['labels'].append(label)
         result_dict['scores'].append(score)
+
     return result_dict, class_names
 
 
@@ -345,7 +346,7 @@ def get_prediction(
         min_conf=0.1,
         segmentation=False,
         enhance_labels=False):
-
+    
     if segmentation:
         tmp_path = os.path.join(CACHE_DIR, 'semantic_seg.pth')
         if not os.path.isfile(tmp_path):
