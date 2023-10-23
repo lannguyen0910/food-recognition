@@ -193,7 +193,7 @@ class DetectionPipeline(object):
         labels_result = []
         scores_result = []
 
-        if self.model_name == "yolov8":
+        if self.model_name.startswith("yolov8"):
             image = self.dataset.image_dir
             preds = self.model.get_prediction(image)
 
