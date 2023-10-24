@@ -1,6 +1,3 @@
-from typing import Callable, Dict, Optional
-
-
 class LoggerSubscriber:
     def __init__(self, **kwargs) -> None:
         pass

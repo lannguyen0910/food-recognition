@@ -1,8 +1,5 @@
-import os
 import yaml
 import torch
-import glob
-import logging
 from theseus.utilities.loggers.observer import LoggerObserver
 LOGGER = LoggerObserver.getLogger("main")
 

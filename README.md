@@ -76,7 +76,7 @@ food-detection-yolov5
 
 
 ## 📔  **Notebook**
-- For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
+- For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1X06Y-HSPeHbEWtsXpyal8R1PliiVvpJq?usp=sharing)
 - For training, refer to these notebooks for your own training:
   -  Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
   -  Classification: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/11VzRR8NmJyZGJ-3obkuV0zZAlYAPhCY1?usp=sharing)
@@ -117,19 +117,6 @@ In total, there are 3 implementation versions:
 For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
 
  ## 🌟 **Inference**
-- File structure
-```
-this repo
-│   app.py
-└───configs
-│     └───classification          # Contains classification's configurations
-|             └───test.yaml 
-│     └───detection          # Contains detection's configurations
-|             └───....
-│     └───segmentation          # Contains segmentation's configurations
-|             └───....
-
-```
 - Install requirements.
 ```
 pip install -e .
@@ -140,9 +127,13 @@ pip install -e .
 sudo apt-get install ffmpeg
 ``` -->
 
-- Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
+- Start the app (Windows). Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
 ```
 run.bat
+```
+or 
+```python
+python3 app.py
 ```
 
 <!-- - Switch between ```CPU``` and ```GPU``` in ```configs```

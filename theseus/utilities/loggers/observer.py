@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Optional, List
+from typing import Dict, List
 import logging
 import torch
 import matplotlib as mpl
