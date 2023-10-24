@@ -126,6 +126,7 @@ class DetectionPipeline(object):
         self.logger.text(self.opt, level=LoggerObserver.INFO)
 
         self.transform_cfg = Config.load_yaml(opt['global']['cfg_transform'])
+        self.model_name = opt["model"]["name"].lower()
         self.device_name = opt['global']['device']
         self.device = torch.device(self.device_name)
 
@@ -184,24 +185,17 @@ class DetectionPipeline(object):
     def inference(self):
         self.infocheck()
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
-
-        self.model.eval()
+        os.makedirs(self.savedir, exist_ok=True)
 
         boxes_result = []
         labels_result = []
         scores_result = []
 
-        for idx, batch in enumerate(tqdm(self.dataloader)):
+        if self.model_name.startswith("yolov8"):
+            image = self.dataset.image_dir
+            preds = self.model.get_prediction(image)
 
-            os.makedirs(self.savedir, exist_ok=True)
-
-            if self.tta is not None:
-                preds = self.tta.make_tta_predictions(
-                    self.model, batch, self.device)
-            else:
-                preds = self.model.get_prediction(batch, self.device)
-
-            for idx, outputs in enumerate(preds):
+            for _, outputs in enumerate(preds):
                 boxes = outputs['bboxes']
                 labels = outputs['classes']
                 scores = outputs['scores']
@@ -212,6 +206,26 @@ class DetectionPipeline(object):
                 boxes_result.append(boxes)
                 labels_result.append(labels)
                 scores_result.append(scores)
+
+        else:
+            for _, batch in enumerate(tqdm(self.dataloader)):
+                if self.tta is not None:
+                    preds = self.tta.make_tta_predictions(
+                        self.model, batch, self.device)
+                else:    
+                    preds = self.model.get_prediction(batch, self.device)
+
+                for _, outputs in enumerate(preds):
+                    boxes = outputs['bboxes']
+                    labels = outputs['classes']
+                    scores = outputs['scores']
+
+                    if len(boxes) == 0:
+                        continue
+
+                    boxes_result.append(boxes)
+                    labels_result.append(labels)
+                    scores_result.append(scores)
 
         return {
             "boxes": boxes_result,

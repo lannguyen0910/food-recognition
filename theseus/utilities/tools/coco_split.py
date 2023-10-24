@@ -37,8 +37,6 @@ def main(args):
         annotations = coco['annotations']
         categories = coco['categories']
 
-        number_of_images = len(images)
-
         images_with_annotations = funcy.lmap(lambda a: int(a['image_id']), annotations)
 
         if args.having_annotations:

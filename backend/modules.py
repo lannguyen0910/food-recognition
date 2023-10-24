@@ -1,24 +1,22 @@
+import os
 import cv2
 import numpy as np
-import os
 import pandas as pd
 
 from theseus.utilities.visualization.utils import draw_bboxes_v2
 from theseus.utilities.download import download_pretrained_weights
-from theseus.utilities import box_fusion, change_box_order, postprocessing
+from theseus.utilities import box_fusion, postprocessing
 from theseus.apis.inference import SegmentationPipeline, DetectionPipeline, ClassificationPipeline
 from theseus.opt import Opts, InferenceArguments
-from analyzer import get_info_from_db
 
-CACHE_DIR = './weights'
-CSV_FOLDER = './static/csv'
+from .edamam.api import get_info_from_db
+from .constants import CACHE_DIR, CSV_FOLDER
 
 
 class DetectionArguments:
     """
     Arguments from input to perform food detection
     """
-
     def __init__(
         self,
         model_name: str = None,
@@ -334,6 +332,7 @@ def ensemble_models(input_path, image_size, min_iou, min_conf, tta=False):
         result_dict['boxes'].append(box)
         result_dict['labels'].append(label)
         result_dict['scores'].append(score)
+
     return result_dict, class_names
 
 
@@ -347,7 +346,7 @@ def get_prediction(
         min_conf=0.1,
         segmentation=False,
         enhance_labels=False):
-
+    
     if segmentation:
         tmp_path = os.path.join(CACHE_DIR, 'semantic_seg.pth')
         if not os.path.isfile(tmp_path):

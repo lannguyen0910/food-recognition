@@ -13,6 +13,7 @@ def download_from_drive(id_or_url, output, md5=None, quiet=False, cache=True):
         return gdown.cached_download(url, md5=md5, quiet=quiet)
 
 weight_urls = {
+    'yolov8s': "1f2kOOyCQ8aHzSHPH8jf9Z6cT4ai-yqmx",
     'yolov5s': "1rISMag8OCM5v99TYuavAobm3LkwjtAi9",
     "yolov5m": "1I649VGqkam_IcCCW8WUA965vPrW_pqDX",
     "yolov5l": "1sBciFcRav2ZE6jzhWnca9uegjQ4860om",

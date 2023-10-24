@@ -11,7 +11,7 @@ setuptools.setup(
     name="food-recognition",
     version='0.0.1',
     author="Hoang-Lan Nguyen",
-    author_email="18120051@student.hcmus.edu.vn",
+    author_email="nhlan091000@gmail.com",
     description="A Baseline Food Recognition using Theseus - A general template for most Pytorch projects",
     long_description=long_description,
     long_description_content_type="text/markdown",

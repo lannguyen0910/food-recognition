@@ -98,7 +98,7 @@ global:
     ]
 
 model:
-  name: YoloBackbone
+  name: YOLOv8
   args:
     max_det: 300 # # max detections per image limit, output of NMS, set <0 for default [effdet: 100; frcnn: 100; yolo: 1000]
 

@@ -2,7 +2,6 @@
 Modified from https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.4/tools/program.py
 """
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import yaml
 import json
 import os

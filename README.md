@@ -67,7 +67,8 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
-<strong><i>[07/03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>. <br>
+<strong><i>[24/10/2023]</i></strong>  Clean and refactor repo. Integrate YOLOv8 to food detection.<br>
+<strong><i>[07/03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>.<br>
 <strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 latest versions P5-P6. Can load checkpoints from original repo.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android. <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app. <br>
@@ -76,7 +77,7 @@ food-detection-yolov5
 
 
 ## 📔  **Notebook**
-- For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1CGEtC65kvoZ-4tcqzeknGrbERvb0beuU/view?usp=sharing)
+- For inference, use this notebook to run the web app [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1X06Y-HSPeHbEWtsXpyal8R1PliiVvpJq?usp=sharing)
 - For training, refer to these notebooks for your own training:
   -  Detection: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1SywGfyfj3SVrE7VAAl3CshB9s3o8WRXL/view?usp=sharing)
   -  Classification: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/11VzRR8NmJyZGJ-3obkuV0zZAlYAPhCY1?usp=sharing)
@@ -90,10 +91,11 @@ food-detection-yolov5
  
 | Models  | Image Size | Epochs | mAP@0.5 | mAP@0.5:0.95 |
 | ------- | :--------: | :----: | :-----: | :----------: |
-| YOLOv5s |  640x640   |  172   |  90.7   |     67.1     |
-| YOLOv5m |  640x640   |  112   |  89.7   |     66.6     |
-| YOLOv5l |  640x640   |  118   |   94    |      73      |
-| YOLOv5x |  640x640   |   62   |  77.9   |     53.3     |
+| YOLOv5s |  640x640   |  172   |  0.907  |    0.671     |
+| YOLOv5m |  640x640   |  112   |  0.897  |    0.666     |
+| YOLOv5l |  640x640   |  118   |  0.94   |     0.73     |
+| YOLOv5x |  640x640   |   62   |  0.779  |    0.533     |
+| YOLOv8s |  640x640   |   70   |  0.963  |     0.82     |
 
 - Segmentation:
   
@@ -116,19 +118,6 @@ In total, there are 3 implementation versions:
 For those who want to play around with the first version, which remains some features, differ from the new version. You can check out the [v1](https://github.com/lannguyen0910/food-detection-yolov5/tree/v1) branch.
 
  ## 🌟 **Inference**
-- File structure
-```
-this repo
-│   app.py
-└───configs
-│     └───classification          # Contains classification's configurations
-|             └───test.yaml 
-│     └───detection          # Contains detection's configurations
-|             └───....
-│     └───segmentation          # Contains segmentation's configurations
-|             └───....
-
-```
 - Install requirements.
 ```
 pip install -e .
@@ -139,9 +128,13 @@ pip install -e .
 sudo apt-get install ffmpeg
 ``` -->
 
-- Start the app. Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
+- Start the app (Windows). Safe to run in insecure connection ```http``` on localhost. You can generate SSL certificate to run the app in ```https```.
 ```
 run.bat
+```
+or 
+```python
+python3 app.py
 ```
 
 <!-- - Switch between ```CPU``` and ```GPU``` in ```configs```
@@ -219,10 +212,10 @@ When a dish is predicted, we provide more information about the nutritional leve
 
 ## 📙 **Credits**
 
-- Custom template: https://github.com/kaylode/theseus.
-- YOLOv5 official repo: https://github.com/ultralytics/yolov5.
-- Semantic segmentation models: https://github.com/qubvel/segmentation_models.pytorch
-- Base code for android app: https://github.com/cmdbug/YOLOv5_NCNN.
-- Ncnn by Tencent: https://github.com/Tencent/ncnn
-- Edamam API: https://developer.edamam.com/food-database-api-docs.
-- Chart.js: https://github.com/chartjs/Chart.js.
+- Custom template: https://github.com/kaylode/theseus
+- YOLOv5: https://github.com/ultralytics/yolov5
+- YOLOv8: https://github.com/ultralytics/ultralytics
+- Timm models: https://github.com/ultralytics/ultralytics
+- Segmentation models: https://github.com/qubvel/segmentation_models.pytorch
+- Edamam API: https://developer.edamam.com/food-database-api-docs
+- Chart.js: https://github.com/chartjs/Chart.js

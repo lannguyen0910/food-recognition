@@ -1,6 +1,6 @@
 API_NAMES = ["edamam", "usda"]
 
-API ={
+API = {
     "edamam": {
         "homepage": "https://developer.edamam.com/",
         "url": "https://api.edamam.com/api/food-database/v2/parser?",

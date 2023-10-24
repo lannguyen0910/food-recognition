@@ -1,26 +1,14 @@
 # Author: Zylo117
+from typing import Any, Dict
 import json
 import numpy as np
 
 import torch
-from torch import nn
-
-from typing import Any, Dict
+from .backbone import BaseBackbone
 
 
-class BaseBackbone(nn.Module):
-    def __init__(self, **kwargs):
-        super(BaseBackbone, self).__init__()
-        pass
 
-    def forward(self, batch):
-        pass
-
-    def detect(self, batch):
-        pass
-
-
-class YoloBackbone(BaseBackbone):
+class YOLOv5(BaseBackbone):
     """
     Some yolov5 models with various pretrained backbones from hub
 
@@ -64,7 +52,7 @@ class YoloBackbone(BaseBackbone):
         return outputs
 
     def get_prediction(self, adict: Dict[str, Any], device: torch.device, is_tta=False):
-        inputs = adict["inputs"]
+        inputs = adict["inputs"].to(device)
         if is_tta:
             inputs = inputs.squeeze(0)
             inputs = inputs.cpu().detach().numpy()
@@ -80,8 +68,10 @@ class YoloBackbone(BaseBackbone):
             labels = []
             scores = []
             for obj_dict in output:
-                boxes.append([obj_dict['xmin'], obj_dict['ymin'], obj_dict['xmax'] -
-                              obj_dict['xmin'], obj_dict['ymax']-obj_dict['ymin']])
+                boxes.append([obj_dict['xmin'], 
+                              obj_dict['ymin'], 
+                              obj_dict['xmax'] - obj_dict['xmin'], 
+                              obj_dict['ymax'] - obj_dict['ymin']])
                 labels.append(obj_dict["class"])
                 scores.append(obj_dict["confidence"])
 

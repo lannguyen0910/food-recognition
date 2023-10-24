@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-from itertools import product
 from theseus.utilities.postprocess import box_fusion
 
 
