@@ -187,8 +187,6 @@ class DetectionPipeline(object):
         self.logger.text("Inferencing...", level=LoggerObserver.INFO)
         os.makedirs(self.savedir, exist_ok=True)
 
-        self.model.eval()
-
         boxes_result = []
         labels_result = []
         scores_result = []
