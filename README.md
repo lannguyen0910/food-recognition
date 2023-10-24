@@ -67,7 +67,8 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
-<strong><i>[07/03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>. <br>
+<strong><i>[24/10/2023]</i></strong>  Clean and refactor repo. Integrate YOLOv8 to food detection.<br>
+<strong><i>[07/03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>.<br>
 <strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 latest versions P5-P6. Can load checkpoints from original repo.<br>
  <strong><i>[26/12/2021]</i></strong> Update app on Android. <br>
  <strong><i>[12/09/2021]</i></strong> Update all features to the web app. <br>
