@@ -10,7 +10,7 @@ omegaconf
 pycocotools
 gdown>=4.4.0
 flask-cors
-flask_ngrok
+pyngrok
 cryptography
 tabulate
 segmentation-models-pytorch

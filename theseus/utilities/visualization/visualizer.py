@@ -124,7 +124,7 @@ class Visualizer():
 
         # Reduce opacity of original image
         o_image = reduce_opacity(image)
-        i_masked = (np.bitwise_not(mask)/255).astype(np.int)
+        i_masked = (np.bitwise_not(mask)/255).astype(int)
         o_image = o_image * i_masked
 
         # Add two image

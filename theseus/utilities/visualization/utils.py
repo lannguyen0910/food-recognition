@@ -11,7 +11,7 @@ def draw_mask(polygons, mask_img):
 
 def draw_polylines(image, polygons):
     image = cv2.polylines(
-        image, [np.array(polygons, dtype=np.int)], True, (0, 0, 1), 2)
+        image, [np.array(polygons, dtype=int)], True, (0, 0, 1), 2)
     return image
 
 
@@ -136,7 +136,7 @@ def draw_bboxes_v2(savepath, img, boxes, label_ids, scores, label_names=None, ob
                         thickness=tf, lineType=cv2.FONT_HERSHEY_SIMPLEX)
 
     # boxes input is xywh
-    boxes = np.array(boxes, np.int)
+    boxes = np.array(boxes, int)
     img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
     for idx, (box, label_id, score) in enumerate(zip(boxes, label_ids, scores)):
@@ -144,7 +144,7 @@ def draw_bboxes_v2(savepath, img, boxes, label_ids, scores, label_names=None, ob
             label = label_names[idx]
         if obj_list is not None:
             label = obj_list[label_id]
-        
+
         new_color = tuple(i*255.0 for i in color_list[int(label_id)])
 
         plot_one_box(
