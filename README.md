@@ -67,7 +67,7 @@ food-detection-yolov5
    
 
 <details open> <summary><strong>Dev logs</strong></summary>
-<strong><i>[01/05/2024]</i></strong>  Fix ngrok bug on Colab (migrate to pyngrok)<br>
+<strong><i>[01/05/2024]</i></strong>  Fix ngrok bug on Colab https://github.com/lannguyen0910/food-recognition/issues/32 (Migrate to pyngrok).<br>
 <strong><i>[24/10/2023]</i></strong>  Clean and refactor repo. Integrate YOLOv8 to food detection.<br>
 <strong><i>[07/03/2022]</i></strong>  Big refactor. Integrate object detection, image classification, semantic segmentation into one <b><i>Ship of Theseus</i></b>.<br>
 <strong><i>[31/01/2022]</i></strong>  Update to new YOLOv5 latest versions P5-P6. Can load checkpoints from original repo.<br>
