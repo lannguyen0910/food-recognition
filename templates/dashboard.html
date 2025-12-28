@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Nutrition CV App - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Collapsible Top Header -->
+    <header class="top-header" id="top-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1 class="app-name"><i class="fas fa-utensils"></i> FoodCV</h1>
+            </div>
+            <div class="header-search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search for anything...">
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                <div class="user-profile" id="user-profile-btn" style="cursor: pointer;" title="Click to edit profile">
+                    <img id="profile-picture" src="https://ui-avatars.com/api/?name=User&background=7C5CFF&color=fff" alt="User">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> Profile Settings</h2>
+                <button class="modal-close" id="close-profile-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form">
+                    <div class="form-section">
+                        <h3>Personal Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="profile-name" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="profile-email" class="form-input" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Health Metrics</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Weight</label>
+                                <div style="display: flex; gap: 6px; align-items: center;">
+                                    <div id="weight-kg-container" style="display: flex; max-width: 120px;">
+                                        <input type="number" id="profile-weight-kg" class="form-input" min="20" max="300" step="0.1" placeholder="70" style="width: 100%;">
+                                    </div>
+                                    <div id="weight-lbs-container" style="display: none; max-width: 120px;">
+                                        <input type="number" id="profile-weight-lbs" class="form-input" min="44" max="661" step="0.1" placeholder="154" style="width: 100%;">
+                                    </div>
+                                    <div class="weight-unit-toggle">
+                                        <button type="button" class="unit-btn active" data-unit="kg">kg</button>
+                                        <button type="button" class="unit-btn" data-unit="lbs">lbs</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Height</label>
+                                <div style="display: flex; gap: 6px; align-items: center;">
+                                    <div id="height-cm-container" style="display: flex; max-width: 120px;">
+                                        <input type="number" id="profile-height-cm" class="form-input" min="100" max="250" step="0.1" placeholder="170" style="width: 100%;">
+                                    </div>
+                                    <div id="height-ft-container" style="display: none; gap: 4px; align-items: center;">
+                                        <input type="number" id="profile-height-ft" class="form-input" min="3" max="8" step="1" placeholder="5" style="width: 45px; padding: 10px 8px; font-size: 13px;">
+                                        <span style="color: #a0a0b8; font-size: 13px;">ft</span>
+                                        <input type="number" id="profile-height-in" class="form-input" min="0" max="11" step="1" placeholder="7" style="width: 45px; padding: 10px 8px; font-size: 13px;">
+                                        <span style="color: #a0a0b8; font-size: 13px;">in</span>
+                                    </div>
+                                    <div class="height-unit-toggle">
+                                        <button type="button" class="unit-btn active" data-unit="cm">cm</button>
+                                        <button type="button" class="unit-btn" data-unit="ft">ft/in</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="number" id="profile-age" class="form-input" min="10" max="120" style="max-width: 120px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select id="profile-gender" class="form-input">
+                                    <option value="">Select...</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="bmi-display" id="bmi-display" style="display: none;">
+                            <strong>BMI:</strong> <span id="bmi-value">--</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Lifestyle</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Activity Level</label>
+                                <select id="profile-activity" class="form-input">
+                                    <option value="">Select...</option>
+                                    <option value="sedentary">Sedentary (little/no exercise)</option>
+                                    <option value="light">Light (1-3 days/week)</option>
+                                    <option value="moderate">Moderate (3-5 days/week)</option>
+                                    <option value="active">Active (6-7 days/week)</option>
+                                    <option value="very-active">Very Active (athlete)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Health Goals</label>
+                                <input type="text" id="profile-goals" class="form-input" placeholder="e.g., Weight loss, Muscle gain, General health">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Dietary Restrictions</label>
+                                <input type="text" id="profile-restrictions" class="form-input" placeholder="e.g., Vegetarian, Gluten-free, Diabetic">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-profile-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" data-view="dashboard">
+                        <i class="fas fa-camera-retro"></i>
+                        <span>Detection</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </nav>
+
+                <!-- History Section -->
+                <div class="history-section">
+                    <h3>Recent Scans</h3>
+                    <div class="history-list" id="history-list">
+                        <div class="history-empty">
+                            <i class="fas fa-inbox"></i>
+                            <p>No scans yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <a href="#" class="nav-item" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View (Food Detection) -->
+            <div class="view-container active" id="dashboard-view">
+                <div class="content-grid">
+
+                <!-- Left: Food Detection & Upload -->
+                <div class="panel detection-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-camera-retro"></i> Food Detection</h3>
+                        <div class="panel-actions">
+                            <button class="icon-btn" title="Upload Image" onclick="document.getElementById('file-input').click()">
+                                <i class="fas fa-upload"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <!-- Image Upload/Preview -->
+                        <div class="image-container" id="image-container">
+                            <div class="upload-placeholder" id="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h4>Upload Food Image</h4>
+                                <p>Click or drag image here</p>
+                                <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                                    <i class="fas fa-upload"></i> Choose Image
+                                </button>
+                            </div>
+                            <img id="preview-image" class="preview-image hidden" alt="Food preview">
+                        </div>
+
+                        <!-- Upload Form -->
+                        <form id="detection-form" class="detection-form">
+                            <input type="file" id="file-input" accept="image/*" style="display: none;">
+
+                            <!-- Detection Settings -->
+                            <div class="settings-compact">
+                                <div class="form-row">
+                                    <label>Confidence:</label>
+                                    <input type="range" id="confidence" min="0" max="100" value="50">
+                                    <span id="confidence-val">50%</span>
+                                </div>
+                                <div class="form-row">
+                                    <label>Model:</label>
+                                    <select id="model-select">
+                                        <option value="yolov8s">YOLOv8s (Weights)</option>
+                                        <option value="yolov8n">YOLOv8n (Fallback)</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="segmentation-toggle" style="margin-right: 8px;">
+                                        <span>Enable Segmentation</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-block" id="analyze-btn" disabled>
+                                <i class="fas fa-brain"></i> Analyze Food
+                            </button>
+                        </form>
+
+                        <div class="status-message" id="status-message"></div>
+                    </div>
+                </div>
+
+                <!-- Right: Nutrition Results -->
+                <div class="panel nutrition-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-chart-pie"></i> Nutrition Insights</h3>
+                        <div class="health-badge" id="health-badge">
+                            <span class="badge">--</span>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <!-- Empty State -->
+                        <div class="nutrition-empty" id="nutrition-empty">
+                            <i class="fas fa-apple-whole"></i>
+                            <p>Upload and analyze an image to see nutrition insights</p>
+                        </div>
+
+                        <!-- Nutrition Content -->
+                        <div class="nutrition-content hidden" id="nutrition-content">
+                            <!-- Detected Foods -->
+                            <div class="detected-foods" id="detected-foods">
+                                <!-- Will be populated dynamically -->
+                            </div>
+
+                            <!-- Nutrition Summary -->
+                            <div class="nutrition-summary" id="nutrition-summary">
+                                <h4>Total Nutrition</h4>
+                                <div class="nutrition-grid">
+                                    <div class="nutrition-item">
+                                        <span class="label">Calories</span>
+                                        <span class="value" id="total-calories">0</span>
+                                    </div>
+                                    <div class="nutrition-item">
+                                        <span class="label">Protein</span>
+                                        <span class="value" id="total-protein">0g</span>
+                                    </div>
+                                    <div class="nutrition-item">
+                                        <span class="label">Carbs</span>
+                                        <span class="value" id="total-carbs">0g</span>
+                                    </div>
+                                    <div class="nutrition-item">
+                                        <span class="label">Fat</span>
+                                        <span class="value" id="total-fat">0g</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Health Score -->
+                            <div class="health-score-section">
+                                <h4>Health Score</h4>
+                                <div class="health-score-bar">
+                                    <div class="health-score-fill" id="health-score-fill" style="width: 0%"></div>
+                                </div>
+                                <p class="health-explanation" id="health-explanation"></p>
+                            </div>
+
+                            <!-- Recommendations -->
+                            <div class="recommendations" id="recommendations">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div class="view-container" id="analytics-view">
+                <div class="analytics-container">
+                    <h2 class="view-title">Analytics Dashboard</h2>
+
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Scans</p>
+                                <h3 class="stat-value" id="total-scans">0</h3>
+                            </div>
+                            <div class="stat-icon success">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-info">
+                                <p class="stat-label">Foods Detected</p>
+                                <h3 class="stat-value" id="foods-detected">0</h3>
+                            </div>
+                            <div class="stat-icon primary">
+                                <i class="fas fa-apple-alt"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-info">
+                                <p class="stat-label">Avg Health Score</p>
+                                <h3 class="stat-value" id="avg-health">--</h3>
+                            </div>
+                            <div class="stat-icon warning">
+                                <i class="fas fa-heart-pulse"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Calories</p>
+                                <h3 class="stat-value" id="total-calories-tracked">0</h3>
+                            </div>
+                            <div class="stat-icon info">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model & Nutrition Info Grid -->
+                    <div class="analytics-info-grid">
+                        <!-- Model Information Panel -->
+                        <div class="info-panel">
+                            <div class="info-panel-header">
+                                <h3><i class="fas fa-brain"></i> Model Performance</h3>
+                            </div>
+                            <div class="info-panel-body">
+                                <div class="info-row">
+                                    <span class="info-label">Model Type:</span>
+                                    <span class="info-value" id="model-type">YOLOv8n</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Model Accuracy:</span>
+                                    <span class="info-value" id="model-accuracy">94.2%</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Classes Trained:</span>
+                                    <span class="info-value" id="model-classes">100</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Avg Confidence:</span>
+                                    <span class="info-value" id="avg-confidence">--</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Detection Speed:</span>
+                                    <span class="info-value" id="detection-speed">~50ms</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Model Size:</span>
+                                    <span class="info-value" id="model-size">6.2 MB</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nutritional Summary Panel -->
+                        <div class="info-panel">
+                            <div class="info-panel-header">
+                                <h3><i class="fas fa-chart-line"></i> Nutrition Trends</h3>
+                                <div class="timeframe-filters">
+                                    <button class="timeframe-btn active" data-timeframe="all">All</button>
+                                    <button class="timeframe-btn" data-timeframe="month">Month</button>
+                                    <button class="timeframe-btn" data-timeframe="week">Week</button>
+                                    <button class="timeframe-btn" data-timeframe="day">Day</button>
+                                </div>
+                            </div>
+                            <div class="info-panel-body">
+                                <div class="chart-container">
+                                    <canvas id="nutrition-chart"></canvas>
+                                </div>
+                                <div class="chart-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-color" style="background: #FF6B6B;"></span>
+                                        <span class="legend-label">Calories</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color" style="background: #4ECDC4;"></span>
+                                        <span class="legend-label">Protein (g)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color" style="background: #FFE66D;"></span>
+                                        <span class="legend-label">Carbs (g)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color" style="background: #FF9F1C;"></span>
+                                        <span class="legend-label">Fat (g)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Detections Table -->
+                    <div class="info-panel full-width">
+                        <div class="info-panel-header">
+                            <h3><i class="fas fa-table"></i> Recent Detections</h3>
+                        </div>
+                        <div class="info-panel-body">
+                            <div class="detections-table-container">
+                                <table class="detections-table" id="recent-detections-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date/Time</th>
+                                            <th>Food Items</th>
+                                            <th>Calories</th>
+                                            <th>Protein (g)</th>
+                                            <th>Carbs (g)</th>
+                                            <th>Fat (g)</th>
+                                            <th>Health Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detections-table-body">
+                                        <tr class="empty-row">
+                                            <td colspan="7">
+                                                <div class="table-empty">
+                                                    <i class="fas fa-inbox"></i>
+                                                    <p>No detection data available</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+</body>
+</html>

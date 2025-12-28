@@ -1,34 +1,64 @@
-__pycache__
-*/__pycache__
-.vscode
+# Python
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+
+# Database
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Model weights
+weights/
+*.pt
+*.pth
+*.onnx
+*.h5
+
+# Uploads and detections
+static/uploads/
+static/detections/
+static/segmentations/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+*.pyc
+
+# Compressed files
 *.zip
-annos
-annotations
-OID
-MAFood121
-food-classify
-=======
-images
-annos
-food-app
-*.zip
-MAFood121
-vn_food
-data
-school_lunch
-data_ocr
-OID
-base.yaml
-food-101.tar.gz
-food-101
-food-classify
-weights
-detection.yaml
-food-android
+*.tar.gz
+*.rar
+
+# Test files
 test.py
-.cache
-.zip.zip
-example
 video_detect.py
-0.5.4
-*.txt
+test_*.py

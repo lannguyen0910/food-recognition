@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Food Nutrition CV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0e27;
+            --bg-secondary: #151a2e;
+            --bg-tertiary: #1e2538;
+            --primary: #4361ee;
+            --primary-hover: #3651ce;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --text: #ffffff;
+            --text-muted: #a0a0b8;
+            --border: #2a3142;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f3a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            padding: 40px 40px 30px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, #5a67d8 100%);
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .auth-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .auth-body {
+            padding: 40px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-google {
+            background: white;
+            color: #333;
+            margin-top: 16px;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+        }
+
+        .btn-guest {
+            background: var(--bg-tertiary);
+            color: var(--text);
+            margin-top: 16px;
+            border: 2px solid var(--border);
+        }
+
+        .btn-guest:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .divider span {
+            padding: 0 16px;
+        }
+
+        .error-message {
+            background: rgba(239, 71, 111, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1><i class="fas fa-utensils"></i> Food Nutrition CV</h1>
+            <p>Analyze your meals with AI-powered nutrition insights</p>
+        </div>
+
+        <div class="auth-body">
+            <div class="error-message" id="error-message"></div>
+
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Login</button>
+                <button class="tab-btn" data-tab="signup">Sign Up</button>
+            </div>
+
+            <!-- Login Tab -->
+            <div class="tab-content active" id="login-tab">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </button>
+                </form>
+
+                <div class="divider"><span>or</span></div>
+
+                <button class="btn btn-google" id="google-login-btn">
+                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                        <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                        <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
+                        <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+                    </svg>
+                    <span>Sign in with Google</span>
+                </button>
+
+                <button class="btn btn-guest" id="guest-btn">
+                    <i class="fas fa-user"></i>
+                    <span>Continue as Guest</span>
+                </button>
+            </div>
+
+            <!-- Signup Tab -->
+            <div class="tab-content" id="signup-tab">
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-input" id="signup-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="signup-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="signup-password" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Create Account</span>
+                    </button>
+                </form>
+
+                <div class="divider"><span>or</span></div>
+
+                <button class="btn btn-google" id="google-signup-btn">
+                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                        <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.10-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                        <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
+                        <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+                    </svg>
+                    <span>Sign up with Google</span>
+                </button>
+
+                <button class="btn btn-guest" id="guest-btn-2">
+                    <i class="fas fa-user"></i>
+                    <span>Continue as Guest</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tab + '-tab').classList.add('active');
+                hideError();
+            });
+        });
+
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('error-message').classList.remove('show');
+        }
+
+        function setLoading(btn, loading) {
+            const icon = btn.querySelector('i');
+            const span = btn.querySelector('span');
+            if (loading) {
+                icon.className = 'fas fa-spinner';
+                btn.disabled = true;
+            } else {
+                btn.disabled = false;
+            }
+        }
+
+        // Login form
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+            const btn = e.target.querySelector('.btn-primary');
+            setLoading(btn, true);
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        email: document.getElementById('login-email').value,
+                        password: document.getElementById('login-password').value
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    showError(data.error || 'Login failed');
+                    setLoading(btn, false);
+                    btn.querySelector('i').className = 'fas fa-sign-in-alt';
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+                setLoading(btn, false);
+                btn.querySelector('i').className = 'fas fa-sign-in-alt';
+            }
+        });
+
+        // Signup form
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+            const btn = e.target.querySelector('.btn-primary');
+            setLoading(btn, true);
+
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        name: document.getElementById('signup-name').value,
+                        email: document.getElementById('signup-email').value,
+                        password: document.getElementById('signup-password').value
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    showError(data.error || 'Signup failed');
+                    setLoading(btn, false);
+                    btn.querySelector('i').className = 'fas fa-user-plus';
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+                setLoading(btn, false);
+                btn.querySelector('i').className = 'fas fa-user-plus';
+            }
+        });
+
+        // Guest login
+        async function guestLogin() {
+            try {
+                const response = await fetch('/api/auth/guest', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    showError(data.error || 'Guest login failed');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        }
+
+        document.getElementById('guest-btn').addEventListener('click', guestLogin);
+        document.getElementById('guest-btn-2').addEventListener('click', guestLogin);
+
+        // Google Sign In (placeholder - requires actual Google OAuth setup)
+        function handleGoogleLogin() {
+            showError('Google Sign-In requires configuration. Add your GOOGLE_CLIENT_ID to .env file.');
+            // TODO: Implement actual Google OAuth flow
+            // google.accounts.id.initialize({
+            //     client_id: 'YOUR_GOOGLE_CLIENT_ID',
+            //     callback: handleGoogleCallback
+            // });
+        }
+
+        document.getElementById('google-login-btn').addEventListener('click', handleGoogleLogin);
+        document.getElementById('google-signup-btn').addEventListener('click', handleGoogleLogin);
+    </script>
+</body>
+</html>
